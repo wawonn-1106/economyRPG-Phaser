@@ -32,7 +32,7 @@ export default class World extends Phaser.Scene{
     preload(){
         this.load.image('player','assets/images/player.png');
         this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test.tmj');
-        this.load.json('myDialogs','assets/data/dialog.json');
+        this.load.json('chapter1','assets/data/dialog1.json');
         this.load.image('tileset','assets/tilesets/pipo-map001.png');
     }
     async loadPlayerData() {
@@ -72,7 +72,22 @@ export default class World extends Phaser.Scene{
     //----------------------------------------------------------プレイヤー------------------------------------------------------------------------------
         this.player=new Player(this,100,300,'player');
     //--------------------------------------------------------NPC-------------------------------------------------------------
-        this.elder=new NPC(this,800,300,'player');
+        //this.elder=new NPC(this,800,300,'player');
+        this.villagers=this.physics.add.group({
+            defaultKey:'villager',
+            setGravityY:0,
+            collideWorldBounds:true
+        });
+
+        const villagerData=[
+            {x:800,y:300,key:'player'},
+            {x:200,y:400,key:'player'},
+            {x:100,y:600,key:'player'},
+        ];
+
+        villagerData.forEach(data=>{
+            const newVillager=new NPC(data.x,data.y,data.key);
+        });
     //----------------------------------------------------------当たり判定-----------------------------------------------------------------------
         this.physics.add.collider(this.player,this.worldLayer);
         this.physics.add.collider(this.elder,this.worldLayer);
@@ -80,9 +95,8 @@ export default class World extends Phaser.Scene{
     //-------------------------------------------------------------ログ--------------------------------------------------------------------------
         this.dialogManager=new DialogManager();
 
-        const allData=this.cache.json.get('myDialogs');
+        const ch1Data=this.cache.json.get('chapter1');
 
-        const ch1Opening=allData.chapter1.opening;
         this.readyTalking=false;
 
         this.input.keyboard.on('keydown-SPACE',()=>{
@@ -90,10 +104,16 @@ export default class World extends Phaser.Scene{
                 this.money+=100;
                 if(this.moneyText) this.moneyText.setText(`所持金：${this.money}`);
                 this.syncMoneyWithServer(this.money);
-                this.dialogManager.start(ch1Opening);
+                this.dialogManager.start(ch1Data,'start');
                 this.elder.showIcon(true);
             }else if(this.dialogManager.isTalking){
-                this.dialogManager.showLine();
+                const currentLine=this.dialogManager.currentSequence[this.dialogManager.currentIndex];
+
+                if(currentLine && currentLine.next){
+                    this.dialogManager.jumpTo(currentLine.next);
+                }else{
+                    this.dialogManager.end();
+                }
             }
         });
         
@@ -103,7 +123,7 @@ export default class World extends Phaser.Scene{
     update(time,delta){
         this.player.update();
         this.elder.update(time, delta);
-        const tile = this.worldLayer.getTileAtWorldXY(this.player.x, this.player.y);
+        /*const tile = this.worldLayer.getTileAtWorldXY(this.player.x, this.player.y);
         if(tile){
             console.log('player tile index:', tile.index);
         }
@@ -113,7 +133,7 @@ export default class World extends Phaser.Scene{
             this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
                 this.scene.start('House');
             });
-        }
+        }*/
 
 
         const distance=Phaser.Math.Distance.Between(

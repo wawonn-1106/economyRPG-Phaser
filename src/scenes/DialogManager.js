@@ -18,9 +18,18 @@ export default class DialogManager {
         }
     }
 //textContentはinnerTextの上位互換
-    start(dialogArray) {
+    start(dialogArray,startId=null) {
+        //null
         this.currentSequence = dialogArray;
-        this.currentIndex = 0;
+        
+        if(startId){
+            const index=this.currentSequence.findIndex(l=>l.id===startId);
+            this.currentIndex=(index !==-1) ? index :0;
+        }else{
+            this.currentIndex=0;
+            //見つからなかった場合
+        }
+
         this.isTalking = true;
         this.elements.window.classList.remove('hidden');//id class両方持つものからclassを取る
         this.showLine();
@@ -50,7 +59,10 @@ export default class DialogManager {
         switch (line.type) {
             case "text":
                 this.inputMode = false;
-                this.currentIndex++;
+                //this.currentIndex++;をやめた
+                if(!line.next){
+                    this.currentIndex++;
+                }
                 break;
 
             case "input":
@@ -96,6 +108,7 @@ export default class DialogManager {
 
             btn.addEventListener('click',()=>{
                 this.clearContent();
+                this.inputMode=false;
                 
                 if(this.onChoice) this.onChoice(choice);
 
@@ -112,6 +125,10 @@ export default class DialogManager {
     }
     clearContent(){
         //明日する
+        while(this.elements.choiceContainer.firstChild){
+            this.elements.choiceContainer.removeChild(this.elements.choiceContainer.firstChild);
+        }
+        this.elements.choiceContainer.classList.add('hidden');
     }
     jumpTo(nextId){
         if(nextId==='end'){

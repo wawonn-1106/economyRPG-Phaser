@@ -1,0 +1,47 @@
+[
+  { 
+    "id": "start",
+    "type": "text", 
+    "name": "長老", 
+    "text": "ようこそ！我が村へ！待ち構えていたぞぃ。",
+    "next": "ask_name"
+  },
+  { 
+    "id": "ask_name",
+    "type": "input", 
+    "name": "長老", 
+    "text": "まずは、お主の名前を教えてくれんか？",
+    "next": "greet"
+  },
+  { 
+    "id": "greet",
+    "type": "text", 
+    "name": "長老", 
+    "text": "おお、[[NAME]]というのか！良い名じゃ。",
+    "next": "ask_ready"
+  },
+  { 
+    "id": "ask_ready",
+    "type": "choice", 
+    "name": "長老", 
+    "text": "お主、旅の準備はできているか？", 
+    "choices": [
+      { "text": "準備万端！", "next": "ready" },
+      { "text": "まだ少し不安...", "next": "not_ready" }
+    ]
+  },
+  { 
+    "id": "ready", 
+    "type": "text", 
+    "name": "長老", 
+    "text": "頼もしいわい！さっそく西の森へ向かうのじゃ。",
+    "next": "end"
+  },
+  { 
+    "id": "not_ready", 
+    "type": "text", 
+    "name": "長老", 
+    "text": "無理は禁物じゃ。村でゆっくり準備を整えるが良い。",
+    "next": "end"
+  }
+]
