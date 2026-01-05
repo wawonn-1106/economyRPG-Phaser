@@ -2,6 +2,7 @@ import Player from './Player.js';
 import DialogManager from './DialogManager.js';
 import NPC from './NPC.js';
 //import House from './House.js';
+import InventoryManager from './InventoryManager.js';
 
 export default class World extends Phaser.Scene{
     constructor(){
@@ -15,6 +16,7 @@ export default class World extends Phaser.Scene{
         this.moneyText=null;
         this.villagers=null;
         this.nearstNPC=null;
+        this.inventoryData=[];
         this.SERVER_URL='http://localhost:3000';
     }
     async syncMoneyWithServer(newMoney){
@@ -100,10 +102,13 @@ export default class World extends Phaser.Scene{
 
         this.input.keyboard.on('keydown-SPACE',()=>{
             if(!this.dialogManager.isTalking && this.readyTalking){
+                
                 this.money+=100;
                 if(this.moneyText) this.moneyText.setText(`所持金：${this.money}`);
                 this.syncMoneyWithServer(this.money);
-                this.dialogManager.start(ch1Data,this.nearstNPC.startId,this.nearstNPC.npcName);
+
+
+                this.dialogManager.start(ch1Data,this.nearstNPC.startId,this.nearstNPC.npcNameoyaga);
                 this.nearstNPC.showIcon(true);
             }else if(this.dialogManager.isTalking){
                 const currentLine=this.dialogManager.currentSequence[this.dialogManager.currentIndex];
@@ -115,7 +120,35 @@ export default class World extends Phaser.Scene{
                 }
             }
         });
-        
+    //-------------------------------------------------------------インベントリ--------------------------------------------------------------------------
+        this.inventoryManager=new InventoryManager();
+
+        this.inventoryData=[
+            {id:'wheat',name:'小麦',realQuality:1,count:5},
+            {id:'stone',name:'石',realQuality:1,count:3},
+            {id:'apple',name:'りんご',realQuality:1,count:12},
+        ];
+
+
+
+        this.input.keyboard.on('keydown-I',()=>{
+            //会話とは違ってIで開け閉め
+            if(this.dialogManager.isTalking) return;
+
+            if(!this.inventoryManager.isOpenInv){
+                this.inventoryManager.openInventory(this.inventoryData);
+            }else{
+                this.inventoryManager.closeInventory();
+            }
+        });
+
+
+
+
+
+
+    //-------------------------------------------------------------カメラ--------------------------------------------------------------------------
+       
         this.cameras.main.startFollow(this.player,true,0.1,0.1);
         this.cameras.main.setBounds(0,0,1600,1600);
     }

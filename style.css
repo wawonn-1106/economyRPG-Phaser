@@ -37,3 +37,10 @@
     color: white;
     font-size: 24px;
 }
+#inventory{
+    position: absolute;
+    border: 2px solid black;
+    width: 800px;
+    height: 800px;
+    margin: auto;
+}

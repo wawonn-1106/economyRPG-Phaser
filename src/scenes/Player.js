@@ -20,11 +20,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         const isLeftDown=this.cursors.left.isDown;
         const isUpDown=this.cursors.up.isDown;
         const isDownDown=this.cursors.down.isDown;
-
+        
+        //会話中、インベントリを開いてる間は動けなくする
         if(this.scene.dialogManager.isTalking){
             this.setVelocity(0);
             return;
         }
+        if(this.scene.inventoryManager.isOpenInv){
+            this.setVelocity(0);
+            return;
+        }
+
         this.setVelocity(0);
 
         if(isRightDown){
