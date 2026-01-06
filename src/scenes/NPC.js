@@ -5,7 +5,7 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         scene.physics.world.enable(this);
         scene.add.existing(this);
 
-        this.npcName=config.name || '村人';
+        this.npcName=config.name || '村人';  //名前なかったら村人になる
         this.startId=config.startId || 'start';
 
         this.setScale(0.1).refreshBody();

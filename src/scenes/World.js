@@ -124,6 +124,7 @@ export default class World extends Phaser.Scene{
         this.inventoryManager=new InventoryManager();
 
         this.inventoryData=[
+            //最終的にはjsonで管理するが、とりあえずインベントリを表示させるためここで
             {id:'wheat',name:'小麦',realQuality:1,count:5},
             {id:'stone',name:'石',realQuality:1,count:3},
             {id:'apple',name:'りんご',realQuality:1,count:12},
