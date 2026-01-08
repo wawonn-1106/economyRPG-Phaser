@@ -1,10 +1,10 @@
-import InventoryManager from './InventoryManager';
-import MenuContent from '../contents/MenuContent';
-import ProfileContent from '../contents/ProfileContent';
-import SettingsContent from '../contents/SettingsContent';
-import InventoryContent from '../contents/InventoryContent';
-import RankingContent from '../contents/RankingContent';
-import ReviewContent from '../contents/ReviewContent';
+import InventoryManager from './InventoryManager.js';
+import MenuContent from '../contents/MenuContent.js';
+import ProfileContent from '../contents/ProfileContent.js';
+import SettingsContent from '../contents/SettingsContent.js';
+import InventoryContent from '../contents/InventoryContent.js';
+import RankingContent from '../contents/RankingContent.js';
+import ReviewContent from '../contents/ReviewContent.js';
 
 export default class MenuManager{
     constructor(scene){
@@ -48,7 +48,7 @@ export default class MenuManager{
     switchTab(tabId){
         this.currentTab=tabId;
 
-        if(this.contentArea.firstChild){
+        while(this.contentArea.firstChild){
             this.contentArea.removeChild(this.contentArea.firstChild);
             /*removeChildでfirstChildを取り出すのを繰り返す→結果的に全部取り出す(張替のため)
             appendChildで毎回一つしか追加されないけど中身の要素は多いからwhileは必須。

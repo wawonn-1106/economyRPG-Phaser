@@ -2,8 +2,8 @@ import Player from '../entities/Player.js';
 import DialogManager from '../managers/DialogManager.js';
 import NPC from '../entities/NPC.js';
 //import House from './House.js';
-import InventoryManager from '../managers/InventoryManager.js';
-import MenuManager from './../managers/MenuManager';
+//import InventoryManager from '../managers/InventoryManager.js';
+import MenuManager from '../managers/MenuManager.js';
 
 export default class World extends Phaser.Scene{
     constructor(){
@@ -17,7 +17,7 @@ export default class World extends Phaser.Scene{
         this.moneyText=null;
         this.villagers=null;
         this.nearstNPC=null;
-        this.inventoryData=[];
+        //this.inventoryData=[];
         this.keys=null;
         this.SERVER_URL='http://localhost:3000';
         this.menuManager=new MenuManager(this);
@@ -75,6 +75,7 @@ export default class World extends Phaser.Scene{
 
     //----------------------------------------------------------キー------------------------------------------------------------------------------
         this.cursors=this.input.keyboard.createCursorKeys();
+        this.keys=this.input.keyboard.addKeys('M,I,P,A,R,S');
     //----------------------------------------------------------プレイヤー------------------------------------------------------------------------------
         this.player=new Player(this,100,300,'player');
     //--------------------------------------------------------NPC-------------------------------------------------------------
