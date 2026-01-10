@@ -1,15 +1,14 @@
-import InventoryManager from "../managers/InventoryManager";
+//import InventoryManager from "../managers/InventoryManager.js";
 
 export default class InventoryContent{
     constructor(scene){
-        this.scene=scene;
-        this.invManager=new InventoryManager();
+        this.scene=scene;//※このsceneはInventoryManager経由できたWorld.jsのやつ
     }
-    getElement(){
+    createElement(){
         const container=document.createElement('div');
         container.classList.add('inventory-container');
 
-        //const items=this.scene.playerItems || [];  World.jsのアイテムなかったら空
+        const items=this.scene.inventoryData || [];  //World.jsのアイテムなかったら空
 
         if(items.length===0){
             const emptyMsg=document.createElement('p');
@@ -35,7 +34,7 @@ export default class InventoryContent{
             nameEl.classList.add('item-name');
             nameEl.textContent=`${item.name}(×${item.count})`;
 
-            const btnGroup=document.createElement('button');
+            const btnGroup=document.createElement('div');
             btnGroup.classList.add('item-actions');
             //使う、捨てる処理は後で
             const useBtn=document.createElement('button');
@@ -44,17 +43,21 @@ export default class InventoryContent{
             const dropBtn=document.createElement('button');
             dropBtn.textContent='捨てる';
 
-            li.sppendChild(qualityDiv);
-            li.sppendChild(nameEl);
-            li.sppendChild(btnGroup);
-            btnGroup.sppendChild(useBtn);
-            btnGroup.sppendChild(dropBtn);
+            dropBtn.onclick=()=>{
+                this.scene.inventoryManager.removeItem(item.id);
+            }
+
+            li.appendChild(qualityDiv); //sppendchild ×
+            li.appendChild(nameEl);
+            li.appendChild(btnGroup);
+            btnGroup.appendChild(useBtn);
+            btnGroup.appendChild(dropBtn);
 
             ul.appendChild(li);
 
 
         });
-        container.sppendChild(ul);
+        container.appendChild(ul);
 
         return container;
     }

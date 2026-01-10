@@ -1,4 +1,3 @@
-import InventoryManager from './InventoryManager.js';
 import MenuContent from '../contents/MenuContent.js';
 import ProfileContent from '../contents/ProfileContent.js';
 import SettingsContent from '../contents/SettingsContent.js';

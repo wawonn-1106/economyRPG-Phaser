@@ -4,6 +4,7 @@ import NPC from '../entities/NPC.js';
 //import House from './House.js';
 //import InventoryManager from '../managers/InventoryManager.js';
 import MenuManager from '../managers/MenuManager.js';
+import InventoryManager from '../managers/InventoryManager.js';
 
 export default class World extends Phaser.Scene{
     constructor(){
@@ -17,10 +18,11 @@ export default class World extends Phaser.Scene{
         this.moneyText=null;
         this.villagers=null;
         this.nearstNPC=null;
-        //this.inventoryData=[];
+        this.inventoryData=[];
         this.keys=null;
         this.SERVER_URL='http://localhost:3000';
-        this.menuManager=new MenuManager(this);
+
+        this.menuManager=new MenuManager(this);//Worldのscene持ってればこれにもアクセスできる
     }
     async syncMoneyWithServer(newMoney){
         try{
@@ -125,7 +127,7 @@ export default class World extends Phaser.Scene{
             }
         });
     //-------------------------------------------------------------インベントリ--------------------------------------------------------------------------
-        /*this.inventoryManager=new InventoryManager();
+        this.inventoryManager=new InventoryManager(this);
 
         this.inventoryData=[
             //最終的にはjsonで管理するが、とりあえずインベントリを表示させるためここで
@@ -137,9 +139,7 @@ export default class World extends Phaser.Scene{
             {id:'pumpkin',name:'かぼちゃ',realQuality:2,count:1},
         ];
 
-
-
-        this.input.keyboard.on('keydown-I',()=>{
+        /*this.input.keyboard.on('keydown-I',()=>{
             //会話とは違ってIで開け閉め
             if(this.dialogManager.isTalking) return;
 

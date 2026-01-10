@@ -24,7 +24,7 @@ export default class MenuContent{
             iconDiv.textContent=item.icon;
 
             const labelDiv=document.createElement('div');
-            iconDiv.classList.add('menu-btn-label');
+            labelDiv.classList.add('menu-btn-label');
             labelDiv.textContent=item.label;
 
             btn.appendChild(iconDiv);

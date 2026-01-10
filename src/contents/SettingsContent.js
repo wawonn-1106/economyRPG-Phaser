@@ -1,8 +1,8 @@
 export default class SettingsContent{
     constructor(scene){
-        this.scene=this.scene;
+        this.scene=scene;
     }
-    getElement(){
+    createElement(){
         const container=document.createElement('div');
         container.classList.add('menu-content');
         return container;
