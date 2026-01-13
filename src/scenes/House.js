@@ -19,7 +19,7 @@ export default class House extends Phaser.Scene{
 
     }
     update(){
-        const speed = 200;
+        /*const speed = 200;
         this.player.setVelocity(0);
 
         const tile=this.worldLayer.getTileAtWorldXY(this.player.x,this.player.y);
@@ -29,12 +29,12 @@ export default class House extends Phaser.Scene{
             this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
                 this.scene.start('World');
             });
-        }
+        }*/
 
-        if (this.cursors.left.isDown) this.player.setVelocityX(-speed);
+        /*if (this.cursors.left.isDown) this.player.setVelocityX(-speed);
         else if (this.cursors.right.isDown) this.player.setVelocityX(speed);
 
         if (this.cursors.up.isDown) this.player.setVelocityY(-speed);
-        else if (this.cursors.down.isDown) this.player.setVelocityY(speed);
+        else if (this.cursors.down.isDown) this.player.setVelocityY(speed);*/
     }
 }

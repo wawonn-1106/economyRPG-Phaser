@@ -89,7 +89,7 @@ export default class World extends Phaser.Scene{
         const villagerData=[
             {x:800,y:300,key:'player',startId:'greet',name:'マイク'},
             {x:200,y:400,key:'player',startId:'start',name:'ジェシカ'},
-            {x:100,y:600,key:'player',startId:'ask_ready',name:'サンドラ'},
+            {x:100,y:600,key:'player',startId:'daily',name:'サンドラ'},
         ];
 
         villagerData.forEach(data=>{
