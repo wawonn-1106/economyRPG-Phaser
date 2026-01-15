@@ -46,6 +46,17 @@ export default class MenuManager{
     }
     switchTab(tabId){
         this.currentTab=tabId;
+        if(this.currentTab==='returnTitle'){
+            this.scene.cameras.main.fadeOut(1000,0,0,0);
+
+                this.scene.cameras.main.once('camerafadeoutcomplete',()=>{
+                    //this.window.classList.add('hidden');
+                    this.closeMenu();
+
+                    this.scene.scene.start('Title');//scene.sceneでconfigの配列に登録してるのは何でも表示できる！！！
+                });
+                return;
+        }
 
         while(this.contentArea.firstChild){
             this.contentArea.removeChild(this.contentArea.firstChild);

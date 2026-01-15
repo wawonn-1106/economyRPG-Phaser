@@ -13,6 +13,7 @@ export default class MenuContent{
             {id:'review',label:'口コミ',icon:'△'},
             {id:'ranking',label:'ランキング',icon:'✖'},
             {id:'settings',label:'設定',icon:'☆'},
+            {id:'returnTitle',label:'タイトルに戻る',icon:'▼'}
         ];
 
         menuItem.forEach(item=>{
@@ -31,7 +32,18 @@ export default class MenuContent{
             btn.appendChild(labelDiv);//btnの中に入れる。containerじゃない
 
             btn.onclick=()=>{
+                /*if(item.id==='returnTitle'){
+                    this.scene.cameras.main.fadeOut(1000,0,0,0);
+
+                    this.scene.cameras.main.once('camerafadeoutcomplete',()=>{
+                        const window=document.getElementById('menu-window');
+                        if(window) this.window.classList.add('hidden');
+
+                        this.scene.start('Title');
+                    });
+                }*/
                 this.menuManager.switchTab(item.id);
+                // /*このsceneはWorldのだからダメなのか、そもそもタイトル画面の遷移はManager経由でするべきなのか*/
             };
 
             container.appendChild(btn);
