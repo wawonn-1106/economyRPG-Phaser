@@ -41,7 +41,9 @@ export default class World extends Phaser.Scene{
     }
     preload(){
         this.load.image('player','assets/images/player.png');
-        this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test.tmj');
+        this.load.image('tileset-test1','assets/tilesets/Beginning Fields.tsj')
+        this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test1.tmj');
+        //this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test.tmj');
         this.load.json('chapter1','assets/data/dialog1.json');
         this.load.image('tileset','assets/tilesets/pipo-map001.png');
     }
@@ -63,7 +65,19 @@ export default class World extends Phaser.Scene{
     create(){
         this.loadPlayerData();
     //-------------------------------------------------------マップ---------------------------------------------------------------------------------
-        const map = this.make.tilemap({ key: 'map' });
+        const map=this.make.tilemap({key:'map'});
+        
+        const tileset = map.addTilesetImage('Beginning Fields','tileset-test1');
+        
+        /*this.backgroundLayer = map.createLayer('ground', tileset, 0, 0);
+
+        this.worldLayer = map.createLayer('object', tileset, 0, 0);*/
+        this.worldLayer.setCollisionByProperty({ collides: true });
+        this.physics.world.setBounds(0,0,1600,1600);
+    
+    
+    
+        /*const map = this.make.tilemap({ key: 'map' });
     
         const tileset = map.addTilesetImage('pipo-map001','tileset');
         
@@ -71,7 +85,7 @@ export default class World extends Phaser.Scene{
 
         this.worldLayer = map.createLayer('object', tileset, 0, 0);
         this.worldLayer.setCollisionByProperty({ collides: true });
-        this.physics.world.setBounds(0,0,1600,1600);
+        this.physics.world.setBounds(0,0,1600,1600);*/
 
         this.moneyText=this.add.text(100,100,`所持金：${this.money}`,{
             fontSize:'36px',fill:'black'
