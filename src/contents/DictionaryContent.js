@@ -4,7 +4,7 @@ export default class DictionaryContent{
     }
     createElement(){
         const container=document.createElement('div');
-        container.classList.add('menu-content');//ここは変えてね
+        container.classList.add('dictionary-content');//ここは変えてね
         return container;
     }
 }

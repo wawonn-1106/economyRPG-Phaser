@@ -10,6 +10,12 @@ body{
     position: relative;
     width: 1280px;
     height: 720px;
+    /*border: 10px solid black; 
+    box-sizing: content-box;*/
+    outline: 10px solid black; /*borderだとconfigのmode:Phaser.Scale.FIT,と衝突する*/
+    margin: 20px auto; 
+    padding: 0;
+    /*line-height: 0*/
 }
 
 #dialog-window {
