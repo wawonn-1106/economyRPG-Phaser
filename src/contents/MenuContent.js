@@ -8,21 +8,22 @@ export default class MenuContent{
         container.classList.add('menu-content');
 
         const menuItem=[
-            {id:'inventory',label:'持ち物',icon:'〇'},
-            {id:'profile',label:'プロフィール',icon:'◇'},
-            {id:'review',label:'口コミ',icon:'△'},
-            {id:'ranking',label:'ランキング',icon:'✖'},
-            {id:'settings',label:'設定',icon:'☆'},
-            {id:'returnTitle',label:'タイトルに戻る',icon:'▼'}
+            {id:'inventory',label:'持ち物',icon:'inventory'},
+            {id:'profile',label:'プロフィール',icon:'profile'},
+            {id:'review',label:'口コミ',icon:'review'},
+            {id:'ranking',label:'ランキング',icon:'ranking'},
+            {id:'dictionary',label:'辞書',icon:'dictionary'},
+            {id:'settings',label:'設定',icon:'settings'},
+            {id:'returnTitle',label:'タイトルに戻る',icon:'returnTitle'}
         ];
 
         menuItem.forEach(item=>{
             const btn=document.createElement('div');
             btn.classList.add('menu-btn');
 
-            const iconDiv=document.createElement('div');
+            const iconDiv=document.createElement('img');
             iconDiv.classList.add('menu-btn-icon');
-            iconDiv.textContent=item.icon;
+            iconDiv.src=`assets/images/${item.icon}.png`;
 
             const labelDiv=document.createElement('div');
             labelDiv.classList.add('menu-btn-label');

@@ -4,6 +4,7 @@ import SettingsContent from '../contents/SettingsContent.js';
 import InventoryContent from '../contents/InventoryContent.js';
 import RankingContent from '../contents/RankingContent.js';
 import ReviewContent from '../contents/ReviewContent.js';
+import DictionaryContent from '../contents/DictionaryContent.js';
 
 export default class MenuManager{
     constructor(scene){
@@ -21,7 +22,8 @@ export default class MenuManager{
             'profile':new ProfileContent(scene),
             'review':new ReviewContent(scene),
             'ranking':new RankingContent(scene),
-            'settings':new SettingsContent(scene)
+            'settings':new SettingsContent(scene),
+            'dictionary':new DictionaryContent(scene)
         };
     }
     toggle(tabId='menu'){

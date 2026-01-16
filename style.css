@@ -65,19 +65,35 @@ body{
 */
 #menu-window{
     position: absolute;
+    display: flex;
+    box-sizing: border-box;
     border: 4px solid black;
-    background-color: rgba(0, 0, 0, 0.5);
-    width: 1276px;
-    height: 716px;
+    background-color: white;
+    width: 1150px;
+    height: 590px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
     z-index: 200;
     color: black;
 }
-#menu-content{
-    padding: 0;
-    margin: 0;
-    color: white;
+.menu-content{
+    /*padding: 0;
+    margin: 0;*/
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 30px;
     font-size: 36px;
-}
+    padding: 30px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box; 
+    
+    justify-items: center;
+    align-items: center;
+}/*HTMLではidになってる。けどこれはMenuContentでclassList.add('menu-content')で作ったクラス。
+idで場所を指定して、addで同じ名前のクラスを作ってそこでCSSを指定している。*/
 .menu-btn{
     cursor: pointer;
 }
