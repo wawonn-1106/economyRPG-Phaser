@@ -2,17 +2,17 @@ export default class ProfileContent{
     constructor(scene,x,y){
         this.scene=scene;
 
-        this.container=this.scene.add.container(0,0);
+        /*this.container=this.scene.add.container(0,0);
         this.graphics=this.scene.add.graphics();
         this.container.add(this.graphics);
 
         this.statLabels=[];
         
-        this.setVisible(false);
+        this.setVisible(false);*/
         this.chartTarget=null;
         //this.drawRadarChart();
     }
-    updatePosition(){
+    /*updatePosition(){
         if(!this.container.visible || !this.chartTarget)return;
 
         //const target=document.getElementById('radar-chart-container');
@@ -31,7 +31,7 @@ export default class ProfileContent{
             this.drawRadarChart();
             this.updatePosition();
         }
-    }
+    }*/
     createElement(){
         const container=document.createElement('div');
         container.classList.add('profile-container');
@@ -93,7 +93,82 @@ export default class ProfileContent{
 
     }
     drawRadarChart(){
-        this.graphics.clear();
+        if(!this.chartTarget) return;
+
+        this.chartTarget.innerHTML='';
+
+        const canvas=document.createElement('canvas');
+        const size=250;
+        canvas.width=size;
+        canvas.height=size;
+        const ctx=canvas.getContext('2d');
+        const center=size/2;
+
+        const manager=this.scene.profileManager;
+        const stats=this.scene.player.stats;
+        const radius=80;
+
+        const bgPoints=manager.getPoints(radius,null);
+        const pPoints=manager.getPoints(radius,stats);
+
+        const maxRadius = 80;
+
+        ctx.translate(center,center);
+
+        ctx.strokeStyle = '#eeeeee'; // 薄いグレー
+        ctx.lineWidth = 1;
+
+    
+        [5, 10, 15, 20, 25].forEach(val => {
+            // 各段階の半径を計算
+            const r = (val / 25) * maxRadius;
+            const points = manager.getPoints(r, null);
+
+            ctx.beginPath();
+            points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+            ctx.stroke();
+
+            if (val === 25) {
+                points.forEach(p => {
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(p.x, p.y);
+                    ctx.strokeStyle = '#dddddd';
+                    ctx.stroke();
+                });
+            }
+        });
+
+        ctx.beginPath();
+        bgPoints.forEach((p,i)=>i===0 ? ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+        ctx.closePath();
+        ctx.strokeStyle='#ccc';
+        ctx.stroke();
+
+        ctx.beginPath();
+        pPoints.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(51, 255, 51, 0.5)';
+        ctx.fill();
+        ctx.strokeStyle = '#33ff33';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = 'black';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        manager.statList.forEach((s, i) => {
+            const p = bgPoints[i];
+            ctx.fillText(s.label, p.x * 1.3, p.y * 1.3);
+        });
+
+        this.chartTarget.appendChild(canvas);
+
+
+
+
+        /*this.graphics.clear();
 
         this.statLabels.forEach(label=>label.destroy());
         this.statLabels=[];
@@ -125,7 +200,7 @@ export default class ProfileContent{
 
             this.container.add(txt);
             this.statLabels.push(txt);
-        });
+        });*/
 
     }
 }

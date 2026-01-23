@@ -239,7 +239,7 @@ export default class World extends Phaser.Scene{
     update(time,delta){
         this.player.update();
 
-        this.menuManager.update();
+        //this.menuManager.update();
         
         let minDistance=100;
         let closestNPC=null;

@@ -26,11 +26,11 @@ export default class MenuManager{
             'dictionary':new DictionaryContent(scene)
         };
     }
-    update(){
+    /*update(){
         if(this.isOpenMenu && this.currentTab==='profile'){
             this.contents['profile'].updatePosition();
         }
-    }
+    }*/
     toggle(tabId='menu'){
         if(!this.isOpenMenu){
             this.openMenu(tabId);
@@ -51,10 +51,10 @@ export default class MenuManager{
         this.isOpenMenu=false;
         this.window.classList.add('hidden');
 
-        const currentContent=this.contents[this.currentTab];
+        /*const currentContent=this.contents[this.currentTab];
         if(currentContent && currentContent.setVisible){//Phaserのグラフがあったら消す
             currentContent.setVisible(false);
-        }
+        }*/
     }
     switchTab(tabId){
         this.currentTab=tabId;
@@ -82,7 +82,7 @@ export default class MenuManager{
 
             this.contentArea.appendChild(element);
 
-            if(content.setVisible) content.setVisible(true);//Phaserのグラフがあるなら表示させる
+            //if(content.setVisible) content.setVisible(true);//Phaserのグラフがあるなら表示させる
         }
 
 
