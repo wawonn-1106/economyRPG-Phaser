@@ -20,6 +20,8 @@ export default class Title extends Phaser.Scene{
         }
 
         startBtn.onclick=()=>{
+            startBtn.classList.add('hidden');
+
             this.cameras.main.fadeOut(1000,0,0,0);
 
             this.cameras.main.once('camerafadeoutcomplete',()=>{

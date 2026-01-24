@@ -9,7 +9,7 @@ export default class ProfileManager{
             {id:'farming',label:'農業'},
             {id:'processing',label:'加工'},
             {id:'logging',label:'木こり'},
-        ];
+        ];//↑jsonに書く予定
 
         //this.profileManager=new ProfileManager(scene); MenuManagerで渡してるからいらんね
     }

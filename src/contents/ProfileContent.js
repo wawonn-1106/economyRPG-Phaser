@@ -95,7 +95,7 @@ export default class ProfileContent{
     drawRadarChart(){
         if(!this.chartTarget) return;
 
-        this.chartTarget.innerHTML='';
+        //this.chartTarget.innerHTML='';
 
         const canvas=document.createElement('canvas');
         const size=250;

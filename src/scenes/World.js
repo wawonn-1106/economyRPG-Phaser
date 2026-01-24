@@ -23,6 +23,9 @@ export default class World extends Phaser.Scene{
         this.nearstNPC=null;
         this.inventoryData=[];
         this.keys=null;
+        this.currentWeather='Clear';
+        this.weatherEffect=null;
+
         this.SERVER_URL='http://localhost:3000';
 
         
@@ -90,8 +93,38 @@ export default class World extends Phaser.Scene{
             console.log('読み込み失敗、0円から開始します', error);
         }
     }
+    async fetchWeather(){//Rain,Snowを取得。
+        try{
+
+        }catch(error){
+
+        }//明日ぐらいにやる
+    }
+    createRain(){
+        this.weatherEffect=this.add.particles(0,0,'rain',{//画像のダウンロード必要、snowも
+            x:{min:0,max:1280},
+            y:-10,
+            lifespan:2000,
+            speedY:{min:400,max:600},
+            quality:5,
+            scrollFactor:0
+        });
+    }
+    createSnow(){
+        this.weatherEffect=this.add.particles(0,0,'snow',{
+            x:{min:0,max:1280},
+            y:-10,
+            lifespan:8000,
+            speedX:{min:50,max:100},
+            speedY:{min:-20,max:20},
+            quality:2,
+            scrollFactor:0
+        });
+    }
     create(){
         this.loadPlayerData();
+
+        /*async create(){}  await this.fetchWeather();を追加する*/
     //-------------------------------------------------------マップ---------------------------------------------------------------------------------
     
     
@@ -109,6 +142,12 @@ export default class World extends Phaser.Scene{
         this.moneyText=this.add.text(100,100,`所持金：${this.money}`,{
             fontSize:'36px',fill:'black'
         }).setOrigin(0,0).setScrollFactor(0);
+    //----------------------------------------------------------天気------------------------------------------------------------------------------
+        if(this.currentWeather==='Rain'){
+            this.createRain();
+        }else if(this.currentWeather==='Snow'){
+            this.createSnow();
+        }//どちらでもないなら晴れ
 
     //----------------------------------------------------------キー------------------------------------------------------------------------------
         this.cursors=this.input.keyboard.createCursorKeys();
