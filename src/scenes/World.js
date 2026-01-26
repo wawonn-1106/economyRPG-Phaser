@@ -94,10 +94,23 @@ export default class World extends Phaser.Scene{
         }
     }
     async fetchWeather(){//Rain,Snowを取得。
+        const API_KEY=process.env.WEATHER_API_KEY;
+        const lat=34.40;
+        const lon=133.20;
+        const URL=`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+
         try{
+            const response=await fetch(URL);
+            if(!response.ok) throw new Error('天気データの取得に失敗しました');
+
+            const data=await response.json();
+
+            this.currentWeather=data.weather[0].main;
+            console.log('現在の尾道の天気：',this.currentWeather);
 
         }catch(error){
-
+            console.error('天気データの取得に失敗しました：',error);
+            this.currentWeather='Clear';//失敗したら晴れ
         }//明日ぐらいにやる
     }
     createRain(){
@@ -121,9 +134,9 @@ export default class World extends Phaser.Scene{
             scrollFactor:0
         });
     }
-    create(){
-        this.loadPlayerData();
-
+    async create(){
+        //this.loadPlayerData();
+        await this.fetchWeather();
         /*async create(){}  await this.fetchWeather();を追加する*/
     //-------------------------------------------------------マップ---------------------------------------------------------------------------------
     
