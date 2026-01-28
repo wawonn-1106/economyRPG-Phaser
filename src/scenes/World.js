@@ -178,12 +178,13 @@ export default class World extends Phaser.Scene{
 
         const guideButton=this.add.image(1230,670,'guide')
                 .setOrigin(0.5)
+                .setScale(0.7)
                 .setInteractive({unHandCursor:true})
                 .setScrollFactor(0)
                 .setDepth(3000);
         
-        guideButton.on('pointerover',()=>guideButton.setScale(1.1));
-        guideButton.on('pointerput',()=>guideButton.setScale(1.0));
+        guideButton.on('pointerover',()=>guideButton.setScale(0.8));
+        guideButton.on('pointerout',()=>guideButton.setScale(0.7));
 
         guideButton.on('pointerdown',()=>{
             this.menuManager.toggle('guide');
