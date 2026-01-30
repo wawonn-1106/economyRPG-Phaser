@@ -52,7 +52,7 @@ export default class World extends Phaser.Scene{
         //this.load.image('tileset-test1','assets/tilesets/Beginning Fields.png')
         //this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test1.tmj');
         //this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test.tmj');
-        this.load.tilemapTiledJSON('map','assets/tilemaps/economyRPG.tmj');
+        this.load.tilemapTiledJSON('map','assets/tilemaps/economyRPG2.tmj');
         this.load.image('rain','assets/images/player.png');
         this.load.image('snow','assets/images/player.png');
 
@@ -169,14 +169,14 @@ export default class World extends Phaser.Scene{
 
         this.OnGroundLayer = map.createLayer('OnGround', tileset, 0, 0);
         this.HouseLayer = map.createLayer('House', tileset, 0, 0);
-        this.SmallDecorationLayer = map.createLayer('SmallDecoration', tileset, 0, 0);
+        //this.SmallDecorationLayer = map.createLayer('SmallDecoration', tileset, 0, 0);
         this.DecorationLayer = map.createLayer('Decoration', tileset, 0, 0);
 
         this.OnGroundLayer.setCollisionByProperty({ collides: true });
         this.HouseLayer.setCollisionByProperty({ collides: true });
-        this.SmallDecorationLayer.setCollisionByProperty({ collides: true });
-        this.DecorationLayer.setCollisionByProperty({ collides: true });
-        this.physics.world.setBounds(0,0,1600,1600);
+        //this.SmallDecorationLayer.setCollisionByProperty({ collides: true });
+        //this.DecorationLayer.setCollisionByProperty({ collides: true });
+        this.physics.world.setBounds(0,0,map.widthInPixels,map.heightInPixels);
 
         this.moneyText=this.add.text(100,100,`所持金：${this.money}`,{
             fontSize:'36px',fill:'black'
@@ -275,7 +275,11 @@ export default class World extends Phaser.Scene{
         this.physics.add.collider(this.player,this.villagers);*/
 
         this.physics.add.collider(this.player,this.OnGroundLayer);
+        this.physics.add.collider(this.player,this.HouseLayer);
+
         this.physics.add.collider(this.villagers,this.OnGroundLayer);
+        this.physics.add.collider(this.villagers,this.HouseLayer);
+
         this.physics.add.collider(this.player,this.villagers);
     //-------------------------------------------------------------ログ--------------------------------------------------------------------------  
 
@@ -334,7 +338,7 @@ export default class World extends Phaser.Scene{
     //-------------------------------------------------------------カメラ--------------------------------------------------------------------------
        
         this.cameras.main.startFollow(this.player,true,0.1,0.1);
-        this.cameras.main.setBounds(0,0,1600,1600);
+        this.cameras.main.setBounds(0,0,map.widthInPixels,map.heightInPixels);
         
         
     }
