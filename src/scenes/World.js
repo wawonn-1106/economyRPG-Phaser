@@ -281,6 +281,28 @@ export default class World extends Phaser.Scene{
         this.physics.add.collider(this.villagers,this.HouseLayer);
 
         this.physics.add.collider(this.player,this.villagers);
+    //----------------------------------------------------------アクション系-----------------------------------------------------------------------
+        this.interactables=[];
+
+        this.villagers.getChildren().forEach(v=>{
+            this.interactables.push({type:'npc',instance:v,x:v.x,y:v.y});
+        });
+
+        const objectLayer=map.getObjectLayer('Object');
+        if(objectLayer){
+            objectLayer.objects.forEach(object=>{
+                if(object.name==='door' || object.name==='machine'){
+                    this.interactables.push({
+                        type:object.name,
+                        data:object,
+                        x:object.x+(object.width/2||0),
+                        y:object.y+(object.height/2||0),
+                    });
+                }
+            });
+        }
+        //↓適当な画像で
+        this.readyIcon=this.add.image(0,0,'readyIcon').setVisible(false).setDepth(4000).setScale(0.5);
     //-------------------------------------------------------------ログ--------------------------------------------------------------------------  
 
         this.readyTalking=false;
@@ -344,11 +366,32 @@ export default class World extends Phaser.Scene{
     }
     update(time,delta){
         this.player.update();
+        this.villagers.getChildren().forEach(v=>v.update(time,delta));
 
         //this.menuManager.update();
         
-        let minDistance=100;
-        let closestNPC=null;
+        let minDistance=60;
+        let closestItem=null;//機械、ドア、NPCで近いものに▼マークを付ける
+        let bestPriority=999;
+
+        this.interactables.forEach(item=>{
+            const dist=Phaser.Math.Distance.Between(this.player.x,this.player.y,item.x,item.y);
+
+            if(dist<minDistance){
+                let priority=3;
+                if(item.type==='npc') priority=0;
+                else if(item.type=='machine') priority=1;
+                else if(item.type=='door') priority=2;
+
+                if(priority<bestPriority || (priority===bestPriority&& dist<minDistance)){
+                    minDistance=dist;
+                    bestPriority=priority;
+                    closestItem=item;
+                }
+            }
+        });
+
+        //if()
 
         this.villagers.getChildren().forEach(v=>{
             v.update(time,delta);
