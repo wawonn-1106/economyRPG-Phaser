@@ -16,17 +16,17 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         this.moveTimer=0;
         this.currentDir=new Phaser.Math.Vector2(0,0);
 
-        this.talkIcon=scene.add.text(x,y-60,'▼',
+        /*this.talkIcon=scene.add.text(x,y-60,'▼',
             {fontSize:'24px'}
-        ).setOrigin(0.5).setVisible(false);
+        ).setOrigin(0.5).setVisible(false);*/
 
     }
-    showIcon(visible){
+    /*showIcon(visible){
         this.talkIcon.setVisible(visible);
-    }
+    }*/
     update(time,delta){
-        this.talkIcon.x=this.x;
-        this.talkIcon.y=this.y-60;
+        /*this.talkIcon.x=this.x;
+        this.talkIcon.y=this.y-60;*/
  
         if(this.scene.dialogManager.isTalking){
             this.setVelocity(0);

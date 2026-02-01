@@ -24,5 +24,5 @@ export const config={
     zoom:1,
     backgroundColor:'#000000',
     pixelArt:true,
-    scene:[Title,World]//sceneの順番は表示する順番でもあるからtitleが先 House一回除外
+    scene:[Title,World,House]//sceneの順番は表示する順番でもあるからtitleが先
 }

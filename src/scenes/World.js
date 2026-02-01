@@ -20,11 +20,16 @@ export default class World extends Phaser.Scene{
         this.money=0;
         this.moneyText=null;
         this.villagers=null;
-        this.nearstNPC=null;
+        //this.nearstNPC=null;
         this.inventoryData=[];
         this.keys=null;
         this.currentWeather='Clear';
         this.weatherEffect=null;
+        this.interactables=[];
+        //this.nearstTarget=null;
+        this.readyIcon=null;
+        this.readyActionType=null;
+        this.actionTarget=null;
 
         this.SERVER_URL='http://localhost:3000';
 
@@ -301,32 +306,46 @@ export default class World extends Phaser.Scene{
                 }
             });
         }
-        //↓適当な画像で
-        this.readyIcon=this.add.image(0,0,'readyIcon').setVisible(false).setDepth(4000).setScale(0.5);
+
+        this.readyIcon=this.add.text(0,0,'▼',
+            {fontSize:'24px'}
+        ).setOrigin(0.5).setVisible(false).setDepth(5000);
+        //this.readyIcon=this.add.image(0,0,'readyIcon').setVisible(false).setDepth(4000).setScale(0.5);
     //-------------------------------------------------------------ログ--------------------------------------------------------------------------  
 
-        this.readyTalking=false;
+        //this.readyTalking=false;
 
         this.input.keyboard.on('keydown-SPACE',()=>{
-            if(!this.dialogManager.isTalking && this.readyTalking){
-                
-                this.money+=100;
-                if(this.moneyText) this.moneyText.setText(`所持金：${this.money}`);
-                this.syncMoneyWithServer(this.money);
-
-
-                this.dialogManager.start('chapter1',this.nearstNPC.startId,this.nearstNPC.npcName);//npcNameoyaga???
-                //この第一引数のchapter1(独占市場)は変える予定あり、chapter2(寡占市場),chapter3(完全競争市場)
-                this.nearstNPC.showIcon(true);
-            }else if(this.dialogManager.isTalking){
+            if(this.dialogManager.isTalking){
                 const currentLine=this.dialogManager.currentSequence[this.dialogManager.currentIndex];
-
                 if(currentLine && currentLine.next){
                     this.dialogManager.jumpTo(currentLine.next);
                 }else{
                     this.dialogManager.end();
                 }
+                return;
             }
+
+            if(this.readyActionType){
+                switch(this.readyActionType){
+                    case 'npc':
+                        const npc=this.actionTarget.instance;
+                        this.dialogManager.start('chapter1',npc.startId,npc.npcName);
+                        //chapter1(独占市場)は変える予定あり、chapter2(寡占市場),chapter3(完全競争市場)
+                        break;
+                    
+                    case 'door':
+                        //入る処理
+                        break;
+                    
+                    case 'machine':
+                        //加工画面を開く
+                        break;
+                }
+            }                
+                /*this.money+=100;
+                if(this.moneyText) this.moneyText.setText(`所持金：${this.money}`);
+                this.syncMoneyWithServer(this.money);*/
         });
     //-------------------------------------------------------------インベントリ--------------------------------------------------------------------------
         this.inventoryManager=new InventoryManager(this);
@@ -370,12 +389,16 @@ export default class World extends Phaser.Scene{
 
         //this.menuManager.update();
         
-        let minDistance=60;
+        let minDistance=100;
         let closestItem=null;//機械、ドア、NPCで近いものに▼マークを付ける
         let bestPriority=999;
 
         this.interactables.forEach(item=>{
-            const dist=Phaser.Math.Distance.Between(this.player.x,this.player.y,item.x,item.y);
+
+            let targetX=item.type==='npc' ? item.instance.x:item.x;
+            let targetY=item.type==='npc' ? item.instance.y:item.y;
+
+            const dist=Phaser.Math.Distance.Between(this.player.x,this.player.y,targetX,targetY);
 
             if(dist<minDistance){
                 let priority=3;
@@ -386,14 +409,31 @@ export default class World extends Phaser.Scene{
                 if(priority<bestPriority || (priority===bestPriority&& dist<minDistance)){
                     minDistance=dist;
                     bestPriority=priority;
-                    closestItem=item;
+
+                    closestItem={
+                        ...item,
+                        currentX:targetX,
+                        currentY:targetY
+                    };
                 }
             }
         });
 
-        //if()
+        const isBusy=this.dialogManager.isTalking || (this.menuManager.isOpen);
 
-        this.villagers.getChildren().forEach(v=>{
+        if(closestItem && !isBusy){
+            this.readyActionType=closestItem.type;
+            this.actionTarget=closestItem;
+            this.readyIcon.setVisible(true);
+            this.readyIcon.setPosition(closestItem.currentX,closestItem.currentY-50);
+
+        }else{
+            this.readyActionType=null;
+            this.actionTarget=null;
+            this.readyIcon.setVisible(false);
+        }
+
+        /*this.villagers.getChildren().forEach(v=>{
             v.update(time,delta);
             v.showIcon(false);
 
@@ -402,7 +442,7 @@ export default class World extends Phaser.Scene{
                 minDistance=dist;
                 closestNPC=v;
             }
-        });
+        });*/
         /*const tile = this.worldLayer.getTileAtWorldXY(this.player.x, this.player.y);
         if(tile){
             console.log('player tile index:', tile.index);
@@ -415,14 +455,14 @@ export default class World extends Phaser.Scene{
             });
         }*/
 
-        if(closestNPC && !this.dialogManager.isTalking){
+        /*if(closestNPC && !this.dialogManager.isTalking){
             this.readyTalking=true;
             this.nearstNPC=closestNPC;
             this.nearstNPC.showIcon(true);
         }else{
             this.readyTalking=false;
             this.nearstNPC=null;
-        }
+        }*/
         //メニューを開くキーのショートカット
         //this.menuManager=new MenuManager();←重くなる原因constructorでやろう
         if(Phaser.Input.Keyboard.JustDown(this.keys.M)){
