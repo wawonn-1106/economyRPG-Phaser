@@ -103,7 +103,7 @@ export default class World extends Phaser.Scene{
             console.log('読み込み失敗、0円から開始します', error);
         }
     }*/
-    async fetchWeather(){//Rain,Snowを取得。
+    /*async fetchWeather(){//Rain,Snowを取得。
         const API_KEY=process.env.WEATHER_API_KEY;
         const lat=34.40;
         const lon=133.20;
@@ -122,8 +122,8 @@ export default class World extends Phaser.Scene{
             console.error('天気データの取得に失敗しました：',error);
             this.currentWeather='Clear';//失敗したら晴れ
         }//明日ぐらいにやる
-    }
-    createRain(){
+    }*/
+    /*createRain(){
         this.weatherEffect=this.add.particles(0,0,'rain',{//画像のダウンロード必要、snowも
             x:{min:0,max:1280},
             y:-10,
@@ -150,7 +150,7 @@ export default class World extends Phaser.Scene{
         overlay.setOrigin(0,0);
         overlay.setScrollFactor(0);
         overlay.setDepth(2000);
-    }
+    }*/
     create(){
         //this.loadPlayerData();
         //await this.fetchWeather();

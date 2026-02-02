@@ -1,4 +1,4 @@
-require('dotenv').config();
+/*require('dotenv').config();
 const express=require('express');
 const mongoose=require('mongoose');
 const cors=require('cors');
@@ -36,4 +36,4 @@ app.get('/load',async(req,res)=>{
     }
 });
 
-app.listen(3000,()=>console.log('Server is running'));
+app.listen(3000,()=>console.log('Server is running'));*/
