@@ -31,7 +31,7 @@ export default class World extends Phaser.Scene{
         this.readyActionType=null;
         this.actionTarget=null;
 
-        this.SERVER_URL='http://localhost:3000';
+        //this.SERVER_URL='http://localhost:3000';
 
         
         this.dictionaryManager=new DictionaryManager(this);
