@@ -3,24 +3,28 @@
     "id": "start",
     "type": "text", 
     "text": "ようこそ！我が村へ！待ち構えていたぞぃ。",
+    "portrait":"player",
     "next": "ask_name"
   },
   { 
     "id": "ask_name",
     "type": "input", 
     "text": "まずは、お主の名前を教えてくれんか？",
+    "portrait":"player",
     "next": "greet"
   },
   { 
     "id": "greet",
     "type": "text", 
     "text": "おお、[[NAME]]というのか！良い名じゃ。",
+    "portrait":"player",
     "next": "ask_ready"
   },
   { 
     "id": "ask_ready",
     "type": "choice", 
     "text": "お主、旅の準備はできているか？", 
+    "portrait":"player",
     "choices": [
       { "text": "準備万端！", "next": "ready" },
       { "text": "まだ少し不安...", "next": "not_ready" }
@@ -30,18 +34,21 @@
     "id": "ready", 
     "type": "text", 
     "text": "頼もしいわい！さっそく西の森へ向かうのじゃ。",
+    "portrait":"player",
     "next": "end"
   },
   { 
     "id": "not_ready", 
     "type": "text", 
     "text": "無理は禁物じゃ。村でゆっくり準備を整えるが良い。",
+    "portrait":"player",
     "next": "end"
   },
   {
     "id":"daily",
     "type":"text",
     "text":"最近、物価が高くてしんどいわ。",
+    "portrait":"player",
     "next":"end"
   }
 ]

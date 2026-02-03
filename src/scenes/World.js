@@ -72,6 +72,7 @@ export default class World extends Phaser.Scene{
         this.load.image('tileset','assets/tilesets/Serene_Village_48x48.png');
 
         this.load.image('menu-bg','assets/images/menu-bg.png');
+        this.load.image('dialog-bg','assets/images/dialog-bg.png');
         this.load.image('review','assets/images/review.png');
         this.load.image('settings','assets/images/settings.png');
         this.load.image('ranking','assets/images/ranking.png');

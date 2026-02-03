@@ -1,6 +1,8 @@
 export default class DialogManager {
     constructor(scene) {
         this.scene=scene;
+        this.uiScene=null;
+
         this.currentSequence = [];
         this.currentIndex = 0;
         this.isTalking = false;
@@ -8,7 +10,7 @@ export default class DialogManager {
         this.inputMode = false; 
         this.onChoice = null;
 
-        this.elements={
+        /*this.elements={
             window:document.getElementById('dialog-window'),
             name:document.getElementById('dialog-name'),
             text:document.getElementById('dialog-text'),
@@ -16,7 +18,10 @@ export default class DialogManager {
             inputField:document.getElementById('player-name-input'),
             inputSubmit:document.getElementById('player-name-submit'),
             choiceContainer:document.getElementById('dialog-choices'),
-        }
+        }*/
+    }
+    setUIScene(uiScene){
+        this.uiScene=uiScene;
     }
 //textContentはinnerTextの上位互換
     start(dataKey,startId=null,speakerName=null) {
@@ -36,7 +41,9 @@ export default class DialogManager {
         }
 
         this.isTalking = true;
-        this.elements.window.classList.remove('hidden');//id class両方持つものからclassを取る
+
+        this.uiScene.showDialogWindow();
+        //this.elements.window.classList.remove('hidden');//id class両方持つものからclassを取る
         this.showLine();
     }
     showLine() {
@@ -57,9 +64,12 @@ export default class DialogManager {
         const displayText = (line.text || '')
             .replaceAll('[[NAME]]', this.playerName); //全てのdialogは一回ここを通る
           //.replaceAll([[]],this);
+        const nameText=this.activeSpeakerName||line.name||"???";
 
-        this.elements.name.textContent=this.activeSpeakerName || line.name;
-        this.elements.text.textContent=displayText;
+        this.uiScene.updateDialogContent(nameText,displayText,line.portrait);
+
+        /*this.elements.name.textContent=this.activeSpeakerName || line.name;
+        this.elements.text.textContent=displayText;*/
 
         switch (line.type) {
             case "text":
@@ -72,39 +82,50 @@ export default class DialogManager {
 
             case "input":
                 this.inputMode = true;
-                this.handleInput();
+                this.uiScene.showInputField((name)=>{
+                    this.handleInputResult(name);
+                });
+                //this.handleInput();
                 break;
 
             case "choice":
                 this.inputMode = true;
-                this.handleChoice(line.choices);
+                this.uiScene.showChoices(line.choices,(choice)=>{
+                    this.handleChoiceResult(choice);
+                });
+                //this.handleChoice(line.choices);
                 break;
         }
     }
-    handleInput(){
-        this.elements.inputContainer.classList.remove('hidden');
-        this.elements.inputField.focus();
+    handleInputResult(name){
+        /*this.elements.inputContainer.classList.remove('hidden');
+        this.elements.inputField.focus();*/
 
-        const submitHandler=()=>{
+        /*const submitHandler=()=>{
             const val=this.elements.inputField.value.trim();
             if(val!==""){
                 this.playerName=val;
                 this.elements.inputContainer.classList.add('hidden');
                 this.elements.inputSubmit.removeEventListener('click',submitHandler);
-                //使い捨てのaddEventだからremoveしておく。    
-       
+                //使い捨てのaddEventだからremoveしておく。*/    
+                if(name&&name.trim()!==''){
+                    this.playerName=name;
+                }else{
+                    alert('名前を入力してください');
+                }
+
                 this.inputMode=false;
                 this.currentIndex++;
                 this.showLine();
-            }else{
+            /*}else{
                 alert('名前を入力してください。');
                 this.elements.inputField.focus();
             }    
         };
-        this.elements.inputSubmit.addEventListener('click',submitHandler);
+        this.elements.inputSubmit.addEventListener('click',submitHandler);*/
     }
-    handleChoice(choices){
-        this.elements.choiceContainer.classList.remove('hidden');
+    handleChoiceResult(choice){
+        /*this.elements.choiceContainer.classList.remove('hidden');
         
         choices.forEach(choice=>{
             const btn=document.createElement('button');
@@ -112,7 +133,7 @@ export default class DialogManager {
             btn.classList.add('choice-btn');
 
             btn.addEventListener('click',()=>{
-                this.clearContent();
+                this.clearContent();*/
                 this.inputMode=false;
                 
                 if(this.onChoice) this.onChoice(choice);
@@ -124,17 +145,17 @@ export default class DialogManager {
                     this.currentIndex++;
                     this.showLine();
                 }
-            });
+            /*});
             this.elements.choiceContainer.appendChild(btn); //createElementで作ったものをHTMLに張り付ける
-        });
+        });*/
     }
-    clearContent(){
+    /*clearContent(){
         //明日する
         while(this.elements.choiceContainer.firstChild){
             this.elements.choiceContainer.removeChild(this.elements.choiceContainer.firstChild);
         }
         this.elements.choiceContainer.classList.add('hidden');
-    }
+    }*/
     jumpTo(nextId){
         if(nextId==='end'){
             //dialog.jsonでendってやつを作って目印にするだけ。showLineとは違って自動でしてくれない
@@ -155,7 +176,9 @@ export default class DialogManager {
     end() {
         this.isTalking = false;
         this.inputMode = false;
-        this.elements.window.classList.add('hidden');
-        this.elements.text.textContent= "";
+        this.uiScene.hideDialogWindow();
+
+        /*this.elements.window.classList.add('hidden');
+        this.elements.text.textContent= "";*/
     }
 }
