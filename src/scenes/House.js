@@ -18,11 +18,14 @@ export default class House extends Phaser.Scene{
 
         this.HouseLayer.setCollisionByProperty({ collides: true });
         this.OnGroundLayer.setCollisionByProperty({ collides: true });
+        this.GroundLayer.setCollisionByProperty({ collides: true });
+
 
         this.player = this.physics.add.sprite(500, 400, 'player').setScale(0.1);
 
         this.physics.add.collider(this.player, this.HouseLayer);
         this.physics.add.collider(this.player, this.OnGroundLayer);
+        this.physics.add.collider(this.player, this.GroundLayer);
 
         this.physics.world.setBounds(0,0,map.widthInPixels,map.heightInPixels);
 

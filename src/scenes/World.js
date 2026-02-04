@@ -161,14 +161,15 @@ export default class World extends Phaser.Scene{
 
         const tileset = map.addTilesetImage('Serene_Village_48x48','tileset');
 
-        this.backgroundLayer = map.createLayer('Ground', tileset, 0, 0);
+        this.GroundLayer = map.createLayer('Ground', tileset, 0, 0);
         this.OnGroundLayer = map.createLayer('OnGround', tileset, 0, 0);
         this.HouseLayer = map.createLayer('House', tileset, 0, 0);
         //this.OnDecorationLayer = map.createLayer('OnDecoration', tileset, 0, 0);
         this.DecorationLayer = map.createLayer('Decoration', tileset, 0, 0);
 
-        //this.OnGroundLayer.setCollisionByProperty({ collides: true });
-        //this.HouseLayer.setCollisionByProperty({ collides: true });
+        this.OnGroundLayer.setCollisionByProperty({ collides: true });
+        this.HouseLayer.setCollisionByProperty({ collides: true });
+        this.GroundLayer.setCollisionByProperty({ collides: true });
         this.physics.world.setBounds(0,0,map.widthInPixels,map.heightInPixels);
 
         /*this.moneyText=this.add.text(100,100,`所持金：${this.money}`,{
@@ -203,7 +204,7 @@ export default class World extends Phaser.Scene{
     //----------------------------------------------------------キー------------------------------------------------------------------------------
         this.cursors=this.input.keyboard.createCursorKeys();
     //----------------------------------------------------------プレイヤー------------------------------------------------------------------------------
-        this.player=new Player(this,100,300,'player');
+        this.player=new Player(this,500,500,'player');
 
         if(data&&data.returnTo){
             const objectLayer=map.getObjectLayer('Object');
@@ -268,9 +269,9 @@ export default class World extends Phaser.Scene{
         this.villagers=this.physics.add.group();
 
         const villagerData=[
-            {x:800,y:300,key:'player',startId:'greet',name:'マイク'},
-            {x:200,y:400,key:'player',startId:'start',name:'ジェシカ'},
-            {x:100,y:600,key:'player',startId:'daily',name:'サンドラ'},
+            {x:800,y:800,key:'player',startId:'greet',name:'マイク'},
+            {x:1000,y:1000,key:'player',startId:'start',name:'ジェシカ'},
+            {x:1200,y:1200,key:'player',startId:'daily',name:'サンドラ'},
         ];
 
         villagerData.forEach(data=>{
@@ -281,9 +282,12 @@ export default class World extends Phaser.Scene{
     //----------------------------------------------------------当たり判定----------------------------------------------------------------------
         this.physics.add.collider(this.player,this.OnGroundLayer);
         this.physics.add.collider(this.player,this.HouseLayer);
+        this.physics.add.collider(this.player,this.GroundLayer);
 
         this.physics.add.collider(this.villagers,this.OnGroundLayer);
         this.physics.add.collider(this.villagers,this.HouseLayer);
+        this.physics.add.collider(this.villagers,this.GroundLayer);
+        this.physics.add.collider(this.villagers,this.villagers,null,null,this);
 
         this.physics.add.collider(this.player,this.villagers);
     //----------------------------------------------------------アクション系-----------------------------------------------------------------------
