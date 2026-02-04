@@ -28,12 +28,12 @@ export default class UIScene extends Phaser.Scene{
         this.keys=this.input.keyboard.addKeys('M,I,P,A,R,S,D');
 
         this.createHealthBar();
-        this.createHotbar();
+        //this.createHotbar();
 
         this.createDialogUI();
 
         if(worldScene.inventoryData){
-            this.updateHotbar(worldScene.inventoryData);
+            //this.updateHotbar(worldScene.inventoryData);
         }
     }
     createHealthBar(){
