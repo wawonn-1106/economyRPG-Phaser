@@ -74,6 +74,10 @@ export default class World extends Phaser.Scene{
         //this.load.image('tileset','assets/tilesets/pipo-map001.png');
         this.load.image('tileset','assets/tilesets/Serene_Village_48x48.png');
 
+        this.load.image('hotbar','assets/images/hotbar.png');//まだ
+        this.load.image('slot-selected','assets/images/slot-selected.png');//まだ
+        this.load.image('time-bg','assets/images/time-bg.png');//まだ
+
         this.load.image('menu-bg','assets/images/menu-bg.png');
         this.load.image('dialog-bg','assets/images/dialog-bg.png');
         this.load.image('machine-bg','assets/images/machine-bg.png');
