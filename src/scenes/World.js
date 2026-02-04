@@ -57,6 +57,7 @@ export default class World extends Phaser.Scene{
     }*/
     preload(){
         this.load.image('player','assets/images/player.png');
+        this.load.image('heart','assets/images/heart.png');
         //this.load.image('tileset-test1','assets/tilesets/Beginning Fields.png')
         //this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test1.tmj');
         //this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test.tmj');
@@ -164,7 +165,7 @@ export default class World extends Phaser.Scene{
         this.OnGroundLayer = map.createLayer('OnGround', tileset, 0, 0);
         this.HouseLayer = map.createLayer('House', tileset, 0, 0);
         //this.OnDecorationLayer = map.createLayer('OnDecoration', tileset, 0, 0);
-        //this.DecorationLayer = map.createLayer('Decoration', tileset, 0, 0);
+        this.DecorationLayer = map.createLayer('Decoration', tileset, 0, 0);
 
         //this.OnGroundLayer.setCollisionByProperty({ collides: true });
         //this.HouseLayer.setCollisionByProperty({ collides: true });

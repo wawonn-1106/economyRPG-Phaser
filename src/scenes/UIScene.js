@@ -9,6 +9,11 @@ export default class UIScene extends Phaser.Scene{
         this.dialogGroup=null;
         this.dialogChoices=[];
         this.inputFields=[];
+
+        this.hpHearts=[];
+        this.hotbarSlots=[];
+        this.hotbarIcons=[];
+        this.maxHp=10;
     }
     create(){
         const worldScene=this.scene.get('World');
@@ -22,7 +27,62 @@ export default class UIScene extends Phaser.Scene{
 
         this.keys=this.input.keyboard.addKeys('M,I,P,A,R,S,D');
 
+        this.createHealthBar();
+        this.createHotbar();
+
         this.createDialogUI();
+
+        if(worldScene.inventoryData){
+            this.updateHotbar(worldScene.inventoryData);
+        }
+    }
+    createHealthBar(){
+        const startX=30;
+        const y=50;
+        for(let i=0;i<this.maxHp;i++){
+
+            const heart=this.add.image(startX+(i*35),y,'heart').setScale(0.08);
+            this.hpHearts.push(heart);
+        }
+    }//↓明日書き直す
+    /*createHotbar(){
+        const gameWidth=this.scale.width;
+        const gameHeight=this.scale.height;
+        const slotCount=9;
+        const slotSize=60;
+        const startX=(gameWidth-(slotCount*slotSize))/2+(slotSize/2);
+        const y=gameHeight-50;
+
+        for(let i=0;i<slotCount;i++){
+
+            const slot=this.add.rectangle(startX+(i*slotSize),y,50,50,0).setStrokeStyle(2,0xffffff);
+            this.hotbarSlots.push(slot);
+
+            this.hotbarIcons.push(null);
+        }
+    }*/
+    /*updateHotbar(inventoryData){
+        inventoryData.forEach((item,index)=>{
+            if(index>=this.hotbarSlots.length)return;
+
+            const slot=this.hotbarSlots[index];
+
+            if(this,this.hotbarIcons[index])this.hotbarIcons[index].destroy();
+
+            if(item){
+                const icon=this.add.image(slot.x,slot.y,'heart').setScale(0.05);
+                this.hotbarIcons[index]=icon;
+            }
+        })
+    }*/
+    updateHP(currentHP){
+        this.hpHearts.forEach((heart,index)=>{
+            if(index<currentHP){
+                heart.setVisible(true).setAlpha(1);
+            }else{
+                heart.setAlpha(0.2);
+            }
+        });
     }
     createDialogUI(){
         const gameWidth=this.scale.width;
