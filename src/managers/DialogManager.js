@@ -68,6 +68,8 @@ export default class DialogManager {
 
         this.uiScene.updateDialogContent(nameText,displayText,line.portrait);
 
+        this.updateTextDisplay(displayText);
+
         /*this.elements.name.textContent=this.activeSpeakerName || line.name;
         this.elements.text.textContent=displayText;*/
 
@@ -172,6 +174,33 @@ export default class DialogManager {
             //一応なかったらその行飛ばす
         }
         this.showLine();
+    }
+    updateTextDisplay(displayText){
+
+        /*this.uiScene.dialogContentText.off('area.down');
+        this.uiScene.dialogContentText.setText(displayText);*/
+        const textContent=this.uiScene.dialogContentText;
+
+        if(!textContent)return;
+
+        textContent.off('area.down');
+
+        textContent.setText(displayText);
+
+
+        textContent.on('area.down',(areaKey)=>{
+            //const termsData=this.scene.dictionaryManager.getTermByWord(areaKey);
+            const termsData = this.scene.cache.json.get('termsData');
+            const termData=termsData.terms.find(term=>term.word===areaKey);
+
+            if(termData){
+                this.uiScene.dictionaryContent.createQuickView(termData);
+
+                /*this.scene.input.once('pointerdown',()=>{
+                    quickView.destroy();
+                });*/
+            }
+        });
     }
     end() {
         this.isTalking = false;

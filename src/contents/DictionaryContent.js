@@ -4,6 +4,33 @@ export default class DictionaryContent{
 
         this.worldScene=this.uiScene.scene.get('World');
     }
+    createQuickView(termData){
+        const container=this.uiScene.add.container(0,0);
+        
+        const bg=this.uiScene.add.image(0,0,'menu-bg').setDisplaySize(1000,600);
+        container.add(bg);//いったんmenu-bgで代用
+
+        const title=this.uiScene.add.text(-180,-110,`[${termData.word}]`,{
+            fontSize:'24px',
+            color:'#000000',
+            fontStyle:'bold'
+        });
+
+        const description=this.uiScene.add.text(-180,-60,`${termData.description}`,{
+            fontSize:'24px',
+            color:'#000000',
+            wordWrap:{width:360}
+        });
+
+        const example=this.uiScene.add.text(-180,40,`${termData.example}`,{
+            fontSize:'24px',
+            color:'#000000',
+            wordWrap:{width:360}
+        });
+
+        container.add([title,description,example]);
+        return container;
+    }
     createView(){
         const container=this.uiScene.add.container(0,0);
 
@@ -37,20 +64,27 @@ export default class DictionaryContent{
             wordWrap:{width:400}
         });
 
-        detailContainer.add([wordTitle,categoryLabel,descriptionText]);//wordTitleもいるなら
+        const exampleText=this.uiScene.add.text(0,200,'',{
+            fontSize:'22px',
+            color:'#000000',
+            wordWrap:{width:400}
+        });//改行しないとはみ出るなぁ
+
+        detailContainer.add([wordTitle,categoryLabel,descriptionText,exampleText]);//wordTitleもいるなら
 
         terms.forEach((term,index)=>{//相対座標にするから毎回index使う、他の場所でも
             const y=index*45;
             const termButton=this.uiScene.add.text(0,y,`${term.word}`,{
                 fontSize:'24px',
                 color:'#000000'
-            }).setInteractive({unHandler:true});//ワードクリックしたら説明が出てくる感じに。
+            }).setInteractive({useHandCursor:true});//ワードクリックしたら説明が出てくる感じに。
             //見開きの本みたいなUIにしよう
 
             termButton.on('pointerdown',()=>{
                wordTitle.setText(term.word);
                categoryLabel.setText(`カテゴリ：${term.category}`);
-               descriptionText.setText(term.description ||'説明はありません'); 
+               descriptionText.setText(term.description ||'説明はありません');
+               exampleText.setText(term.example ||'例文はありません'); 
             });
 
             listContainer.add(termButton);

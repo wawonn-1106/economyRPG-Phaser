@@ -16,6 +16,13 @@ export const config={
             debug:true
         }
     },
+    plugins:{
+        global:[{
+            key:'rexBBCodeTextPlugin',
+            plugin:window.rexbbcodetextplugin,
+            start:true
+        }]
+    },
     parent:'game-container',
     dom:{
         createContainer:true

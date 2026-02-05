@@ -1,4 +1,6 @@
 import MenuManager from "../managers/MenuManager.js";
+import DictionaryContent from "../contents/DictionaryContent.js";
+//import DictionaryManager from "../managers/DictionaryManager.js";
 
 export default class UIScene extends Phaser.Scene{
     constructor(){
@@ -30,10 +32,13 @@ export default class UIScene extends Phaser.Scene{
         this.timeBg=null;
         this.dayText=null;
         this.clockText=null;
+
+        //this.dictionaryContent = new DictionaryContent(this);
     }
     create(){
         const worldScene=this.scene.get('World');
 
+        this.dictionaryContent = new DictionaryContent(this);
         this.menuManager=new MenuManager(this,worldScene);
         worldScene.menuManager=this.menuManager;
 
@@ -162,12 +167,14 @@ export default class UIScene extends Phaser.Scene{
             fontFamily:'sans-serif'
         });
 
-        this.dialogContentText=this.add.text(gameWidth/2-120,gameHeight-165,'',{
+        this.dialogContentText=this.add.rexBBCodeText(gameWidth/2-120,gameHeight-165,'',{
             fontSize:'24px',
             color:'#000000',
             wordWrap:{width:500},
-            lineSpacing:10
-        });
+            lineSpacing:10,
+            interactive: true
+        }).setDepth(5000);
+        this.dialogContentText.setInteractive();//あああああああああああ
 
         this.dialogGroup.add([winBg,this.portrait,this.dialogNameText,this.dialogContentText]);
     }
@@ -228,7 +235,7 @@ export default class UIScene extends Phaser.Scene{
         const confirmInput=()=>{
             if(currentText.trim()==='')return;
 
-            this.inputFields.keyboard.off('keydown',keyHandler);
+            this.input.keyboard.off('keydown',keyHandler);
             this.clearInputFields();
             callback(currentText);
         };
