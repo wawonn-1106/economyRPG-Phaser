@@ -77,9 +77,13 @@ export default class World extends Phaser.Scene{
         this.load.image('hotbar','assets/images/hotbar.png');//まだ
         this.load.image('slot-selected','assets/images/slot-selected.png');//まだ
         this.load.image('time-bg','assets/images/time-bg.png');//まだ
+        this.load.image('submit-btn','assets/images/submit-btn.png');
+        this.load.image('input-bg','assets/images/choice-btn.png');//まだ
+        this.load.image('choice-btn','assets/images/choice-btn.png');
 
         this.load.image('menu-bg','assets/images/menu-bg.png');
-        this.load.image('dialog-bg','assets/images/dialog-bg.png');
+        this.load.image('dialog-bg','assets/images/machine-bg.png');//dialog-bg用意する
+        this.load.image('portrait-container','assets/images/portrait-container.png');
         this.load.image('machine-bg','assets/images/machine-bg.png');
         this.load.image('review','assets/images/review.png');
         this.load.image('settings','assets/images/settings.png');
@@ -194,15 +198,20 @@ export default class World extends Phaser.Scene{
         const guideButton=this.add.image(1230,670,'guide')
                 .setOrigin(0.5)
                 .setScale(0.7)
-                .setInteractive({unHandCursor:true})
+                .setInteractive({useHandCursor:true})
                 .setScrollFactor(0)
                 .setDepth(3000);
         
-        guideButton.on('pointerover',()=>guideButton.setScale(0.8));
-        guideButton.on('pointerout',()=>guideButton.setScale(0.7));
-
+        if(this.dialogManager && !this.dialogManager.isTalking){
+            guideButton.on('pointerover',()=>guideButton.setScale(0.8));
+            guideButton.on('pointerout',()=>guideButton.setScale(0.7));
+        }//会話中は大きくならないようにしたい、なんかできないから。後で修正。
+        
         guideButton.on('pointerdown',()=>{
-            this.menuManager?.toggle('guide');
+
+            if(this.dialogManager && !this.dialogManager.isTalking){
+                this.menuManager?.toggle('guide');
+            }
         });
 
     //----------------------------------------------------------キー------------------------------------------------------------------------------

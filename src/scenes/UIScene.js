@@ -70,7 +70,18 @@ export default class UIScene extends Phaser.Scene{
 
             const heart=this.add.image(startX+(i*35),y,'heart').setScale(0.08);
             this.hpHearts.push(heart);
+
+            this.tweens.add({
+                targets:heart,
+                scale:0.1,
+                duration:600,
+                yoyo:true,
+                repeat:-1,
+                ease:'Sine.easeInOut',
+                //delay:i*100 波打ちのような感じ
+            });//これいらんな
         }
+
     }//↓明日書き直す
     createHotbar(){
         const gameWidth=this.scale.width;
@@ -138,9 +149,11 @@ export default class UIScene extends Phaser.Scene{
 
         this.dialogGroup=this.add.container(0,0).setDepth(4000).setVisible(false);
 
-        const winBg=this.add.image(gameWidth/2,gameHeight-140,'dialog-bg');
+        const winBg=this.add.image(gameWidth/2,gameHeight-140,'dialog-bg').setScale(3,1.5);
 
-        this.portrait=this.add.image(gameWidth/2-280,gameHeight-150,'portrait-container').setOrigin(0.5,1);
+        this.portrait=this.add.image(gameWidth/2-280,gameHeight-50,'portrait-container')
+            //.setScale(3,1.5)
+            .setOrigin(0.5,1);
 
         this.dialogNameText=this.add.text(gameWidth/2-120,gameHeight-200,'',{
             fontSize:'22px',
@@ -164,12 +177,13 @@ export default class UIScene extends Phaser.Scene{
     hideDialogWindow(){
         this.dialogGroup.setVisible(false);
         this.clearChoices();
+        this.clearInputFields();
     }
     updateDialogContent(name,text,portraitKey=null){
         this.dialogNameText.setText(name);
         this.dialogContentText.setText(text);
         if(portraitKey){//立ち絵。ない時用の立ち絵も用意する予定
-            this.portrait.setTexture(portraitKey).setVisible(true);//いったん全部player.png
+            this.portrait.setTexture(portraitKey).setScale(0.3).setVisible(true);//いったん全部player.png
         }else{
             this.portrait.setVisible(false);
         }
@@ -181,7 +195,7 @@ export default class UIScene extends Phaser.Scene{
         const gameWidth=this.scale.width;
         const gameHeight=this.scale.height;
 
-        const inputBg=this.add.image(gameWidth/2,gameHeight/2,'input-bg').setDepth(5000);
+        const inputBg=this.add.image(gameWidth/2,gameHeight/2+250,'input-bg').setDepth(5000);
 
         let currentText='';
         const inputTextDisplay=this.add.text(gameWidth/2,gameHeight/2-20,'',{
@@ -190,12 +204,13 @@ export default class UIScene extends Phaser.Scene{
         }).setOrigin(0.5).setDepth(5001);
 
         const submitBtn=this.add.image(gameWidth/2,gameWidth/2+60,'submit-btn')
-            .setInteractive({unHandCursor:true})
+            .setInteractive({useHandCursor:true})
+            .setOrigin(0.5)
             .setDepth(5001);
         
-        const submitText=this.add.text(gameWidth/2,gameHeight/2+60,'決定',{
+        /*const submitText=this.add.text(gameWidth/2,gameHeight/2+60,'決定',{
             fontSize:'20px'
-        }).setOrigin(0.5).setDepth(5002);
+        }).setOrigin(0.5).setDepth(5002);*/
 
         const keyHandler=(event)=>{
             if(event.key==='Enter'){
@@ -228,14 +243,33 @@ export default class UIScene extends Phaser.Scene{
     }
     showChoices(choices,callback){
         this.clearChoices();
+
+        const gameWidth=this.scale.width;
+        const gameHeight=this.scale.height;
+
+        const startY=gameHeight-100;
+        const choiceSpacing=160;
+
+        const totalWidth=(choices.length-1)*choiceSpacing;
+        const startX=(gameWidth/2)-(totalWidth/2);
+
         choices.forEach((choice,index)=>{
-            const x=this.scale.width/2;
-            const y=250+(index*70);
+            const x=startX+(index*choiceSpacing);
+            const y=startY;
 
-            const btn=this.add.image(x,y,'choice-btn').setInteractive({useHandCursor: true});
-            const text=this.add.text(x,y,choice.text,{fontSize:'20px'}).setOrigin(0.5);
+            const btn=this.add.image(x,y,'choice-btn')
+                .setScale(1.5)
+                .setDepth(4001)
+                .setInteractive({useHandCursor: true});
 
-            btn.on('pointerdown',()=>callback(choice));//選択の後の処理に飛ばす
+            const text=this.add.text(x,y,choice.text,{fontSize:'20px'})
+                .setDepth(4002)
+                .setOrigin(0.5);
+
+            btn.on('pointerdown',()=>{
+                this.clearChoices();
+                callback(choice)
+            });//選択の後の処理に飛ばす
 
             this.dialogChoices.push(btn,text);
         });

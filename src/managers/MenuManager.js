@@ -70,7 +70,9 @@ export default class MenuManager{
         this.currentTab=tabId;
         if(this.currentTab==='returnTitle'){
                 this.closeMenu();
+                
                 this.worldScene.cameras.main.fadeOut(1000,0,0,0);
+                this.uiScene.cameras.main.fadeOut(1000,0,0,0);
 
                 this.worldScene.cameras.main.once('camerafadeoutcomplete',()=>{
                     //this.window.classList.add('hidden');
