@@ -183,25 +183,20 @@ export default class DialogManager {
 
         if(!textContent)return;
 
-        textContent.off('area.down');
+        textContent.off('areaclick');
 
         textContent.setText(displayTerm);
 
-        if (textContent.updateInteractive) {
+        /*if (textContent.updateInteractive) {
             textContent.updateInteractive();
-        }
+        }*/
 
-        this.uiScene.time.delayedCall(20,()=>{
-            if(textContent.updateInteractive){
-                textContent.updateInteractive();
-            }
-            this.scene.input.enableDebug(textContent, 0xff00ff);
-
-            textContent.on('area.down',(areaKey)=>{
+        textContent.on('areaclick',(areaKey)=>{
             //const termsData=this.scene.dictionaryManager.getTermByWord(areaKey);
             /*const termsData = this.scene.cache.json.get('termsData');
             const termData=termsData.terms.find(term=>term.word===areaKey);*/
-            const termData = this.scene.dictionaryManager.getTermByWord(areaKey);
+            const world=this.scene;
+            const termData = world.dictionaryManager.getTermByWord(areaKey);
 
             if(termData){
                 this.uiScene.dictionaryContent.createQuickView(termData);
@@ -211,15 +206,11 @@ export default class DialogManager {
                 });*/
             }
         });
-        })
-        
-
-
-        
     }
     end() {
         this.isTalking = false;
         this.inputMode = false;
+        this.uiScene.dictionaryContent.hide();
         this.uiScene.hideDialogWindow();
 
         /*this.elements.window.classList.add('hidden');

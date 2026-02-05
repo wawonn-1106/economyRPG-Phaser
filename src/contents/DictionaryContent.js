@@ -3,13 +3,23 @@ export default class DictionaryContent{
         this.uiScene=uiScene;
 
         this.worldScene=this.uiScene.scene.get('World');
+        this.quickViewContainer=null;
     }
     createQuickView(termData){
-        const container=this.uiScene.add.container(0,0).setDepth(10000);
 
-        const overlay=this.uiScene.add.rectangle(0,0,1280,720,0x000000,0.3).setInteractive();
+        if(this.quickViewContainer){
+            this.quickViewContainer.destroy();
+        }
+
+        this.quickViewContainer=this.uiScene.add.container(640,360).setDepth(10000);
+        //相対座標にする予定
+
+        const overlay=this.uiScene.add.rectangle(0,0,1280,720,0x000000,0.3)
+            .setDepth(500)//コンテナの中をクリックしてもとじなくしたい→できた
+            .setInteractive();
         
-        const bg=this.uiScene.add.image(0,0,'hotber').setDisplaySize(400,300);
+        const bg=this.uiScene.add.image(0,0,'menu-bg').setDisplaySize(600,300);
+        bg.setInteractive();
         //container.add(bg);//いったんmenu-bgで代用
 
         const title=this.uiScene.add.text(-180,-110,`[${termData.word}]`,{
@@ -30,13 +40,13 @@ export default class DictionaryContent{
             wordWrap:{width:360}
         });
 
-        container.add([overlay,bg,title,description,example]);
+        this.quickViewContainer.add([overlay,bg,title,description,example]);
 
         overlay.once('pointerdown',()=>{
-            container.destroy();
+            this.quickViewContainer.destroy();
         });
 
-        return container;
+        return this.quickViewContainer;
     }
     createView(){
         const container=this.uiScene.add.container(0,0);
@@ -123,5 +133,12 @@ export default class DictionaryContent{
         });
 
         return container;
+    }
+    hide(){
+        if(this.quickViewContainer){
+            this.quickViewContainer.destroy();
+            this.quickViewContainer=null;
+            this.currentWord=null;
+        }
     }
 }

@@ -4,7 +4,7 @@
             "id":"opportunity_cost",
             "word":"機会費用",
             "category":"基本概念",
-            "description":"",
+            "description":"ここに機会費用の説明",
             "example":"1限を出席するということは、二度寝をする機会を失ったということ",
             "unlocked":true
         },

@@ -174,20 +174,20 @@ export default class UIScene extends Phaser.Scene{
             color:'#000000',
             wordWrap:{width:500},
             lineSpacing:10,
-            padding: { top: 10 },
+            padding: { top: 10 },//他の会話のやつもこれ入れる
             //interactive:true,
-            tags:{
+            /*tags:{
                 area:{
                     mode:'click'
                 }
             },
-            area:true
+            area:true*/
         }).setDepth(4005).setVisible(false);
 
         this.dialogContentText.setInteractive();//あああああああああああ
 
-        this.dialogGroup.add([winBg,this.portrait,this.dialogNameText]);
-        //this.dialogGroup.removeInteractive();
+        this.dialogGroup.add([winBg,this.portrait,this.dialogNameText,this.dialogContentText]);
+        this.dialogGroup.removeInteractive();
     }
     showDialogWindow(){
         this.dialogGroup.setVisible(true);
