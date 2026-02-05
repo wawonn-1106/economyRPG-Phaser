@@ -89,7 +89,7 @@ export default class UIScene extends Phaser.Scene{
 
         const y=gameHeight-50;
 
-        this.hotbar=this.add.image(gameWidth/2,y,'hotbar');//'hotbar
+        this.hotbar=this.add.image(gameWidth/2,y,'hotbar').setScale(1.8,0.3);//'hotbar
         /*const slotCount=9;
         const slotSize=60;*/
         
@@ -102,12 +102,12 @@ export default class UIScene extends Phaser.Scene{
             this.hotbarSlots.push({
                 x:startX+(i*spacing),
                 y:y
-            });
+            });//もうちょい大きくてもいい
 
             this.hotbarIcons.push(null);
             this.hotbarTexts.push(null);
         }
-        this.selector=this.add.image(this.hotbarSlots[0].x,y,'slot-selected').setDepth(10);
+        this.selector=this.add.image(this.hotbarSlots[0].x,y,'hotbar').setScale(0.2).setDepth(10);
         //選ばれてるときわかりやすく
     }
     updateHotbar(inventoryData){

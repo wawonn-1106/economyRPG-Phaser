@@ -74,7 +74,7 @@ export default class World extends Phaser.Scene{
         //this.load.image('tileset','assets/tilesets/pipo-map001.png');
         this.load.image('tileset','assets/tilesets/Serene_Village_48x48.png');
 
-        this.load.image('hotbar','assets/images/hotbar.png');//まだ
+        this.load.image('hotbar','assets/images/hotbar.png');
         this.load.image('slot-selected','assets/images/slot-selected.png');//まだ
         this.load.image('time-bg','assets/images/time-bg.png');//まだ
         this.load.image('submit-btn','assets/images/submit-btn.png');
@@ -311,7 +311,7 @@ export default class World extends Phaser.Scene{
         });
 
         const objectLayer=map.getObjectLayer('Object');
-        if(objectLayer){
+        if(objectLayer){//家に入る、機械を開いたり、▼が出るアクション
             objectLayer.objects.forEach(object=>{
                 if(object.name==='door' || object.name==='machine'){
                     this.interactables.push({
@@ -327,6 +327,39 @@ export default class World extends Phaser.Scene{
         this.readyIcon=this.add.text(0,0,'▼',
             {fontSize:'24px'}
         ).setOrigin(0.5).setVisible(false).setDepth(5000);
+
+        if(objectLayer){//マップの移動、家を出るのと同じロジック。触れるだけでOK
+            objectLayer.objects.forEach(obj=>{
+                if(obj.name==='wrap'){
+                    const wrapRegion=this.add.zone(
+                        obj.x+obj.width/2,obj.y+obj.height/2,
+                        obj.width,obj.height
+                    );
+                    this.physics.add.existing(wrapRegion,true);
+
+                    const targetName=obj.properties?.find(p=>p.name==='target')?.value;
+
+                    this.physics.add.overlap(this.player,wrapRegion,()=>{
+                        if(!this.isWraping){
+                            this.isWraping=true;
+                            //this.player.body.enable=false;
+
+                            this.cameras.main.fadeOut(1000,0,0,0);
+                            this.cameras.main.once('camerafadeoutcomplete',()=>{
+                                const data={fromScene:this.scene.key, spawnPoint:targetName};
+
+                                switch(targetName){
+                                    case 'toForest':
+                                        this.scene.start('Forest',data);
+                                        break;
+                                    //追加していく
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
         //this.readyIcon=this.add.image(0,0,'readyIcon').setVisible(false).setDepth(4000).setScale(0.5);
 
 
@@ -400,7 +433,10 @@ export default class World extends Phaser.Scene{
             {id:'egg',name:'卵',realQuality:2,count:5},
             {id:'banana',name:'バナナ',realQuality:3,count:5},
             {id:'pumpkin',name:'かぼちゃ',realQuality:2,count:1},
-        ];
+            {id:'egg',name:'卵',realQuality:2,count:5},
+            {id:'banana',name:'バナナ',realQuality:3,count:5},
+            {id:'pumpkin',name:'かぼちゃ',realQuality:2,count:1}
+        ];//wheatとか全てのidの画像を用意する→
 
         /*this.input.keyboard.on('keydown-I',()=>{
             //会話とは違ってIで開け閉め
