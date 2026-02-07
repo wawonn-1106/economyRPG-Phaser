@@ -12,7 +12,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         this.speed=200;
         this.jump_speed=-330;
 
+        this.heldItem=scene.add.image(x,y,null).setVisible(false);
+        this.heldItem.setScale(0.5);
+        this.heldItem.setDepth(this.depth+1);
+
         this.cursors=scene.cursors;
+    }
+    updateHeldItem(textureKey){
+        if(!textureKey){
+            this.heldItem.setVisible(false);
+        }else{
+            this.heldItem.setTexture(textureKey);
+            this.heldItem.setVisible(true);
+        }
     }
     update(){
         if(!this.active) return;//体力があるかどうか？？
@@ -64,6 +76,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         if(!moving){
             this.setVelocity(0);
             //this.anims.play('idle',true);
+        }
+
+        if(this.heldItem.visible){
+            this.heldItem.setPosition(this.x+25,this.y+15).setDisplaySize(30,30);
+            //this.x,yがプレイヤーのいる位置
         }
         
         if (this.body.velocity.x !== 0 && this.body.velocity.y !== 0) {

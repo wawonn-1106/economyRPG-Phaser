@@ -231,11 +231,11 @@ export default class World extends BaseScene{
 
         this.inventoryData=[
             //最終的にはjsonで管理するが、とりあえずインベントリを表示させるためここで
-            {id:'wheat',name:'小麦',realQuality:1,count:5},
-            {id:'stone',name:'石',realQuality:1,count:3},
-            {id:'apple',name:'りんご',realQuality:1,count:12},
-            {id:'egg',name:'卵',realQuality:2,count:5},
-            {id:'banana',name:'バナナ',realQuality:3,count:5},
+            {id:'apple',name:'りんご',realQuality:1,count:5},
+            {id:'seed',name:'種',realQuality:1,count:13},
+            {id:'axe',name:'斧',realQuality:1,count:1},
+            {id:'pickaxe',name:'ツルハシ',realQuality:2,count:1},
+            {id:'fishing-rod',name:'釣り竿',realQuality:3,count:1},
             {id:'pumpkin',name:'かぼちゃ',realQuality:2,count:1},
             {id:'egg',name:'卵',realQuality:2,count:5},
             {id:'banana',name:'バナナ',realQuality:3,count:5},

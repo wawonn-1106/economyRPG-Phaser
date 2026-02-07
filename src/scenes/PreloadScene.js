@@ -16,6 +16,11 @@ export default class PreloadScene extends Phaser.Scene{
 //--------------------------------天気------------------------------------------------------
         this.load.image('rain','assets/images/player.png');
         this.load.image('snow','assets/images/player.png');
+        this.load.image('apple','assets/images/apple.png');
+        this.load.image('seed','assets/images/seed.png');
+        this.load.image('axe','assets/images/axe.png');
+        this.load.image('pickaxe','assets/images/pickaxe.png');
+        this.load.image('fishing-rod','assets/images/fishing-rod.png');
 //--------------------------------json------------------------------------------------------
         this.load.json('chapter1','assets/data/dialog1.json');
         this.load.json('termsData','assets/data/dictionary.json');

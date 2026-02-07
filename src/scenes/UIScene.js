@@ -71,6 +71,15 @@ export default class UIScene extends Phaser.Scene{
                 this.selectedSlotIndex=(this.selectedSlotIndex-1+9)%9;
             }
             this.updateSelectorPosition();
+
+            const inventory=worldScene.inventoryData;
+            const currentItem=inventory[this.selectedSlotIndex];
+
+            if(currentItem&& currentItem.count>0){
+                worldScene.player.updateHeldItem(currentItem.id);
+            }else{
+                worldScene.player.updateHeldItem(null);
+            }
         });
 
         //his.input.setTopOnly(true);
@@ -133,7 +142,8 @@ export default class UIScene extends Phaser.Scene{
 
             if(item && item.count>0){
 
-                this.hotbarIcons[index]=this.add.image(slotPos.x,slotPos.y,item.id);
+                this.hotbarIcons[index]=this.add.image(slotPos.x,slotPos.y,item.id)
+                    .setDisplaySize(30,30);//元の画像の大きさが違っても無理やり統一
 
                 this.hotbarTexts[index]=this.add.text(slotPos.x+10,slotPos.y+10,item.count,{
                     fontSize:'24px',
