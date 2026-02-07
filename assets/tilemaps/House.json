@@ -346,9 +346,14 @@
                  "name":"exit",
                  "properties":[
                         {
-                         "name":"spawnHolder",
+                         "name":"spawnPoint",
                          "type":"string",
                          "value":"world_house"
+                        }, 
+                        {
+                         "name":"target",
+                         "type":"string",
+                         "value":"World"
                         }],
                  "rotation":0,
                  "type":"",

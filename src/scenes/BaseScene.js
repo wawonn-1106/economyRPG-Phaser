@@ -41,6 +41,7 @@ export default class BaseScene extends Phaser.Scene{
         this.cursors=this.input.keyboard.createCursorKeys();
 
         this.input.keyboard.on('keydown-SPACE',()=>{
+            console.log('クリックされました');
             this.handleAction();//スペース押されたら、アクションを起こせるかどうかの可否と、アクションへの分岐
         })
     }
@@ -99,7 +100,7 @@ export default class BaseScene extends Phaser.Scene{
                 case 'exit':
                     //入る処理
                     if (this.isWraping) return;
-                        this.isWraping = true;
+                    //this.isWraping = true;
 
                     const targetScene=this.actionTarget.data.properties.find(p=>p.name==='target')?.value;
                     const spawnPointName=this.actionTarget.data.properties.find(p=>p.name==='spawnPoint')?.value;
@@ -172,17 +173,35 @@ export default class BaseScene extends Phaser.Scene{
                     y:obj.y+(obj.height/2)
                 });
             }
+
+            if(obj.name==='machine'){
+                this.interactables.push({
+                    type:'machine',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
+
+            if(obj.name==='displayShelf'){
+                this.interactables.push({
+                    type:'displayShelf',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
         });
     }
     performTransition(nextScene,spawnPoint){
-        //if(this.isWraping) return;
-        this.isWraping=true;
+        if(this.isWraping) return;
+        //this.isWraping=true;
 
         this.player.body.enable=false;
 
         this.cameras.main.fadeOut(1000,0,0,0);
         this.cameras.main.once('camerafadeoutcomplete',()=>{
-            this.isWraping=false;
+            //this.isWraping=false;
 
             this.scene.start(nextScene,{spawnPoint:spawnPoint});
            // this.scene.start(nextScene,spawnPoint);

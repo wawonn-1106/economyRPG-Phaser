@@ -19,7 +19,9 @@ export default class House extends BaseScene{
     /*init(data){
         this.fromDoor=data.fromDoor;
     }*/
-    create(){
+    create(data){
+        super.create(data);
+        
         this.initManagers();
         this.initInput();
 
@@ -29,7 +31,10 @@ export default class House extends BaseScene{
 
         const map=this.createMap('house','Serene_Village_48x48','tileset');
 
-        this.player = this.physics.add.sprite(500, 400, 'player').setScale(0.1);
+        this.player = this.physics.add.sprite(0, 0, 'player').setScale(0.1);
+
+        this.setPlayerSpawnPoint(data);
+
         this.setupSceneTransitions(map, this.player);
 
         this.villagers=this.physics.add.group();

@@ -156,7 +156,7 @@ export default class World extends BaseScene{
     //----------------------------------------------------------プレイヤー------------------------------------------------------------------------------
         this.player=new Player(this,500,500,'player');
 
-        //this.setPlayerSpawnPoint(data)
+        this.setPlayerSpawnPoint(data)
 
         this.setupSceneTransitions(map, this.player);
 

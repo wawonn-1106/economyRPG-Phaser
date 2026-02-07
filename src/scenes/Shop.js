@@ -11,7 +11,7 @@ export default class Shop extends BaseScene{
         this.fromDoor=data.fromDoor;
     }*/
     create(data){
-
+        //console.log("Shopシーン開始！");
         super.create(data);
 
         this.initManagers();

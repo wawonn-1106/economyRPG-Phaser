@@ -238,6 +238,11 @@
                          "name":"spawnPoint",
                          "type":"string",
                          "value":"world_shop"
+                        }, 
+                        {
+                         "name":"target",
+                         "type":"string",
+                         "value":"World"
                         }],
                  "rotation":0,
                  "type":"",
