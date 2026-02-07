@@ -376,6 +376,27 @@ export default class UIScene extends Phaser.Scene{
         this.clockText.setText(`${hour}:${minute}:${ampm}`);
 
     }
+    createGuideBtn(){
+        const guideButton=this.add.image(1230,670,'guide')//UISceneに移行する
+
+                .setOrigin(0.5)
+                .setScale(0.7)
+                .setInteractive({useHandCursor:true})
+                .setScrollFactor(0)
+                .setDepth(3000);
+        
+        if(this.dialogManager && !this.dialogManager.isTalking){
+            guideButton.on('pointerover',()=>guideButton.setScale(0.8));
+            guideButton.on('pointerout',()=>guideButton.setScale(0.7));
+        }//会話中は大きくならないようにしたい、なんかできないから。後で修正。
+        
+        guideButton.on('pointerdown',()=>{
+
+            if(this.dialogManager && !this.dialogManager.isTalking){
+                this.menuManager?.toggle('guide');
+            }
+        });
+    }
     update(time,delta){
         const world=this.scene.get('World');
 

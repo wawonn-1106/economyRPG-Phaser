@@ -6,45 +6,27 @@ export default class Shop extends BaseScene{
     constructor(){
         super({key:'Shop'});
 
-        this.isWraping=false;
-        this.fromDoor=null;
-        this.interactables=[];
+        //this.isWraping=false;
+        //this.fromDoor=null;
+        //this.interactables=[];
         //this.nearstTarget=null;
-        this.readyIcon=null;
-        this.readyActionType=null;
-        this.actionTarget=null;
-        this.fromDoor=null;
+        //this.readyIcon=null;
+        //this.readyActionType=null;
+        //this.actionTarget=null;
+        //this.fromDoor=null;
         //this.isWraping=false;
     }
-    init(data){
+    /*init(data){
         this.fromDoor=data.fromDoor;
-    }
+    }*/
     create(){
-        this.dialogManager = new DialogManager(this);
+        this.initManagers();
+        this.initInput();
 
-        const map = this.make.tilemap({ key: 'shop' });
-    
-        const tileset = map.addTilesetImage('Serene_Village_48x48','tileset');
-        
-        this.GroundLayer = map.createLayer('Ground', tileset, 0, 0); 
-        //this.HouseLayer = map.createLayer('House', tileset, 0, 0);
-        this.OnGroundLayer = map.createLayer('OnGround', tileset, 0, 0);
-
-        //this.HouseLayer.setCollisionByProperty({ collides: true });
-        this.OnGroundLayer.setCollisionByProperty({ collides: true });
+        const map=this.createMap('shop','Serene_Village_48x48','tileset');
 
         this.player = this.physics.add.sprite(500, 400, 'player').setScale(0.1);
 
-        this.physics.add.collider(this.player, this.HouseLayer);
-        this.physics.add.collider(this.player, this.OnGroundLayer);
-
-        this.physics.world.setBounds(0,0,map.widthInPixels,map.heightInPixels);
-
-        this.cursors = this.input.keyboard.createCursorKeys();
-
-        const objectLayer=map.getObjectLayer('Object');
-        
-        this.isWraping = false;
         this.interactables=[];
 
         this.villagers=this.physics.add.group();
@@ -56,14 +38,45 @@ export default class Shop extends BaseScene{
         ];
 
         villagerData.forEach(data=>{
-                    //第五引数のdataはNPC.jsでconfigとして受け取る。必要に応じてconfig.startIdで取得できる。第六まで増やす必要もない。
-                    const newVillager=new NPC(this,data.x,data.y,data.key,data);//this忘れ、どこに書けばいいかわからなかったことによるエラー。
-                    this.villagers.add(newVillager);
+            //第五引数のdataはNPC.jsでconfigとして受け取る。必要に応じてconfig.startIdで取得できる。第六まで増やす必要もない。
+            const newVillager=new NPC(this,data.x,data.y,data.key,data);//this忘れ、どこに書けばいいかわからなかったことによるエラー。
+            this.villagers.add(newVillager);
+
+            this.interactables.push({type:'npc',instance:newVillager});
         });
 
         this.villagers.getChildren().forEach(v=>{
             this.interactables.push({type:'npc',instance:v,x:v.x,y:v.y});
         });
+
+        this.setupCollisions(this.player);
+        this.setupCollisions(this.villagers);
+
+        this.physics.add.collider(this.player,this.villagers);
+        this.physics.add.collider(this.villagers,this.villagers);
+        /*this.dialogManager = new DialogManager(this);
+
+        const map = this.make.tilemap({ key: 'shop' });
+    
+        const tileset = map.addTilesetImage('Serene_Village_48x48','tileset');
+        
+        this.GroundLayer = map.createLayer('Ground', tileset, 0, 0); 
+        //this.HouseLayer = map.createLayer('House', tileset, 0, 0);
+        this.OnGroundLayer = map.createLayer('OnGround', tileset, 0, 0);
+
+        //this.HouseLayer.setCollisionByProperty({ collides: true });
+        this.OnGroundLayer.setCollisionByProperty({ collides: true });*/
+
+        /*this.physics.add.collider(this.player, this.HouseLayer);
+        this.physics.add.collider(this.player, this.OnGroundLayer);
+
+        this.physics.world.setBounds(0,0,map.widthInPixels,map.heightInPixels);
+
+        this.cursors = this.input.keyboard.createCursorKeys();*/
+
+        /*const objectLayer=map.getObjectLayer('Object');
+        
+        //this.isWraping = false;
 
         //const objectLayer=map.getObjectLayer('Object');
         if(objectLayer){//家に入る、機械を開いたり、▼が出るアクション
@@ -101,10 +114,11 @@ export default class Shop extends BaseScene{
                     })
                 }
             })
-        }
+        }*/
 
-        this.cameras.main.startFollow(this.player,true,0.1,0.1);
-        this.cameras.main.setBounds(0,0,map.widthInPixels,map.heightInPixels);
+        this.setupCamera(this.player);
+        /*this.cameras.main.startFollow(this.player,true,0.1,0.1);
+        this.cameras.main.setBounds(0,0,map.widthInPixels,map.heightInPixels);*/
 
     }
     update(time,delta){

@@ -16,15 +16,15 @@ export default class World extends BaseScene{
         super({key:'World'});
 
         this.player=null;
-        this.cursors=null;
-        this.readyTalking=false;
-        this.isWraping=false;
-        this.money=0;
-        this.moneyText=null;
+        //this.cursors=null;
+        //this.readyTalking=false;
+        //this.isWraping=false;
+        //this.money=0;
+        //this.moneyText=null;
         this.villagers=null;
         //this.nearstNPC=null;
         this.inventoryData=[];
-        this.keys=null;
+        //this.keys=null;
         this.currentWeather='Clear';
         this.weatherEffect=null;
         /*this.interactables=[];
@@ -32,8 +32,8 @@ export default class World extends BaseScene{
         this.readyIcon=null;
         this.readyActionType=null;
         this.actionTarget=null;*/
-        this.fromDoor=null;
-        this.isWraping=false;
+        //this.fromDoor=null;
+        //this.isWraping=false;
 
         //this.SERVER_URL='http://localhost:3000';
 
@@ -164,8 +164,9 @@ export default class World extends BaseScene{
         }//どちらでもないなら晴れ*/
 
     //----------------------------------------------------------操作説明ボタン------------------------------------------------------------------------------
-
-        const guideButton=this.add.image(1230,670,'guide')//UISceneに移行する
+        this.uiScene = this.scene.get('UIScene');
+        this.uiScene.createGuideBtn();
+        /*const guideButton=this.add.image(1230,670,'guide')//UISceneに移行する
 
                 .setOrigin(0.5)
                 .setScale(0.7)
@@ -183,14 +184,16 @@ export default class World extends BaseScene{
             if(this.dialogManager && !this.dialogManager.isTalking){
                 this.menuManager?.toggle('guide');
             }
-        });
+        });*/
 
     //----------------------------------------------------------キー------------------------------------------------------------------------------
-        this.cursors=this.input.keyboard.createCursorKeys();
+        //this.cursors=this.input.keyboard.createCursorKeys();
     //----------------------------------------------------------プレイヤー------------------------------------------------------------------------------
         this.player=new Player(this,500,500,'player');
 
-        if(data&&data.returnTo){
+        this.setupSceneTransitions(map, this.player);
+
+        /*if(data&&data.returnTo){
             const objectLayer=map.getObjectLayer('Object');
             
             const doorObj=objectLayer.objects.find(obj=>{
@@ -264,6 +267,8 @@ export default class World extends BaseScene{
             //第五引数のdataはNPC.jsでconfigとして受け取る。必要に応じてconfig.startIdで取得できる。第六まで増やす必要もない。
             const newVillager=new NPC(this,data.x,data.y,data.key,data);//this忘れ、どこに書けばいいかわからなかったことによるエラー。
             this.villagers.add(newVillager);
+
+            this.interactables.push({type:'npc',instance:newVillager});
         });
     //----------------------------------------------------------当たり判定----------------------------------------------------------------------
         this.setupCollisions(this.player);
@@ -283,7 +288,7 @@ export default class World extends BaseScene{
 
         this.physics.add.collider(this.player,this.villagers);*/
     //----------------------------------------------------------アクション系-----------------------------------------------------------------------
-        this.interactables=[];
+        /*this.interactables=[];
 
         this.villagers.getChildren().forEach(v=>{
             this.interactables.push({type:'npc',instance:v,x:v.x,y:v.y});

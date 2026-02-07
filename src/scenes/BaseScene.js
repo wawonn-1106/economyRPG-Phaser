@@ -9,6 +9,7 @@ import ProfileManager from '../managers/ProfileManager.js';
 import DictionaryManager from '../managers/DictionaryManager.js';
 //import ProfileContent from '../contents/ProfileContent.js';
 import MachineManager from '../managers/MachineManager.js';
+import UIScene from "./UIScene.js";
 
 export default class BaseScene extends Phaser.Scene{
     constructor(config){
@@ -18,6 +19,7 @@ export default class BaseScene extends Phaser.Scene{
         this.readyIcon=null;
         this.readyActionType=null;
         this.actionTarget=null;
+        this.isWraping=false;
     }
     initManagers(){
         this.dialogManager=new DialogManager(this);
@@ -27,6 +29,7 @@ export default class BaseScene extends Phaser.Scene{
         this.dictionaryManager=new DictionaryManager(this);
         this.inventoryManager=new InventoryManager(this);   
         this.menuManager=new MenuManager(this);
+        //this.uiScene=new UIScene(this);勘違いしてた。Sceneはインスタンスじゃなくてscene.get('')で取得する
 
     }
     initInput(){
@@ -50,6 +53,10 @@ export default class BaseScene extends Phaser.Scene{
         });//forEachとかは配列にしか使えない。{}で分割代入はできないよ、Object.()を使うならできる
 
         this.physics.world.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
+
+        this.readyIcon=this.add.text(0,0,'▼',//なんかいい場所がなかったからここに置いとく
+            {fontSize:'24px'}
+        ).setOrigin(0.5).setVisible(false).setDepth(10);
 
         return this.map;//SceneでcreateMap(情報をいれて);を呼ぶ形でマップは書く
     }
@@ -118,6 +125,47 @@ export default class BaseScene extends Phaser.Scene{
                     });
                 }
             }                
+    }
+    setupSceneTransitions(map,player){
+        const objectLayer=map.getObjectLayer('Object');
+        if(!objectLayer) return;
+
+        objectLayer.objects.forEach(obj=>{
+            if(obj.name==='exit' || obj.name==='wrap'){
+                const zone=this.add.zone(obj.x+obj.width/2,obj.y+obj.height/2,obj.width,obj.height);
+                this.physics.add.existing(zone,true);
+
+                const targetScene=obj.properties?.find(p=>p.name==='targetScene')?.val;
+                const targetDoor=obj.properties?.find(p=>p.name==='targetDoor')?.val;
+
+                this.physics.add.overlap(player,zone,()=>{
+                    this.performTransition(targetScene,{from:targetDoor});
+                    //行く場所と入る前のシーンは記憶しておく
+                });
+            }
+
+            if(obj.name==='door'){
+                this.interactables.push({
+                    type:'door',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
+        });
+    }
+    performTransition(nextScene,data){
+        if(this.isWraping) return;
+        this.isWraping=true;
+
+        this.player.body.enable=false;
+
+        this.cameras.main.fadeOut(1000,0,0,0);
+        this.cameras.main.once('camerafadeoutcomplete',()=>{
+            this.isWraping=false;
+
+            this.scene.start(nextScene,data);
+        });
     }
     /*wrapToScene(targetKey){
         this.player.body.enable=false;
