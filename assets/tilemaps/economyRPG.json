@@ -346,9 +346,19 @@
                  "name":"door",
                  "properties":[
                         {
+                         "name":"spawnHolder",
+                         "type":"string",
+                         "value":"world_house"
+                        }, 
+                        {
+                         "name":"spawnPoint",
+                         "type":"string",
+                         "value":"front_house"
+                        }, 
+                        {
                          "name":"target",
                          "type":"string",
-                         "value":"house"
+                         "value":"House"
                         }],
                  "rotation":0,
                  "type":"",
@@ -363,9 +373,19 @@
                  "name":"door",
                  "properties":[
                         {
+                         "name":"spawnHolder",
+                         "type":"string",
+                         "value":"world_shop"
+                        }, 
+                        {
+                         "name":"spawnPoint",
+                         "type":"string",
+                         "value":"front_shop"
+                        }, 
+                        {
                          "name":"target",
                          "type":"string",
-                         "value":"shop"
+                         "value":"Shop"
                         }],
                  "rotation":0,
                  "type":"",
@@ -393,7 +413,7 @@
                         {
                          "name":"target",
                          "type":"string",
-                         "value":"toForest"
+                         "value":"Forest"
                         }],
                  "rotation":0,
                  "type":"",

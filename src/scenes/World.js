@@ -121,6 +121,8 @@ export default class World extends BaseScene{
     create(data){
         this.initManagers();
         this.initInput();
+
+        this.interactables=[];
         /*this.dictionaryManager=new DictionaryManager(this);
         this.profileManager=new ProfileManager(this); 
         this.dialogManager=new DialogManager(this);
@@ -135,24 +137,6 @@ export default class World extends BaseScene{
     
         const map=this.createMap('map','Serene_Village_48x48','tileset');
     
-        /*const map = this.make.tilemap({ key: 'map' });
-
-        const tileset = map.addTilesetImage('Serene_Village_48x48','tileset');
-
-        this.GroundLayer = map.createLayer('Ground', tileset, 0, 0);
-        this.OnGroundLayer = map.createLayer('OnGround', tileset, 0, 0);
-        this.HouseLayer = map.createLayer('House', tileset, 0, 0);
-        //this.OnDecorationLayer = map.createLayer('OnDecoration', tileset, 0, 0);
-        this.DecorationLayer = map.createLayer('Decoration', tileset, 0, 0);
-
-        this.OnGroundLayer.setCollisionByProperty({ collides: true });
-        this.HouseLayer.setCollisionByProperty({ collides: true });
-        this.GroundLayer.setCollisionByProperty({ collides: true });
-        this.physics.world.setBounds(0,0,map.widthInPixels,map.heightInPixels);
-
-        /*this.moneyText=this.add.text(100,100,`所持金：${this.money}`,{
-            fontSize:'36px',fill:'black'
-        }).setOrigin(0,0).setScrollFactor(0);*/
         this.scene.launch('UIScene');
     //----------------------------------------------------------天気------------------------------------------------------------------------------
         /*if(this.currentWeather==='Rain'){
@@ -166,60 +150,22 @@ export default class World extends BaseScene{
     //----------------------------------------------------------操作説明ボタン------------------------------------------------------------------------------
         this.uiScene = this.scene.get('UIScene');
         this.uiScene.createGuideBtn();
-        /*const guideButton=this.add.image(1230,670,'guide')//UISceneに移行する
-
-                .setOrigin(0.5)
-                .setScale(0.7)
-                .setInteractive({useHandCursor:true})
-                .setScrollFactor(0)
-                .setDepth(3000);
-        
-        if(this.dialogManager && !this.dialogManager.isTalking){
-            guideButton.on('pointerover',()=>guideButton.setScale(0.8));
-            guideButton.on('pointerout',()=>guideButton.setScale(0.7));
-        }//会話中は大きくならないようにしたい、なんかできないから。後で修正。
-        
-        guideButton.on('pointerdown',()=>{
-
-            if(this.dialogManager && !this.dialogManager.isTalking){
-                this.menuManager?.toggle('guide');
-            }
-        });*/
 
     //----------------------------------------------------------キー------------------------------------------------------------------------------
         //this.cursors=this.input.keyboard.createCursorKeys();
     //----------------------------------------------------------プレイヤー------------------------------------------------------------------------------
         this.player=new Player(this,500,500,'player');
 
+        //this.setPlayerSpawnPoint(data)
+
         this.setupSceneTransitions(map, this.player);
 
-        /*if(data&&data.returnTo){
-            const objectLayer=map.getObjectLayer('Object');
-            
-            const doorObj=objectLayer.objects.find(obj=>{
-                const targetProp=obj.properties?.find(p=>p.name==='target');
-                return targetProp && targetProp.value==data.returnTo;
-            });
-
-            if(doorObj){
-                this.player.setPosition(
-                    doorObj.x+(doorObj.width/2),
-                    doorObj.y+(doorObj.height/2),
-                );
-            }
-        }//わかりやすくここに配置。家を出た時、家の前に戻るように
-
-        //this.menuManager=new MenuManager(this);//Worldのscene持ってればこれにもアクセスできる
 
         //this.player.name='尾道太郎';
         const testData=this.cache.json.get('playerData');
         //最初の書き換えをjsonでやって、↑そのデータを受け取って個体値の決定。
         this.profileManager.initTutorialProfile(testData.name);
 
-        //this.profileContent.drawRadarChart();
-        
-
-        //this.testProfile = new ProfileContent(this, 400, 300);
     
     //----------------------------------------------------------アニメーション------------------------------------------------------------------------------
         /*this.anims.create({
@@ -277,141 +223,9 @@ export default class World extends BaseScene{
         this.physics.add.collider(this.player,this.villagers);
         this.physics.add.collider(this.villagers,this.villagers);
 
-        /*this.physics.add.collider(this.player,this.OnGroundLayer);
-        this.physics.add.collider(this.player,this.HouseLayer);
-        this.physics.add.collider(this.player,this.GroundLayer);
-
-        this.physics.add.collider(this.villagers,this.OnGroundLayer);
-        this.physics.add.collider(this.villagers,this.HouseLayer);
-        this.physics.add.collider(this.villagers,this.GroundLayer);
-        this.physics.add.collider(this.villagers,this.villagers,null,null,this);
-
-        this.physics.add.collider(this.player,this.villagers);*/
+        
     //----------------------------------------------------------アクション系-----------------------------------------------------------------------
-        /*this.interactables=[];
-
-        this.villagers.getChildren().forEach(v=>{
-            this.interactables.push({type:'npc',instance:v,x:v.x,y:v.y});
-        });
-
-        const objectLayer=map.getObjectLayer('Object');
-        if(objectLayer){//家に入る、機械を開いたり、▼が出るアクション
-            objectLayer.objects.forEach(object=>{
-                if(object.name==='door' || object.name==='machine'){
-                    this.interactables.push({
-                        type:object.name,
-                        data:object,
-                        x:object.x+(object.width/2||0),
-                        y:object.y+(object.height/2||0),
-                    });
-                }
-            });
-        }
-
-        this.readyIcon=this.add.text(0,0,'▼',
-            {fontSize:'24px'}
-        ).setOrigin(0.5).setVisible(false).setDepth(10);
-
-        if(objectLayer){//マップの移動、家を出るのと同じロジック。触れるだけでOK
-            objectLayer.objects.forEach(obj=>{
-                if(obj.name==='wrap'){
-                    const wrapRegion=this.add.zone(
-                        obj.x+obj.width/2,obj.y+obj.height/2,
-                        obj.width,obj.height
-                    );
-                    this.physics.add.existing(wrapRegion,true);
-
-                    const targetName=obj.properties?.find(p=>p.name==='target')?.value;
-
-                    this.physics.add.overlap(this.player,wrapRegion,()=>{
-                        if(!this.isWraping){
-                            this.isWraping=true;
-                            //this.player.body.enable=false;
-
-                            this.cameras.main.fadeOut(1000,0,0,0);
-                            this.cameras.main.once('camerafadeoutcomplete',()=>{
-                                const data={fromScene:this.scene.key, spawnPoint:targetName};
-
-                                switch(targetName){
-                                    case 'toForest':
-                                        this.scene.start('Forest',data);
-                                        break;
-                                    //追加していく
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
-        //this.readyIcon=this.add.image(0,0,'readyIcon').setVisible(false).setDepth(4000).setScale(0.5);
-
-
-        //this.readyTalking=false;
-        this.isWraping = false;
-
-        /*this.input.keyboard.on('keydown-SPACE',()=>{
-            if (this.dialogManager.inputMode) return;
-
-            if(this.dialogManager.isTalking){
-                const currentLine=this.dialogManager.currentSequence[this.dialogManager.currentIndex];
-                if(currentLine && currentLine.next){
-                    this.dialogManager.jumpTo(currentLine.next);
-                }else{
-                    this.dialogManager.end();
-                }
-                return;
-            }
-
-            if(this.readyActionType){
-                switch(this.readyActionType){
-                    case 'npc':
-                        const npc=this.actionTarget.instance;
-                        this.dialogManager.start('chapter1',npc.startId,npc.npcName);
-                        //chapter1(独占市場)は変える予定あり、chapter2(寡占市場),chapter3(完全競争市場)
-                        break;
-                    
-                    case 'door':
-                        //入る処理
-                        if (this.isWraping) return;
-                        this.isWraping = true;
-
-                        const targetValue=this.actionTarget.data.properties.find(p=>p.name==='target')?.value;
-
-                        //const doorName=this.actionTarget.data.name;
-
-                        this.player.body.enable=false;
-                        this.cameras.main.fadeOut(1000,0,0,0);
-
-                        this.cameras.main.once('camerafadeoutcomplete',()=>{
-
-                            const data={fromDoor:targetValue};
-
-                            switch(targetValue){
-                                case 'house':
-                                    this.scene.start('House',data);
-                                    break;
-                                case 'shop':
-                                    this.scene.start('Shop',data);
-                                    break;
-                            }
-                        });
-                        break;
-                    
-                    case 'machine':
-                        //加工画面を開く
-                        this.menuManager.toggle('machine');
-                        break;
-                    case 'displayShelf':
-                        //店に並べる画面
-                        console.log('クリックされた');
-                        break;
-                }
-            }                
-                /*this.money+=100;
-                if(this.moneyText) this.moneyText.setText(`所持金：${this.money}`);
-                this.syncMoneyWithServer(this.money);*/
-        //});*/
+        
     //-------------------------------------------------------------インベントリ--------------------------------------------------------------------------
         this.inventoryManager=new InventoryManager(this);
 
@@ -427,30 +241,9 @@ export default class World extends BaseScene{
             {id:'banana',name:'バナナ',realQuality:3,count:5},
             {id:'pumpkin',name:'かぼちゃ',realQuality:2,count:1}
         ];//wheatとか全てのidの画像を用意する→
-
-        /*this.input.keyboard.on('keydown-I',()=>{
-            //会話とは違ってIで開け閉め
-            if(this.dialogManager.isTalking) return;
-
-            if(!this.inventoryManager.isOpenInv){
-                this.inventoryManager.openInventory(this.inventoryData);
-            }else{
-                this.inventoryManager.closeInventory();
-            }
-        });*/
-
-
-
-
-
-
     //-------------------------------------------------------------カメラ--------------------------------------------------------------------------
        
         this.setupCamera(this.player);
-        /*this.cameras.main.startFollow(this.player,true,0.1,0.1);
-        this.cameras.main.setBounds(0,0,map.widthInPixels,map.heightInPixels);*/
-        
-        
     }
     update(time,delta){
         this.updateInteractables(this.player);
@@ -458,83 +251,5 @@ export default class World extends BaseScene{
         this.player.update();
         this.villagers.getChildren().forEach(v=>v.update(time,delta));
 
-        //this.menuManager.update();
-        
-        /*let minDistance=100;
-        let closestItem=null;//機械、ドア、NPCで近いものに▼マークを付ける
-        let bestPriority=999;
-
-        this.interactables.forEach(item=>{
-
-            let targetX=item.type==='npc' ? item.instance.x:item.x;
-            let targetY=item.type==='npc' ? item.instance.y:item.y;
-
-            const dist=Phaser.Math.Distance.Between(this.player.x,this.player.y,targetX,targetY);
-
-            if(dist<minDistance){
-                let priority=3;
-                if(item.type==='npc') priority=0;
-                else if(item.type=='machine') priority=1;
-                else if(item.type=='door') priority=2;
-
-                if(priority<bestPriority || (priority===bestPriority&& dist<minDistance)){
-                    minDistance=dist;
-                    bestPriority=priority;
-
-                    closestItem={
-                        ...item,
-                        currentX:targetX,
-                        currentY:targetY
-                    };
-                }
-            }
-        });
-
-        const isMenuOpen=this.menuManager?.isOpenMenu || false;
-        const isBusy=this.dialogManager.isTalking || isMenuOpen;
-
-        if(closestItem && !isBusy){
-            this.readyActionType=closestItem.type;
-            this.actionTarget=closestItem;
-            this.readyIcon.setVisible(true);
-            this.readyIcon.setPosition(closestItem.currentX,closestItem.currentY-50);
-
-        }else{
-            this.readyActionType=null;
-            this.actionTarget=null;
-            this.readyIcon.setVisible(false);
-        }
-
-        /*this.villagers.getChildren().forEach(v=>{
-            v.update(time,delta);
-            v.showIcon(false);
-
-            const dist=Phaser.Math.Distance.Between(this.player.x,this.player.y,v.x,v.y);
-            if(dist<minDistance){
-                minDistance=dist;
-                closestNPC=v;
-            }
-        });*/
-        /*const tile = this.worldLayer.getTileAtWorldXY(this.player.x, this.player.y);
-        if(tile){
-            console.log('player tile index:', tile.index);
-        }
-        if(tile && tile.index === 99){
-            this.cameras.main.fadeOut(500, 0, 0, 0);
-
-            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                this.scene.start('House');
-            });
-        }*/
-
-        /*if(closestNPC && !this.dialogManager.isTalking){
-            this.readyTalking=true;
-            this.nearstNPC=closestNPC;
-            this.nearstNPC.showIcon(true);
-        }else{
-            this.readyTalking=false;
-            this.nearstNPC=null;
-        }*/
-        
-    }
+    }    
 }

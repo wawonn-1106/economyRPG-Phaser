@@ -21,6 +21,10 @@ export default class BaseScene extends Phaser.Scene{
         this.actionTarget=null;
         this.isWraping=false;
     }
+    create(data){
+        this.initData = data;
+        this.isWraping = false;
+    }
     initManagers(){
         this.dialogManager=new DialogManager(this);
         this.profileManager=new ProfileManager(this); 
@@ -30,7 +34,8 @@ export default class BaseScene extends Phaser.Scene{
         this.inventoryManager=new InventoryManager(this);   
         this.menuManager=new MenuManager(this);
         //this.uiScene=new UIScene(this);勘違いしてた。Sceneはインスタンスじゃなくてscene.get('')で取得する
-
+        const ui = this.scene.get('UIScene'); 
+        this.dialogManager.setUIScene(ui);
     }
     initInput(){
         this.cursors=this.input.keyboard.createCursorKeys();
@@ -49,7 +54,7 @@ export default class BaseScene extends Phaser.Scene{
         this.decorationLayer=this.map.createLayer('Decoration',this.tileset,0,0);
 
         [this.groundLayer,this.onGroundLayer,this.houseLayer].forEach(layer=>{
-            if(layer) layer.setCollision({colloides:true});
+            if(layer) layer.setCollisionByProperty({collides:true});
         });//forEachとかは配列にしか使えない。{}で分割代入はできないよ、Object.()を使うならできる
 
         this.physics.world.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
@@ -86,27 +91,41 @@ export default class BaseScene extends Phaser.Scene{
             switch(this.readyActionType){
                 case 'npc':
                     const npc=this.actionTarget.instance;
-                    this.dialogManager.start('chapter1',npc.startId,npc.npcName);
+                    this.dialogManager?.start('chapter1',npc.startId,npc.npcName);
                     //chapter1(独占市場)は変える予定あり、chapter2(寡占市場),chapter3(完全競争市場)
                     break;
                     
                 case 'door':
+                case 'exit':
                     //入る処理
                     if (this.isWraping) return;
-                    this.isWraping = true;
+                        this.isWraping = true;
 
-                    const targetValue=this.actionTarget.data.properties.find(p=>p.name==='target')?.value;
+                    const targetScene=this.actionTarget.data.properties.find(p=>p.name==='target')?.value;
+                    const spawnPointName=this.actionTarget.data.properties.find(p=>p.name==='spawnPoint')?.value;
+
+                    if(targetScene){
+                        this.performTransition(targetScene,spawnPointName);
+                    }
+                    break;
+                
+                case 'machine':
+                    this.menuManager.toggle('machine');
+                    break;
+                case 'displayShelf':
+                    //店に並べる画面
+                    console.log('クリックされた');
+                    break;
 
                     //const doorName=this.actionTarget.data.name;
 
-                    this.player.body.enable=false;
+                    /*this.player.body.enable=false;
                     this.cameras.main.fadeOut(1000,0,0,0);
 
-                    this.cameras.main.once('camerafadeoutcomplete',()=>{
+                    this.cameras.main.once('camerafadeoutcomplete',()=>{*/
+                    //const data={fromDoor:targetValue};
 
-                        const data={fromDoor:targetValue};
-
-                        switch(targetValue){
+                        /*switch(targetValue){
                             case 'house':
                                 this.scene.start('House',data);
                                 break;
@@ -121,8 +140,8 @@ export default class BaseScene extends Phaser.Scene{
                                 //店に並べる画面
                                 console.log('クリックされた');
                                 break;
-                        }
-                    });
+                        }*/
+                    //});
                 }
             }                
     }
@@ -131,20 +150,21 @@ export default class BaseScene extends Phaser.Scene{
         if(!objectLayer) return;
 
         objectLayer.objects.forEach(obj=>{
-            if(obj.name==='exit' || obj.name==='wrap'){
+            if(obj.name==='wrap'){
                 const zone=this.add.zone(obj.x+obj.width/2,obj.y+obj.height/2,obj.width,obj.height);
                 this.physics.add.existing(zone,true);
 
-                const targetScene=obj.properties?.find(p=>p.name==='targetScene')?.val;
-                const targetDoor=obj.properties?.find(p=>p.name==='targetDoor')?.val;
+                const targetScene=obj.properties?.find(p=>p.name==='target')?.value;
+                const spawnPointName=obj.properties?.find(p=>p.name==='spawnPoint')?.value;
 
                 this.physics.add.overlap(player,zone,()=>{
-                    this.performTransition(targetScene,{from:targetDoor});
-                    //行く場所と入る前のシーンは記憶しておく
+                    if(targetScene&& !this.isWraping){
+                        this.performTransition(targetScene,spawnPointName);
+                    }
                 });
             }
 
-            if(obj.name==='door'){
+            if(obj.name==='door' || obj.name==='exit'){
                 this.interactables.push({
                     type:'door',
                     data:obj,
@@ -154,8 +174,8 @@ export default class BaseScene extends Phaser.Scene{
             }
         });
     }
-    performTransition(nextScene,data){
-        if(this.isWraping) return;
+    performTransition(nextScene,spawnPoint){
+        //if(this.isWraping) return;
         this.isWraping=true;
 
         this.player.body.enable=false;
@@ -164,8 +184,26 @@ export default class BaseScene extends Phaser.Scene{
         this.cameras.main.once('camerafadeoutcomplete',()=>{
             this.isWraping=false;
 
-            this.scene.start(nextScene,data);
+            this.scene.start(nextScene,{spawnPoint:spawnPoint});
+           // this.scene.start(nextScene,spawnPoint);
         });
+    }
+    setPlayerSpawnPoint(data){
+        if(!data) return;
+
+        const objectLayer=this.map.getObjectLayer('Object');
+        
+        const spawnHolder=objectLayer.objects.find(obj=>{
+            const prop=obj.properties?.find(p=>p.name==='spawnHolder');
+            return prop?.value===data.spawnPoint;
+        })
+
+        if(spawnHolder){
+            const x=spawnHolder.x+(spawnHolder.width/2);
+            const y=spawnHolder.y+(spawnHolder.height/2);
+
+            this.player.setPosition(x,y);
+        }
     }
     /*wrapToScene(targetKey){
         this.player.body.enable=false;
@@ -197,6 +235,7 @@ export default class BaseScene extends Phaser.Scene{
                 if(item.type==='npc') priority=0;
                 else if(item.type=='machine') priority=1;
                 else if(item.type=='door') priority=2;
+                else if(item.type=='exit') priority=2;//ここ
 
                 if(priority<bestPriority || (priority===bestPriority&& dist<minDistance)){
                     minDistance=dist;

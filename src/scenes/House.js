@@ -23,11 +23,14 @@ export default class House extends BaseScene{
         this.initManagers();
         this.initInput();
 
+        this.interactables=[];
+
+        this.scene.launch('UIScene');
+
         const map=this.createMap('house','Serene_Village_48x48','tileset');
 
         this.player = this.physics.add.sprite(500, 400, 'player').setScale(0.1);
-
-        this.interactables=[];
+        this.setupSceneTransitions(map, this.player);
 
         this.villagers=this.physics.add.group();
 
@@ -45,9 +48,9 @@ export default class House extends BaseScene{
             this.interactables.push({type:'npc',instance:newVillager});
         });
 
-        this.villagers.getChildren().forEach(v=>{
+        /*this.villagers.getChildren().forEach(v=>{
             this.interactables.push({type:'npc',instance:v,x:v.x,y:v.y});
-        });
+        });*/
 
         this.setupCollisions(this.player);
         this.setupCollisions(this.villagers);
@@ -122,6 +125,8 @@ export default class House extends BaseScene{
 
     }
     update(time,delta){
+        this.updateInteractables(this.player);
+
         const speed = 200;
         this.player.setVelocity(0);
 

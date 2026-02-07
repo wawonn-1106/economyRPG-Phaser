@@ -233,6 +233,12 @@
                  "height":118.181818181818,
                  "id":1,
                  "name":"exit",
+                 "properties":[
+                        {
+                         "name":"spawnPoint",
+                         "type":"string",
+                         "value":"world_shop"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -250,6 +256,34 @@
                  "width":87.8787878787878,
                  "x":603.030303030303,
                  "y":387.878787878788
+                }, 
+                {
+                 "height":145.454545454545,
+                 "id":3,
+                 "name":"door",
+                 "properties":[
+                        {
+                         "name":"spawnHolder",
+                         "type":"string",
+                         "value":"front_shop"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":166.666666666667,
+                 "x":196.969696969697,
+                 "y":212.121212121212
+                }, 
+                {
+                 "height":0,
+                 "id":4,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":3.03030303030312,
+                 "x":630.30303030303,
+                 "y":900
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -480,7 +514,7 @@
          "y":0
         }],
  "nextlayerid":6,
- "nextobjectid":3,
+ "nextobjectid":7,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

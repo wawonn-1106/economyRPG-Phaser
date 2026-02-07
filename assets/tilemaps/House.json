@@ -344,6 +344,12 @@
                  "height":50,
                  "id":5,
                  "name":"exit",
+                 "properties":[
+                        {
+                         "name":"spawnHolder",
+                         "type":"string",
+                         "value":"world_house"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -372,6 +378,23 @@
                  "width":0,
                  "x":-600,
                  "y":806.060606060606
+                }, 
+                {
+                 "height":84.8484848484847,
+                 "id":8,
+                 "name":"door",
+                 "properties":[
+                        {
+                         "name":"spawnHolder",
+                         "type":"string",
+                         "value":"front_house"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":303.030303030303,
+                 "x":327.272727272727,
+                 "y":506.060606060606
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -491,7 +514,7 @@
          "y":0
         }],
  "nextlayerid":6,
- "nextobjectid":8,
+ "nextobjectid":9,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

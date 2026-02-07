@@ -6,28 +6,29 @@ export default class Shop extends BaseScene{
     constructor(){
         super({key:'Shop'});
 
-        //this.isWraping=false;
-        //this.fromDoor=null;
-        //this.interactables=[];
-        //this.nearstTarget=null;
-        //this.readyIcon=null;
-        //this.readyActionType=null;
-        //this.actionTarget=null;
-        //this.fromDoor=null;
-        //this.isWraping=false;
     }
     /*init(data){
         this.fromDoor=data.fromDoor;
     }*/
-    create(){
+    create(data){
+
+        super.create(data);
+
         this.initManagers();
         this.initInput();
 
+        this.interactables=[];
+
+        this.scene.launch('UIScene');
+
         const map=this.createMap('shop','Serene_Village_48x48','tileset');
 
-        this.player = this.physics.add.sprite(500, 400, 'player').setScale(0.1);
+        this.player = this.physics.add.sprite(0, 0, 'player').setScale(0.1);
 
-        this.interactables=[];
+        this.setPlayerSpawnPoint(data);
+
+        this.setupSceneTransitions(map, this.player);
+
 
         this.villagers=this.physics.add.group();
 
@@ -45,76 +46,16 @@ export default class Shop extends BaseScene{
             this.interactables.push({type:'npc',instance:newVillager});
         });
 
-        this.villagers.getChildren().forEach(v=>{
+        /*this.villagers.getChildren().forEach(v=>{
             this.interactables.push({type:'npc',instance:v,x:v.x,y:v.y});
-        });
+        });*///なんで同じことやってた？
 
         this.setupCollisions(this.player);
         this.setupCollisions(this.villagers);
 
         this.physics.add.collider(this.player,this.villagers);
         this.physics.add.collider(this.villagers,this.villagers);
-        /*this.dialogManager = new DialogManager(this);
-
-        const map = this.make.tilemap({ key: 'shop' });
-    
-        const tileset = map.addTilesetImage('Serene_Village_48x48','tileset');
         
-        this.GroundLayer = map.createLayer('Ground', tileset, 0, 0); 
-        //this.HouseLayer = map.createLayer('House', tileset, 0, 0);
-        this.OnGroundLayer = map.createLayer('OnGround', tileset, 0, 0);
-
-        //this.HouseLayer.setCollisionByProperty({ collides: true });
-        this.OnGroundLayer.setCollisionByProperty({ collides: true });*/
-
-        /*this.physics.add.collider(this.player, this.HouseLayer);
-        this.physics.add.collider(this.player, this.OnGroundLayer);
-
-        this.physics.world.setBounds(0,0,map.widthInPixels,map.heightInPixels);
-
-        this.cursors = this.input.keyboard.createCursorKeys();*/
-
-        /*const objectLayer=map.getObjectLayer('Object');
-        
-        //this.isWraping = false;
-
-        //const objectLayer=map.getObjectLayer('Object');
-        if(objectLayer){//家に入る、機械を開いたり、▼が出るアクション
-            objectLayer.objects.forEach(object=>{
-                if(object.name==='door' || object.name==='machine'){
-                    this.interactables.push({
-                        type:object.name,
-                        data:object,
-                        x:object.x+(object.width/2||0),
-                        y:object.y+(object.height/2||0),
-                    });
-                }
-            });
-        }
-
-        this.readyIcon=this.add.text(0,0,'▼',
-            {fontSize:'24px'}
-        ).setOrigin(0.5).setVisible(false).setDepth(10);
-        if(objectLayer){
-            objectLayer.objects.forEach(obj=>{
-                if(obj.name==='exit'){
-                    const exitRegion=this.add.zone(obj.x+obj.width/2,obj.y+obj.height/2,200,50);
-                    this.physics.add.existing(exitRegion,true);
-
-                    this.physics.add.overlap(this.player,exitRegion,()=>{
-                        if(!this.isWraping){
-                            this.isWraping=true;
-                            this.player.body.enable=false;
-
-                            this.cameras.main.fadeOut(1000,0,0,0);
-                            this.cameras.main.once('camerafadeoutcomplete',()=>{
-                                this.scene.start('World',{returnTo:this.fromDoor});
-                            });
-                        }
-                    })
-                }
-            })
-        }*/
 
         this.setupCamera(this.player);
         /*this.cameras.main.startFollow(this.player,true,0.1,0.1);
@@ -122,6 +63,8 @@ export default class Shop extends BaseScene{
 
     }
     update(time,delta){
+        this.updateInteractables(this.player);
+
         const speed = 200;
         this.player.setVelocity(0);
 
