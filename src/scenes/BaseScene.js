@@ -142,6 +142,20 @@ export default class BaseScene extends Phaser.Scene{
                         });
                     }
                     break;
+                case 'rock':
+                    //const rock=this.actionTarget;
+                    const rock=this.interactables.find(i=>i.instance===this.actionTarget.instance);
+
+                    rock.hp--;
+                    console.log(rock.hp);
+
+                    if(rock.hp<=0){
+                        rock.instance.destroy();
+
+                        this.interactables=this.interactables.filter(i=>i!==rock);
+                        this.readyIcon.setVisible(false);//ない方がいいかも
+                    }
+                    break;
 
                     //const doorName=this.actionTarget.data.name;
 
@@ -232,6 +246,27 @@ export default class BaseScene extends Phaser.Scene{
                     markerIcon:fishIcon
                 });
             }
+
+            if(obj.name==='rock'){
+                const durability=obj.properties?.find(p=>p.name==='durability')?.value;
+                const subType=obj.type || 'stone';
+
+                const rockSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),subType)
+                    .setDepth(5);
+
+                this.physics.add.existing(rockSprite,true);
+                this.physics.add.collider(player,rockSprite);//NPCにもつける
+
+                this.interactables.push({
+                    type:'rock',
+                    subType:subType,
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2),
+                    hp:durability,
+                    instance:rockSprite
+                });
+            }
         });
     }
     performTransition(nextScene,spawnPoint){
@@ -286,11 +321,21 @@ export default class BaseScene extends Phaser.Scene{
         this.interactables.forEach(item=>{
 
             if(item.type==='fishingSpot'){//釣り竿持ってるときだけ、釣り可能
-                const ui=this.scene.get('UIScene');
+                const ui=this.scene.get('UIScene'); 
                 const inventory=this.inventoryData;//Worldから持ってきてるけど今日json形式に変える
                 const selectedId=inventory[ui.selectedSlotIndex]?.id;
 
                 if(selectedId!=='fishing-rod'){
+                    return;
+                }
+            }
+
+            if(item.type==='rock'){//釣り竿持ってるときだけ、釣り可能
+                const ui=this.scene.get('UIScene');
+                const inventory=this.inventoryData;//Worldから持ってきてるけど今日json形式に変える
+                const selectedId=inventory[ui.selectedSlotIndex]?.id;
+
+                if(selectedId!=='pickaxe'){
                     return;
                 }
             }
