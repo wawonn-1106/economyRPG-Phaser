@@ -63,7 +63,10 @@ export default class UIScene extends Phaser.Scene{
 
         this.input.on('wheel',(pointer,gameObjects,deltaX,deltaY,deltaZ)=>{
 
-            if (worldScene.dialogManager?.isTalking || worldScene.dialogManager?.inputMode) return;
+            const activeScene=this.scene.manager.getScenes(true).find(s=>s.scene.key!=='UIScene');
+            //UIScene以外の一番上のSceneどのシーンにプレイヤーがいるかの取得。
+
+            if (activeScene.dialogManager?.isTalking || activeScene.dialogManager?.inputMode) return;
 
             if(deltaY>0){
                 this.selectedSlotIndex=(this.selectedSlotIndex+1)%9;
@@ -76,9 +79,9 @@ export default class UIScene extends Phaser.Scene{
             const currentItem=inventory[this.selectedSlotIndex];
 
             if(currentItem&& currentItem.count>0){
-                worldScene.player.updateHeldItem(currentItem.id);
+                activeScene.player.updateHeldItem(currentItem.id);
             }else{
-                worldScene.player.updateHeldItem(null);
+                activeScene.player.updateHeldItem(null);
             }
         });
 
@@ -406,6 +409,47 @@ export default class UIScene extends Phaser.Scene{
                 this.menuManager?.toggle('guide');
             }
         });
+    }
+    startFishing(callback){
+        const gameWidth=this.scale.width;
+        const gameHeight=this.scale.height;
+
+        this.fishingGroup=this.add.container(gameWidth/2,gameHeight/2).setDepth(5000);
+
+        const bar=this.add.image(0,0,'fishing-bar');//釣りのゲームの棒
+
+        const zone=this.add.image(0,Phaser.Math.Between(-80,80),'fishing-target');
+
+        const cursor=this.add.image(0,120,'fishing-cursor').setDepth(5000);
+
+        this.fishingGroup.add([bar,zone,cursor]);
+
+        const tween=this.tweens.add({
+            targets:cursor,
+            y:-120,
+            duration:800,
+            yoyo:true,
+            loop:-1,
+            ease:'Linear'
+        });
+
+        const catchHandler=(event)=>{
+            if(event.code==='Space'){
+                this.input.keyboard.off('keydown',catchHandler);
+                tween.stop();
+
+                const diff=Math.abs(cursor.y-zone.y);//絶対値
+                const isSuccess=diff<30;//30の差があっても成功
+
+                this.time.delayedCall(500,()=>{
+                    this.fishingGroup.destroy();
+
+                    callback(isSuccess);
+                });
+            }
+        };
+
+        this.input.keyboard.on('keydown',catchHandler);
     }
     update(time,delta){
         const world=this.scene.get('World');

@@ -117,6 +117,31 @@ export default class BaseScene extends Phaser.Scene{
                     //店に並べる画面
                     console.log('クリックされた');
                     break;
+                case 'fishingSpot':
+                    //console.log('釣りの開始');
+                    const spot=this.actionTarget;
+
+                    if(spot.isAvailable){
+                        this.player.setVelocity(0);
+                        this.player.body.enable=false;
+
+                        spot.isAvailable=false;//ここでfalseに
+                        if(spot.markerIcon) spot.markerIcon.setVisible(false);
+
+                        const ui=this.scene.get('UIScene');
+                        ui.startFishing((success)=>{
+                            if(success){
+                                console.log('成功');
+
+                                this.time.delayedCall(30000,()=>{
+                                    spot.isAvailable=true;
+                                    if(spot.markerIcon) spot.markerIcon.setVisible(true);
+                                });
+                            }
+                            this.player.body.enable=true;
+                        });
+                    }
+                    break;
 
                     //const doorName=this.actionTarget.data.name;
 
@@ -191,6 +216,22 @@ export default class BaseScene extends Phaser.Scene{
                     y:obj.y+(obj.height/2)
                 });
             }
+
+            if(obj.name==='fishingSpot'){
+
+                const fishIcon=this.add.image(obj.x+(obj.width/2),obj.y+(obj.height/2),'fishIcon')
+                    .setDepth(5)
+                    .setVisible(true);
+
+                this.interactables.push({
+                    type:'fishingSpot',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2),
+                    isAvailable:true,
+                    markerIcon:fishIcon
+                });
+            }
         });
     }
     performTransition(nextScene,spawnPoint){
@@ -243,6 +284,16 @@ export default class BaseScene extends Phaser.Scene{
         let bestPriority=999;
 
         this.interactables.forEach(item=>{
+
+            if(item.type==='fishingSpot'){//釣り竿持ってるときだけ、釣り可能
+                const ui=this.scene.get('UIScene');
+                const inventory=this.inventoryData;//Worldから持ってきてるけど今日json形式に変える
+                const selectedId=inventory[ui.selectedSlotIndex]?.id;
+
+                if(selectedId!=='fishing-rod'){
+                    return;
+                }
+            }
 
             let targetX=item.type==='npc' ? item.instance.x:item.x;
             let targetY=item.type==='npc' ? item.instance.y:item.y;

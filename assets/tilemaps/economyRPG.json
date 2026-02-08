@@ -421,6 +421,17 @@
                  "width":48.4848484848485,
                  "x":309.090909090909,
                  "y":651.515151515152
+                }, 
+                {
+                 "height":151.515151515152,
+                 "id":5,
+                 "name":"fishingSpot",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":72.7272727272725,
+                 "x":1509.09090909091,
+                 "y":736.363636363636
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -540,7 +551,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":5,
+ "nextobjectid":6,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

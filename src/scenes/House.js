@@ -1,6 +1,7 @@
 import NPC from '../entities/NPC.js';
 import DialogManager from '../managers/DialogManager.js';
 import BaseScene from './BaseScene.js';
+import Player from '../entities/Player.js';
 
 export default class House extends BaseScene{
     constructor(){
@@ -21,7 +22,7 @@ export default class House extends BaseScene{
     }*/
     create(data){
         super.create(data);
-        
+
         this.initManagers();
         this.initInput();
 
@@ -31,7 +32,8 @@ export default class House extends BaseScene{
 
         const map=this.createMap('house','Serene_Village_48x48','tileset');
 
-        this.player = this.physics.add.sprite(0, 0, 'player').setScale(0.1);
+        //this.player = this.physics.add.sprite(0, 0, 'player').setScale(0.1);
+        this.player=new Player(this,0,0,'player');
 
         this.setPlayerSpawnPoint(data);
 
@@ -132,14 +134,16 @@ export default class House extends BaseScene{
     update(time,delta){
         this.updateInteractables(this.player);
 
-        const speed = 200;
+        this.player.update();
+
+        /*const speed = 200;
         this.player.setVelocity(0);
 
         if (this.cursors.left.isDown) this.player.setVelocityX(-speed);
         else if (this.cursors.right.isDown) this.player.setVelocityX(speed);
 
         if (this.cursors.up.isDown) this.player.setVelocityY(-speed);
-        else if (this.cursors.down.isDown) this.player.setVelocityY(speed);
+        else if (this.cursors.down.isDown) this.player.setVelocityY(speed);*/
 
         this.villagers.getChildren().forEach(v=>v.update(time,delta));
     }
