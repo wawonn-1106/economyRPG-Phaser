@@ -119,10 +119,14 @@ export default class World extends BaseScene{
         overlay.setDepth(2000);
     }*/
     create(data){
+        super.create(data);
+
         this.initManagers();
         this.initInput();
+        this.initPlacementPreview();
 
         this.interactables=[];
+        
         /*this.dictionaryManager=new DictionaryManager(this);
         this.profileManager=new ProfileManager(this); 
         this.dialogManager=new DialogManager(this);
@@ -231,22 +235,25 @@ export default class World extends BaseScene{
 
         this.inventoryData=[
             //最終的にはjsonで管理するが、とりあえずインベントリを表示させるためここで
-            {id:'apple',name:'りんご',realQuality:1,count:5},
-            {id:'seed',name:'種',realQuality:1,count:13},
-            {id:'axe',name:'斧',realQuality:1,count:1},
-            {id:'pickaxe',name:'ツルハシ',realQuality:2,count:1},
-            {id:'fishing-rod',name:'釣り竿',realQuality:3,count:1},
-            {id:'pumpkin',name:'かぼちゃ',realQuality:2,count:1},
-            {id:'egg',name:'卵',realQuality:2,count:5},
-            {id:'banana',name:'バナナ',realQuality:3,count:5},
-            {id:'pumpkin',name:'かぼちゃ',realQuality:2,count:1}
+            {id:'apple',name:'りんご',realQuality:1,count:5,isPlaceable:true},
+            {id:'seed',name:'種',realQuality:1,count:13,isPlaceable:true},
+            {id:'axe',name:'斧',realQuality:1,count:1,isPlaceable:false},
+            {id:'pickaxe',name:'ツルハシ',realQuality:2,count:1,isPlaceable:false},
+            {id:'fishing-rod',name:'釣り竿',realQuality:3,count:1,isPlaceable:false},
+            {id:'pumpkin',name:'かぼちゃ',realQuality:2,count:1,isPlaceable:true},
+            {id:'egg',name:'卵',realQuality:2,count:5,isPlaceable:true},
+            {id:'banana',name:'バナナ',realQuality:3,count:5,isPlaceable:true},
+            {id:'pumpkin',name:'かぼちゃ',realQuality:2,count:1,isPlaceable:true}
         ];//wheatとか全てのidの画像を用意する→
     //-------------------------------------------------------------カメラ--------------------------------------------------------------------------
        
         this.setupCamera(this.player);
     }
     update(time,delta){
+        super.update(time, delta);
+
         this.updateInteractables(this.player);
+        this.updatePlacementPreview();
 
         this.player.update();
         this.villagers.getChildren().forEach(v=>v.update(time,delta));

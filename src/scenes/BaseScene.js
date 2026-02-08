@@ -9,21 +9,27 @@ import ProfileManager from '../managers/ProfileManager.js';
 import DictionaryManager from '../managers/DictionaryManager.js';
 //import ProfileContent from '../contents/ProfileContent.js';
 import MachineManager from '../managers/MachineManager.js';
-import UIScene from "./UIScene.js";
+//import UIScene from "./UIScene.js";
 
 export default class BaseScene extends Phaser.Scene{
     constructor(config){
         super(config);
 
         this.interactables=[];
+        this.inventoryData = [];
         this.readyIcon=null;
         this.readyActionType=null;
         this.actionTarget=null;
         this.isWraping=false;
+
+        this.placePreview=null;
+        this.canPlace=false;
     }
     create(data){
         this.initData = data;
         this.isWraping = false;
+
+        this.initPlacementPreview();
     }
     initManagers(){
         this.dialogManager=new DialogManager(this);
@@ -44,6 +50,12 @@ export default class BaseScene extends Phaser.Scene{
             console.log('クリックされました');
             this.handleAction();//スペース押されたら、アクションを起こせるかどうかの可否と、アクションへの分岐
         })
+    }
+    initPlacementPreview(){
+        this.placePreview=this.add.sprite(0,0,'')
+            .setAlpha(0.5)
+            .setVisible(false)
+            .setDepth(1000);
     }
     createMap(mapKey,tilesetName,tilesetKey){
         this.map=this.make.tilemap({key:mapKey});
@@ -85,6 +97,11 @@ export default class BaseScene extends Phaser.Scene{
             }else{
                 this.dialogManager.end();
             }
+            return;
+        }
+
+        if(this.placePreview&& this.placePreview.visible&& this.canPlace){
+            this.placeItem();
             return;
         }
 
@@ -309,6 +326,93 @@ export default class BaseScene extends Phaser.Scene{
         })
 
     }*/
+    updatePlacementPreview(){
+        const ui=this.scene.get('UIScene');
+        if(!this.inventoryData)return;
+
+        const selectedItem=this.inventoryData[ui.selectedSlotIndex];
+
+        if(selectedItem&& selectedItem.isPlaceable){//placeableは後で付ける
+            this.placePreview.setVisible(true);
+            this.placePreview.setTexture(selectedItem.id);
+
+            const offset=48;
+            let targetX=this.player.x;
+            let targetY=this.player.y;
+
+            if(this.player.flipX){
+                targetX-=offset;
+            }else{
+                targetX+=offset;
+            }
+
+            const gridSize=48;
+            const gridX=Math.floor(targetX/gridSize)*gridSize+(gridSize/2);
+            const gridY=Math.floor(targetY/gridSize)*gridSize+(gridSize/2);
+
+            this.placePreview.setPosition(gridX,gridY);
+
+            if(this.canPlaceAt(gridX,gridY)){
+                this.placePreview.clearTint();
+                this.canPlace=true;
+            }else{
+                this.placePreview.setTint(0xff0000)//赤
+                this.canPlace=false;
+            }
+        }else{
+            this.placePreview.setVisible(false);
+            this.canPlace=false;
+        }
+    }
+    canPlaceAt(x,y){
+        const isOverlapping=this.interactables.some(item=>{
+            return item.x===x && item.y===y;
+        });
+
+        if(isOverlapping)return false;
+
+        //const tile=this.onGroundLayer.getTileAtWorld(x,y);
+        const checkLayers=[this.onGroundLayer,this.houseLayer];
+
+        for(const layer of checkLayers){//for(const A of B){}
+            if (layer && typeof layer.getTileAtWorld === 'function'){
+                //↑getTileAtWorldは関数であると定義、getTileAtWorldはJSの機能じゃないから必要
+                const tile=layer.getTileAtWorld(x,y);
+
+                if(tile&& tile.collides){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    placeItem(){
+        const ui=this.scene.get('UIScene');
+        const selectedItem=this.inventoryData[ui.selectedSlotIndex];
+
+        const x=this.placePreview.x;
+        const y=this.placePreview.y;
+
+        const newItem=this.add.sprite(x,y,selectedItem.id).setDepth(y);
+
+        this.physics.add.existing(newItem,true);
+        this.physics.add.collider(this.player,newItem);
+        this.physics.add.collider(this.villagers,newItem);
+
+        this.interactables.push({
+            type:selectedItem.id,
+            instance:newItem,
+            x:x,
+            y:y,
+            isPlaced:true//回収するときのフラグ
+        });
+
+        selectedItem.count--;
+
+        if(selectedItem.count<=0){
+            this.inventoryData.splice(ui.selectedSlotIndex,1);
+        }
+    }
     setupCamera(target){
         this.cameras.main.startFollow(target,true,0.1,0.1);
         this.cameras.main.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
