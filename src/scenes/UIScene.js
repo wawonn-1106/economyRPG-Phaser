@@ -24,10 +24,14 @@ export default class UIScene extends Phaser.Scene{
 
         this.maxHp=10;
 
-        this.draggedItem=null;
+        /*this.draggedItem=null;
         this.dragStartIndex=null;
         this.dragIcon=null;
         this.dragCountText=null;
+        this.processingItem=false;*/
+        this.heldItem=null;
+        this.cursorIcon=null;
+        this.cursorCountText=null;
 
         this.gameTime={
             day:1,
@@ -62,20 +66,23 @@ export default class UIScene extends Phaser.Scene{
 
         this.createClock();
 
-        this.dragIcon=this.add.image(0,0,'').setVisible(false).setDepth(10000);
-        this.dragCountText=this.add.text(0,0,'',{
+        this.cursorIcon=this.add.image(0,0,'').setVisible(false).setDepth(10000);
+        this.cursorCountText=this.add.text(0,0,'',{
             fontSize:'18px',
             stroke:'#000',
             strokeThickness:3
         }).setVisible(false).setDepth(10001);
 
-        this.input.on('pointermove',(pointer)=>{
-            if(this.draggedItem){
-                this.dragIcon.setPosition(pointer.x,pointer.y);
-                
-                this.dragCountText.setPosition(pointer.x+20,pointer.y+20);
+        this.input.on('pointerup',(pointer)=>{
+            if(this.heldItem){
+
+                if(this.heldItem&& !this.isPointerOver(pointer)){
+                    this.dropItemToWorld();
+                }
+                //this.dragIcon.setPosition(pointer.x,pointer.y);
+                //this.dragCountText.setPosition(pointer.x+20,pointer.y+20);
             }
-        })
+        });
 
         if(worldScene.inventoryData){
             this.updateHotbar(worldScene.inventoryData);
@@ -179,50 +186,143 @@ export default class UIScene extends Phaser.Scene{
         const targetPos=this.hotbarSlots[this.selectedSlotIndex];
         this.selector.setPosition(targetPos.x,targetPos.y);
     }
-    startDragItem(index){
+    /*startDragItem(index){
+        if(this.processingItem)return;
+
+        if (this.draggedItem) {
+            this.dropItem(index);
+            return;
+        }
+        this.processingItem=true;
+
         const inventory=this.registry.get('inventoryData');
 
-        if(inventory &&inventory[index]){
+        if(inventory &&inventory[index] && inventory[index].id!==null){
             this.dragStartIndex=index;
 
             //this.draggedItem={...inventory[index]};
             this.draggedItem=JSON.parse(JSON.stringify(inventory[index]));
 
-            inventory[index]=null;
+            //inventory[index]=null;
+            inventory[index] = { id: null, count: 0 };
             this.registry.set('inventoryData',inventory);
 
-            this.dragIcon.setTexture(this.draggedItem.id).setVisible(true);
-            this.dragCountText.setText(this.draggedItem.count).setVisible(true);
+            this.dragIcon.setTexture(this.heldItem.id).setVisible(true);
+            this.dragCountText.setText(this.heldItem.count).setVisible(true);
 
             this.updateHotbar(inventory);
+
+            this.time.delayedCall(50,()=>{this.processingItem=false;});
         }
-    }
-    dropItem(targetIndex){
-        if(!this.draggedItem)return;
+    }*/
+    handleInteraction(targetIndex){
+        //if(!this.draggedItem)return;
 
         const inventory=this.registry.get('inventoryData');
-        const targetItem=inventory[targetIndex];
+        const clickedItem=inventory[targetIndex];
+        //const maxStack=64;
 
-        if(targetItem){
-            inventory[this.dragStartIndex]=targetItem;
+        if(!this.heldItem && clickedItem&&clickedItem.id!==null){
+            this.heldItem=JSON.parse(JSON.stringify(clickedItem));
+            inventory[targetIndex]={id:null,count:0};
+            //inventory[this.dragStartIndex]=targetItem;
+            //inventory[targetIndex]=this.draggedItem;
+            
+        }else if(this.heldItem){
+            if(clickedItem&& clickedItem.id===this.heldItem.id){
+                const maxStack=64;
 
-            inventory[targetIndex]=this.draggedItem;
-        }else{
-            inventory[targetIndex]=this.draggedItem;
+                const spaceLeft=maxStack-clickedItem.count;
+                const amountAdd=Math.min(spaceLeft,this.heldItem.count);
+
+                if(this.heldItem.count<=0) this.heldItem=null;
+            }else{
+                const tempItem=JSON.parse(JSON.stringify(clickedItem))||{id:null,count:0};
+                inventory[targetIndex]=JSON.parse(JSON.stringify(this.heldItem));
+
+                this.heldItem=tempItem===null? null:tempItem;
+            }
+            
+
+            /*if(amountAdd>0){
+                targetItem.count+=amountAdd;
+
+                this.draggedItem.count-=amountAdd;
+            }*/
+            
+            /*if(this.draggedItem.count<=0){
+                this.draggedItem=null;
+                this.dragStartIndex = null;
+
+                this.dragIcon.setVisible(false);
+                this.dragCountText.setVisible(false);
+            }else{
+                //inventory[this.dragStartIndex]=null;
+                this.dragCountText.setText(this.draggedItem.count);
+            }*/
+
         }
+            //const tempItem=JSON.parse(JSON.stringify(targetItem))||{id:null,count:0};
 
+            /*//inventory[this.dragStartIndex]=targetItem;
+            inventory[targetIndex]=JSON.parse(JSON.stringify(this.draggedItem));
+
+            if(tempItem && tempItem.id!==null){
+                this.draggedItem=tempItem;
+
+                this.dragIcon.setTexture(this.draggedItem.id).setVisible(true);
+                this.dragCountText.setText(this.draggedItem.count).setVisible(true);
+
+                this,this.dragStartIndex=targetIndex;
+            }else{
+                this.draggedItem=null;
+                this.dragStartIndex = null;
+
+                this.dragIcon.setVisible(false);
+                this.dragCountText.setVisible(false);
+            }*/
         this.registry.set('inventoryData',inventory);
 
-        this.draggedItem=null;
+        /*this.draggedItem=null;
         this.dragStartIndex=null;
 
         this.dragIcon.setVisible(false);
-        this.dragCountText.setVisible(false);
+        this.dragCountText.setVisible(false);*/
 
         this.updateHotbar(inventory);
 
         if(this.menuManager&& this.menuManager.isOpenMenu){
             this.menuManager.switchTab('inventory');
+        }
+    }
+    dropItemToWorld(){
+        if(!this.heldItem)return;
+
+        const worldScene=this.scene.get('World');
+
+        worldScene.spawnItemNearPlayer(this.heldItem);
+
+        this.heldItem=null;
+        this.updateCursorVisual();
+    }
+    isPointerOver(pointer){
+        if(!this.menuManager.isOpenMenu)return false;
+
+        const hW=500;
+        const hH=300;
+        const centerX=this.scale.width/2;
+        const centerY=this.scale.height/2;
+
+        return(pointer.x>=centerX-hW&& pointer.x<=centerX+hW 
+            && pointer.y>=centerY-hH&& pointer.y<=centerY+hH);
+    }
+    updateCursorVisual(){
+        if(this.heldItem&& this.heldItem.id){
+            this.cursorIcon.setTexture(this.heldItem.id).setVisible(true);
+            this.cursorCountText.setText(this,this.heldItem.count).setVisible(true);
+        }else{
+            this.cursorIcon.setVisible(false);
+            this.cursorCountText.setVisible(false);
         }
     }
     updateHP(currentHP){
@@ -529,6 +629,13 @@ export default class UIScene extends Phaser.Scene{
                 this.gameTime.elapsed=0;
                 this.advanceTime();
             }
+        }
+
+        if(this.heldItem){
+            const pointer=this.input.activePointer;
+
+            this.cursorIcon.setPosition(pointer.x,pointer.y);
+            this.cursorCountText.setPosition(pointer.x+20,pointer.y+20);
         }
         //メニューを開くキーのショートカット
         if(Phaser.Input.Keyboard.JustDown(this.keys.M)){

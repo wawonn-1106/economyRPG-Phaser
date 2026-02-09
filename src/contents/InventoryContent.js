@@ -33,7 +33,7 @@ export default class InventoryContent{
         const hotbarStartY=175;
         const slotSize=102;
 
-        const tooltip=this.uiScene.add.text(0,-240,'',{
+        /*const tooltip=this.uiScene.add.text(0,-240,'',{
             fontSize:'20px',
             color:'#000000',
             backgroundColor:'#ffffff',
@@ -41,7 +41,8 @@ export default class InventoryContent{
             lineSpacing:8
         }).setOrigin(0.5,0.5).setDepth(2000).setVisible(false);
         
-        container.add(tooltip);
+        //container.add(tooltip);
+        tooltip.setDepth(10000);
         /*const colWidth=260;
         const rowHeight=120;
         const maxCols=3;
@@ -97,63 +98,102 @@ export default class InventoryContent{
                 itemContainer.add([icon,countText]);
             }
 
-            hitArea.on('pointerover',(pointer)=>{
-                if(this.uiScene.draggedItem ||item.count<=0)return;
+            /*hitArea.on('pointerover',(pointer)=>{
+                if(!item || !item.id || this.uiScene.draggedItem || item.count <= 0) return;
+                //if(this.uiScene.draggedItem ||item.count<=0)return;
 
                 let text=`【${item.name}】`;
 
                 if(item.qualityDetails){
-                    text+=`★１:${item.qualityDetails[0]} ★２:${item.qualityDetails[1]} ★３:${item.qualityDetails[2]}}`;
+                    text+=`★１:${item.qualityDetails[0]} ★２:${item.qualityDetails[1]} ★３:${item.qualityDetails[2]}`;
                 }
 
-                tooltip.setText(text).setVisible(true).setPosition(pointer.worldX,pointer.worldY);
+                tooltip.setText(text).setVisible(true).setPosition(pointer.x,pointer.y);
             });
 
             hitArea.on('pointermove',(pointer)=>{
-                tooltip.setPosition(pointer.worldX,pointer.worldY);
+                tooltip.setPosition(pointer.x,pointer.y);
             });
 
             hitArea.on('pointerout',()=>{
                 tooltip.setVisible(false);
+            });*/
+
+            //let pressStartTime=0;
+            let isDragging=false;
+
+            /*hitArea.on('pointerdown',(pointer)=>{
+                isDragging=false;
+                //this.showItemDescription(item,pointer.x,pointer.y);
+                //console.log('クリックされました');
+                //if(!item.active)return;
+                //this.showItemDescription(item,pointer.x,pointer.y);
+
+                //pressStartTime=pointer.time;
             });
 
-            let pressStartTime=0;
-
-            hitArea.on('pointerdown',(pointer)=>{
-                pressStartTime=pointer.time;
-            });
-
-            hitArea.on('pointerup',(pointer)=>{
+            /*hitArea.on('pointerup',(pointer)=>{
                 const duration=pointer.time-pressStartTime;
+                
+                const distance=Phaser.Math.Distance.Between(
+                    pointer.downX,pointer.downY,
+                    pointer.upX,pointer.upY
+                );
 
                 if(this.uiScene.draggedItem){
                     this.uiScene.dropItem(index);
                     //this.worldScene.menuManager.switchTab('inventory');
-                }else if(duration<200 && !this.uiScene.draggedItem){
-                    this.showItemDescription(item);
+                }else if(duration<200&& distance<10){
+                    this.showItemDescription(item,pointer.x,pointer.y);
                 }
+            });*/
+            hitArea.on('pointerdown',(pointer)=>{
+                isDragging=false;
+
+                this.clickTimer=this.uiScene.time.delayedCall(200,()=>{
+                    if(!isDragging&& item&& item.id){
+                        this.showItemDescription(item,pointer.x,pointer.y);
+                    }
+                });
             });
 
             hitArea.on('dragstart',()=>{
-                if(item.count<=0)return;
+                isDragging=true;
+                //if(!item|| item.count<=0)return;
 
-                this.uiScene.startDragItem(index);
-                itemContainer.setVisible(false);
-                tooltip.setVisible(false);
+                //itemContainer.setVisible(false);
+                if(this.clickTimer)this.clickTimer.remove();
+                if(this.descPanel) this.descPanel.destroy();
+
+                this.uiScene.handleInteraction(index);
+                //tooltip.setVisible(false);
             });
+
         });
         //container.appendChild(ul);
 
         return container;
     }
-    showItemDescription(item){
-        if (!item || this.uiScene.draggedItem) return;
+    showItemDescription(item,x,y){
+        //if (!item ||item.count<=0|| this.uiScene.draggedItem) return;
+
+        console.log(item);
 
         if(this.descPanel)this.descPanel.destroy();
 
-        this.descPanel=this.uiScene.add.container(250,-150);
+        let panelX=x+175;
+        let panelY=y;
 
-        const panelBg=this.uiScene.add.image(0,0,'descPane-bg')
+        if(panelX+175>this.uiScene.scale.width){
+            panelX=x-175;
+        }
+        if(panelY+225>this.uiScene.scale.height){
+            panelY=this.uiScene.scale.height-225;
+        }
+
+        this.descPanel=this.uiScene.add.container(panelX,panelY);
+
+        const panelBg=this.uiScene.add.image(0,0,'menu-bg')//descPanel-bg
             .setDisplaySize(350,450)
             .setInteractive();
 
@@ -161,19 +201,20 @@ export default class InventoryContent{
             fontSize:'28px',
             color:'#000000',
             stroke:'#000',
-            strokeTickness:4
+            strokeThickness:4
         }).setOrigin(0.5);
 
         const descText=this.uiScene.add.text(-140,-130,item.description,{
             fontSize:'18px',
             color:'#ffffff',
-            lineSpacing:5
+            lineSpacing:5,
+            wordWrap:{width:280}
         });
 
         let qualityInfo=`【品質内訳】`;
 
         if(item.qualityDetails){
-            qualityInfo+=`★１:${item.qualityDetails[0]}個 ★２:${item.qualityDetails[1]}個 ★３:${item.qualityDetails[2]}個}`;
+            qualityInfo+=`★１:${item.qualityDetails[0]}個 ★２:${item.qualityDetails[1]}個 ★３:${item.qualityDetails[2]}個`;
         }
 
         const qualityText=this.uiScene.add.text(-140,50,qualityInfo,{
@@ -197,6 +238,6 @@ export default class InventoryContent{
         });
 
         this.descPanel.add([panelBg,titleText,descText,qualityText,closeBtn,closeText]);
-        this.descPanel.setDepth(5000);
+        this.descPanel.setDepth(20000);
     }
 }
