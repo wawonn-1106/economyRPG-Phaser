@@ -220,7 +220,7 @@ export default class UIScene extends Phaser.Scene{
 
         const inventory=this.registry.get('inventoryData');
         const clickedItem=inventory[targetIndex];
-        //const maxStack=64;
+        const maxStack=64;
 
         if(!this.heldItem && clickedItem&&clickedItem.id!==null){
             this.heldItem=JSON.parse(JSON.stringify(clickedItem));
@@ -230,10 +230,13 @@ export default class UIScene extends Phaser.Scene{
             
         }else if(this.heldItem){
             if(clickedItem&& clickedItem.id===this.heldItem.id){
-                const maxStack=64;
+                //const maxStack=64;
 
                 const spaceLeft=maxStack-clickedItem.count;
                 const amountAdd=Math.min(spaceLeft,this.heldItem.count);
+
+                clickedItem.count+=amountAdd;
+                this.heldItem.count-=amountAdd;
 
                 if(this.heldItem.count<=0) this.heldItem=null;
             }else{
@@ -290,6 +293,7 @@ export default class UIScene extends Phaser.Scene{
         this.dragCountText.setVisible(false);*/
 
         this.updateHotbar(inventory);
+        this.updateCursorVisual();
 
         if(this.menuManager&& this.menuManager.isOpenMenu){
             this.menuManager.switchTab('inventory');
@@ -319,7 +323,7 @@ export default class UIScene extends Phaser.Scene{
     updateCursorVisual(){
         if(this.heldItem&& this.heldItem.id){
             this.cursorIcon.setTexture(this.heldItem.id).setVisible(true);
-            this.cursorCountText.setText(this,this.heldItem.count).setVisible(true);
+            this.cursorCountText.setText(this.heldItem.count).setVisible(true);
         }else{
             this.cursorIcon.setVisible(false);
             this.cursorCountText.setVisible(false);

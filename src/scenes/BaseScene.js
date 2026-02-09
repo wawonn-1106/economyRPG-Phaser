@@ -170,8 +170,50 @@ export default class BaseScene extends Phaser.Scene{
                     }
                     break;
                 case 'rock':
+                case 'wood':
+                case 'fence':
+                case 'equipment'://machineがいいなぁ、被る。
+                case 'chest':
+                case 'furniture':
+                case 'tile':
+
+                console.log('ダメージを受けてる');
+                const target=this.interactables.find(i=>i.instance===this.actionTarget);
+                if(!target) return;
+
+                const ui=this.scene.get('UIScene');
+                const inventory=this.registry.get('inventoryData');
+                const selectedItem=inventory[ui.selectedSlotIndex];
+                const toolId=selectedItem? selectedItem.id:'hand';
+
+                let canBreak=false;
+
+                switch(target.type){
+                    case 'rock':
+                        if(toolId==='pickaxe') canBreak=true;
+                        break;
+                    case 'wood':
+                    case 'chest':
+                        if(toolId==='axe')canBreak=true;
+                        break;
+                    case 'equipment':
+                        if(toolId==='pickaxe')canBreak=true;
+                        break;
+                    case 'fence':
+                    case 'tile':
+                    case 'furniture':
+                        canBreak=true;
+                        break;
+                }
+
+                if(canBreak){
+                    this.damageInteractable(target);
+                }else{
+                    //ここで惚れない時の音とか
+                }
+                break;
                     //const rock=this.actionTarget;
-                    const rock=this.interactables.find(i=>i.instance===this.actionTarget.instance);
+                    /*const rock=this.interactables.find(i=>i.instance===this.actionTarget.instance);
 
                     rock.hp--;
                     console.log(rock.hp);
@@ -182,7 +224,7 @@ export default class BaseScene extends Phaser.Scene{
                         this.interactables=this.interactables.filter(i=>i!==rock);
                         this.readyIcon.setVisible(false);//ない方がいいかも
                     }
-                    break;
+                    break;*/
 
                     //const doorName=this.actionTarget.data.name;
 
@@ -326,6 +368,139 @@ export default class BaseScene extends Phaser.Scene{
 
             this.player.setPosition(x,y);
         }
+    }
+    spawnItemNearPlayer(itemData){
+        if(!itemData) return;
+
+        let offsetX=0;
+        let offsetY=0;
+        const distance=45;
+
+        const dir=this.player.direction;//まだ定義してない
+
+        switch(dir){
+            case 'left':
+                offsetX=-distance;
+                break;
+            case 'right':
+                offsetX=distance;
+                break;
+            case 'up':
+                offsetY=-distance;
+                break;
+            case 'down':
+                offsetY=distance;
+                break;
+            default:
+                offsetY=10; 
+        }
+
+        const dropX=this.player.x+offsetX;
+        const dropY=this.player.y+offsetY;
+
+        const item=this.physics.add.sprite(dropX,dropY,itemData.id);
+
+        item.setScale(0.8).setDepth(dropY);
+
+        item.setData('info',JSON.parse(JSON.stringify(itemData)));
+
+        /*if(this.groundItems){
+            this.groundItems.add(item);
+        }*///後で作る用
+    }
+    damageInteractable(target){
+        console.log('ダメージを受けてる');
+        if(!target.hp&& target.hp!==0){
+            target.hp=2;
+            target.maxHp=2;
+        }
+
+        target.hp--;
+
+        this.showItemHealthBar(target);
+
+        if(target.healthbar)target.healthbar.destroy();
+
+        //----------------------画像orグラフで耐久値の表示↓
+
+        if(target.hp<=0){
+            if(target.healthbar)target.healthbar.destroy();
+
+            this.destroyAndDrop(target);
+        }
+    }
+    showItemHealthBar(target){
+        if(!target.healthbarContainer){
+            const x=target.instance.x;
+            const y=target.instance.y;
+
+            const container=this.add.container(x,y);
+
+            const bg=this.add.image(0,0,'bar-bg').setOrigin(0.5);
+
+            const fill=this.add.image(-(bg.displayWidth/2),0,'bar-fill').setOrigin(0,0.5);
+
+            container.add([bg,fill]);
+            container.setDepth(10000);
+
+            target.healthbarContainer=container;
+            target.healthbarFill=fill;
+            target.barFullWidth=bg.displayWidth;
+        }else{
+            target.healthbarContainer.setAlpha(1);
+        }
+
+        const barPercent=target.hp/target.maxHp;
+
+        const targetScaleX=(target.barFullWidth*barPercent)/target.healthbarFill.displayWidth;
+
+        this.tweens.add({
+            targets:target.healthbarFill,
+            scaleX:targetScaleX,
+            duration:150,
+            ease:'Cubic easeOut'
+        });
+
+        if(target.barTimer)target.barTimer.remove();
+
+        target.barTimer=this.time.delayedCall(2000,()=>{
+            if(target.healthbarContainer){
+
+                this.tweens.add({
+                    targets:target.healthbarContainer,
+                    alpha:0,
+                    duration:400,
+                    onComplete:()=>{
+                        target.healthbarContainer?.destroy();
+                        target.healthbarContainer=null;
+                    }
+                });
+            }
+        });
+    }
+    destroyAndDrop(target){
+        const itemData=target.data|| {id:target.type};
+
+        const x=target.instance.x;
+        const y=target.instance.y;
+
+        target.instance.destroy();
+        this.interactables=this.interactables.filter(item=>item!==target);
+
+        this.spawnItemAtPoint(x,y,itemData);
+    }
+    spawnItemAtPoint(x,y,itemData){
+        const item=this.physics.add.sprite(x,y,itemData.id);
+
+        item.setScale(0.8).setDepth(y+10);
+        item.setData('info',itemData);
+        item.setData('canPickup',false);
+
+        this.time.delayedCall(1000,()=>{
+            if(item.active) item.setData('canPickup',true);
+        });
+
+        if(this.groundItems)this.groundItems.add(item);
     }
     /*wrapToScene(targetKey){
         this.player.body.enable=false;
