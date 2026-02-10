@@ -36,5 +36,6 @@ export const config={
     zoom:1,
     backgroundColor:'#000000',
     pixelArt:true,
-    scene:[PreloadScene,BaseScene,Title,World,House,Shop,Forest,UIScene]//sceneの順番は表示する順番でもあるからtitleが先
+    scene:[PreloadScene,BaseScene,Title,World,House,Shop,Forest,UIScene]//UISceneの順番Baseの後でいいかも
+    //↑この配列の順番は読み込みの順番。Preload→Baseで準備をしてからTitleシーン
 }

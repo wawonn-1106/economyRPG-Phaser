@@ -12,49 +12,17 @@ export default class InventoryContent{
         const bg=this.uiScene.add.image(0,0,'menu-bg').setDisplaySize(1000,600);//menu-bg→inventory-bg
         container.add(bg);
 
-        //const container=document.createElement('div');
-        //container.classList.add('inventory-container');
-
-        //const items=this.worldScene.inventoryData || [];  //World.jsのアイテムなかったら空
         const items=this.uiScene.registry.get('inventoryData');
-
-        /*if(items.length===0){
-            const emptyMsg=this.uiScene.add.text(0,0,'持ち物はありません',{
-                fontSize:'28px',
-                color:'#000000'
-            });
-            //emptyMsg.textContent='持ち物はありません';
-            container.add(emptyMsg);
-            return container;
-        }*/
 
         const startX=-410;
         const backPackStartY=-125;
         const hotbarStartY=175;
         const slotSize=102;
 
-        /*const tooltip=this.uiScene.add.text(0,-240,'',{
-            fontSize:'20px',
-            color:'#000000',
-            backgroundColor:'#ffffff',
-            padding:{x:12,y:10},
-            lineSpacing:8
-        }).setOrigin(0.5,0.5).setDepth(2000).setVisible(false);
-        
-        //container.add(tooltip);
-        tooltip.setDepth(10000);
-        /*const colWidth=260;
-        const rowHeight=120;
-        const maxCols=3;
-        /*const ul=document.createElement('ul');
-        ul.classList.add('item-grid');*/
-
         items.forEach((item,index)=>{
             const isHotbar=index<9;
 
             let x,y;
-            /*const col=isHotbar? index:(index-9)%9;
-            const row=isHotbar?0:Math.floor((index%9)/9);*/
             
             if(isHotbar){
                 x=startX+(index*slotSize);
@@ -76,17 +44,6 @@ export default class InventoryContent{
 
             container.add(hitArea);
 
-            /*const x=startX+(col*slotSize);
-            const y=isHotbar? hotbarStartY:backPackStartY+(row*slotSize);
-
-            const slotBg=this.uiScene.add.image(x,y,'slot-bg')
-                .setDisplaySize(90,90)
-                .setInteractive({useHandCursor:true,draggable:true});
-
-            container.add(slotBg);*/
-
-            //const itemContainer=this.uiScene.add.container(x,y);
-
             if(item&& item.count>0){
                 const icon=this.uiScene.add.image(0,0,item.id).setDisplaySize(70,70);
                 const countText=this.uiScene.add.text(35,35,item.count,{
@@ -98,55 +55,8 @@ export default class InventoryContent{
                 itemContainer.add([icon,countText]);
             }
 
-            /*hitArea.on('pointerover',(pointer)=>{
-                if(!item || !item.id || this.uiScene.draggedItem || item.count <= 0) return;
-                //if(this.uiScene.draggedItem ||item.count<=0)return;
-
-                let text=`【${item.name}】`;
-
-                if(item.qualityDetails){
-                    text+=`★１:${item.qualityDetails[0]} ★２:${item.qualityDetails[1]} ★３:${item.qualityDetails[2]}`;
-                }
-
-                tooltip.setText(text).setVisible(true).setPosition(pointer.x,pointer.y);
-            });
-
-            hitArea.on('pointermove',(pointer)=>{
-                tooltip.setPosition(pointer.x,pointer.y);
-            });
-
-            hitArea.on('pointerout',()=>{
-                tooltip.setVisible(false);
-            });*/
-
-            //let pressStartTime=0;
             let isDragging=false;
 
-            /*hitArea.on('pointerdown',(pointer)=>{
-                isDragging=false;
-                //this.showItemDescription(item,pointer.x,pointer.y);
-                //console.log('クリックされました');
-                //if(!item.active)return;
-                //this.showItemDescription(item,pointer.x,pointer.y);
-
-                //pressStartTime=pointer.time;
-            });
-
-            /*hitArea.on('pointerup',(pointer)=>{
-                const duration=pointer.time-pressStartTime;
-                
-                const distance=Phaser.Math.Distance.Between(
-                    pointer.downX,pointer.downY,
-                    pointer.upX,pointer.upY
-                );
-
-                if(this.uiScene.draggedItem){
-                    this.uiScene.dropItem(index);
-                    //this.worldScene.menuManager.switchTab('inventory');
-                }else if(duration<200&& distance<10){
-                    this.showItemDescription(item,pointer.x,pointer.y);
-                }
-            });*/
             hitArea.on('pointerdown',(pointer)=>{
                 isDragging=false;
 

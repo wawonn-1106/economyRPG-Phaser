@@ -613,6 +613,7 @@ export default class UIScene extends Phaser.Scene{
 
         this.hotbar?.setVisible(this.isDecorationMode);
         this.selector?.setVisible(this.isDecorationMode);
+        //this.heldItem?.setVisible(this.isDecorationMode);
 
         this.hotbarIcons.forEach(icon=>icon?.setVisible(this.isDecorationMode));
         this.hotbarTexts.forEach(text=>text?.setVisible(this.isDecorationMode));

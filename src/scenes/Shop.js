@@ -1,19 +1,15 @@
 import NPC from '../entities/NPC.js';
-import DialogManager from '../managers/DialogManager.js';
 import BaseScene from './BaseScene.js';
 import Player from '../entities/Player.js';
 
 export default class Shop extends BaseScene{
     constructor(){
-        super({key:'Shop'});
-
+        super({key:'Shop'});/*BaseSceneを経由して、このsceneをShopという名前で登録
+                            BaseSceneはPhaser.Sceneを継承してるからそこで子(Shop,World)などと一緒に登録*/
     }
-    /*init(data){
-        this.fromDoor=data.fromDoor;
-    }*/
     create(data){
-        //console.log("Shopシーン開始！");
-        super.create(data);
+        console.log("Shopシーン開始！");
+        super.create(data);//親クラス(BaseScene)のcreate()を実行。そこにはinventoryDataをjsonから取得するのがある
 
         this.initManagers();
         this.initInput();
@@ -22,17 +18,17 @@ export default class Shop extends BaseScene{
 
         this.interactables=[];
 
-        this.scene.launch('UIScene');
+        this.scene.launch('UIScene');//Sceneは基本一個づつ表示だが、ShopではShopシーンを消さずにUISceneを立ち上げるように命令。他のSceneでもね。
 
         const map=this.createMap('shop','Serene_Village_48x48','tileset');
-
-        //this.player = this.physics.add.sprite(0, 0, 'player').setScale(0.1);
+  
         this.player = new Player(this, 0, 0,'player');
+        //this.player = this.physics.add.sprite(0, 0, 'player').setScale(0.1);
+        //どのシーンに出すかが指定できないadd.spriteは不適
 
         this.setPlayerSpawnPoint(data);
 
         this.setupSceneTransitions(map, this.player);
-
 
         this.villagers=this.physics.add.group();
 
@@ -43,16 +39,11 @@ export default class Shop extends BaseScene{
         ];
 
         villagerData.forEach(data=>{
-            //第五引数のdataはNPC.jsでconfigとして受け取る。必要に応じてconfig.startIdで取得できる。第六まで増やす必要もない。
-            const newVillager=new NPC(this,data.x,data.y,data.key,data);//this忘れ、どこに書けばいいかわからなかったことによるエラー。
+            const newVillager=new NPC(this,data.x,data.y,data.key,data);
             this.villagers.add(newVillager);
 
             this.interactables.push({type:'npc',instance:newVillager});
         });
-
-        /*this.villagers.getChildren().forEach(v=>{
-            this.interactables.push({type:'npc',instance:v,x:v.x,y:v.y});
-        });*///なんで同じことやってた？
 
         this.setupCollisions(this.player);
         this.setupCollisions(this.villagers);
@@ -60,11 +51,7 @@ export default class Shop extends BaseScene{
         this.physics.add.collider(this.player,this.villagers);
         this.physics.add.collider(this.villagers,this.villagers);
         
-
         this.setupCamera(this.player);
-        /*this.cameras.main.startFollow(this.player,true,0.1,0.1);
-        this.cameras.main.setBounds(0,0,map.widthInPixels,map.heightInPixels);*/
-
     }
     update(time,delta){
         super.update(time, delta);
@@ -72,17 +59,10 @@ export default class Shop extends BaseScene{
         this.updateInteractables(this.player);
         this.updatePlacementPreview();
 
-        this.player.update();
-
-        /*const speed = 200;
-        this.player.setVelocity(0);
-
-        if (this.cursors.left.isDown) this.player.setVelocityX(-speed);
-        else if (this.cursors.right.isDown) this.player.setVelocityX(speed);
-
-        if (this.cursors.up.isDown) this.player.setVelocityY(-speed);
-        else if (this.cursors.down.isDown) this.player.setVelocityY(speed);*/
+        this.player.update();/*イメージしづらいが、this.playerはPlayer.jsで作ったから。
+        　　　　　　　　　　　　this.player.updateってここでかいてもShop.jsのupdateは実行されない*/
 
         this.villagers.getChildren().forEach(v=>v.update(time,delta));
+        //ここのupdateはNPC.jsのupdate。new NPCでインスタンス作ってるから。
     }
 }

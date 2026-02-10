@@ -2,9 +2,6 @@ export default class Title extends Phaser.Scene{
     constructor(){
         super({key:'Title'});
     }
-    preload(){
-        //引っ越し
-    }
     create(){
         if (this.scene.isActive('UIScene')) {
             this.scene.stop('UIScene');
@@ -22,11 +19,7 @@ export default class Title extends Phaser.Scene{
             this.cameras.main.fadeOut(1000,0,0,0);
 
             this.cameras.main.once('camerafadeoutcomplete',()=>{
-
-                /*if (this.scene.isActive('UIScene')) {
-                    this.scene.stop('UIScene');
-                }*/
-
+                
                 this.scene.start('World');
             });
         })
@@ -38,10 +31,6 @@ export default class Title extends Phaser.Scene{
             this.cameras.main.fadeOut(1000,0,0,0);
 
             this.cameras.main.once('camerafadeoutcomplete',()=>{
-
-                /*if (this.scene.isActive('UIScene')) {
-                    this.scene.stop('UIScene');
-                }*/
 
                 this.scene.start('World');
             });

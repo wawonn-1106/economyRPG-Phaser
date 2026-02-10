@@ -3,34 +3,30 @@ export default class PreloadScene extends Phaser.Scene{
         super({key:'PreloadScene'});
     }
     preload(){
-//--------------------------------その他------------------------------------------------------
+//--------------------------------画像------------------------------------------------------
         this.load.image('player','assets/images/player.png');
         this.load.image('heart','assets/images/heart.png');
         this.load.image('dictionary-bg','assets/images/dictionary-bg.png');
-//--------------------------------tilemap------------------------------------------------------
-        //this.load.image('tileset-test1','assets/tilesets/Beginning Fields.png')
-        //this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test1.tmj');
-        //this.load.tilemapTiledJSON('map','assets/tilemaps/tilemap-test.tmj');
-        this.load.tilemapTiledJSON('map','assets/tilemaps/economyRPG.json');
-        this.load.tilemapTiledJSON('house','assets/tilemaps/House.json');
-        this.load.tilemapTiledJSON('shop','assets/tilemaps/Shop.json');
-//--------------------------------天気------------------------------------------------------
-        this.load.image('rain','assets/images/player.png');
-        this.load.image('snow','assets/images/player.png');
         this.load.image('apple','assets/images/apple.png');
         this.load.image('seed','assets/images/seed.png');
         this.load.image('axe','assets/images/axe.png');
         this.load.image('pickaxe','assets/images/pickaxe.png');
         this.load.image('fishing-rod','assets/images/fishing-rod.png');
+//--------------------------------tilemap------------------------------------------------------
+        this.load.tilemapTiledJSON('map','assets/tilemaps/economyRPG.json');
+        this.load.tilemapTiledJSON('house','assets/tilemaps/House.json');
+        this.load.tilemapTiledJSON('shop','assets/tilemaps/Shop.json');
+//--------------------------------tileset-----------------------------------------------------
+        this.load.image('tileset','assets/tilesets/Serene_Village_48x48.png');
+//--------------------------------天気------------------------------------------------------
+        this.load.image('rain','assets/images/player.png');
+        this.load.image('snow','assets/images/player.png');
 //--------------------------------json------------------------------------------------------
         this.load.json('chapter1','assets/data/dialog1.json');
         this.load.json('termsData','assets/data/dictionary.json');
         this.load.json('recipesData','assets/data/recipes.json');
         this.load.json('playerData','assets/data/playerData.json');
         this.load.json('inventoryData','assets/data/inventory.json');
-//--------------------------------tileset------------------------------------------------------
-        //this.load.image('tileset','assets/tilesets/pipo-map001.png');
-        this.load.image('tileset','assets/tilesets/Serene_Village_48x48.png');
 //--------------------------------タイトル------------------------------------------------------       
         this.load.image('title','assets/images/title-image.png');
         this.load.image('start-btn','assets/images/start-btn.png');//その場しのぎの画像

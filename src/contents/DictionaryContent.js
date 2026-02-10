@@ -53,8 +53,6 @@ export default class DictionaryContent{
 
         const bg=this.uiScene.add.image(0,0,'dictionary-bg').setDisplaySize(1000,600);
         container.add(bg);
-        //const container=document.createElement('div');
-        //container.classList.add('dictionary-content');//ここは変えてね
 
         const listX=-300;
         const listY=-200;
@@ -101,7 +99,7 @@ export default class DictionaryContent{
             fontSize:'22px',
             color:'#000000',
             wordWrap:{width:400}
-        });//改行しないとはみ出るなぁ
+        });
 
         detailContainer.add([wordTitle,categoryLabel,descriptionText,exampleText]);//wordTitleもいるなら
 
@@ -123,33 +121,7 @@ export default class DictionaryContent{
             termButton.on('pointerover',()=>termButton.setColor('#ffffff'));
             termButton.on('pointerout',()=>termButton.setColor('#000000'));
 
-            //listContainer.add(termButton);
             scrollContent.add(termButton);
-            /*const item=document.createElement('div');
-            item.classList.add('dictionary-item');
-
-            const word=document.createElement('div');
-            word.classList.add('term-word');
-            word.textContent=term.word;
-
-            const category=document.createElement('div');
-            category.classList.add('term-category');
-            category.textContent=term.category;
-
-            const description=document.createElement('div');
-            description.classList.add('term-description');
-            description.textContent=term.description || '説明はありません';
-
-            const example=document.createElement('div');
-            example.classList.add('term-example');
-            example.textContent=term.example || '例文はありません';
-
-            item.appendChild(word);
-            item.appendChild(category);
-            item.appendChild(description);
-            item.appendChild(example);
-
-            container.appendChild(item);*/
         });
 
         const contentHeight=terms.length*55;

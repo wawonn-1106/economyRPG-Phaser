@@ -5,8 +5,8 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         scene.physics.world.enable(this);
         scene.add.existing(this);
 
-        this.npcName=config.name || '村人';  //名前なかったら村人になる
-        this.startId=config.startId || 'start';
+        this.npcName=config.name;
+        this.startId=config.startId;
 
         this.setScale(0.1).refreshBody();
         this.setCollideWorldBounds(true);
@@ -15,30 +15,17 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
 
         this.moveTimer=0;
         this.currentDir=new Phaser.Math.Vector2(0,0);
-
-        /*this.talkIcon=scene.add.text(x,y-60,'▼',
-            {fontSize:'24px'}
-        ).setOrigin(0.5).setVisible(false);*/
-
     }
-    /*showIcon(visible){
-        this.talkIcon.setVisible(visible);
-    }*/
     update(time,delta){
-        /*this.talkIcon.x=this.x;
-        this.talkIcon.y=this.y-60;*/
- 
         if(this.scene.dialogManager.isTalking){
             this.setVelocity(0);
-            return; //超大事
+            return;
         }
 
         this.moveTimer-=delta;
         if(this.moveTimer<=0){
             this.decideNextAction();
         }
-
-
     }
     decideNextAction(){
         if(Math.random()<0.5){

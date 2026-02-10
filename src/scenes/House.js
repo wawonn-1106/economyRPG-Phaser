@@ -1,25 +1,11 @@
 import NPC from '../entities/NPC.js';
-import DialogManager from '../managers/DialogManager.js';
 import BaseScene from './BaseScene.js';
 import Player from '../entities/Player.js';
 
 export default class House extends BaseScene{
     constructor(){
         super({key:'House'});
-
-        //this.isWraping=false;
-        //this.fromDoor=null;
-        //this.interactables=[];
-        //this.nearstTarget=null;
-        //this.readyIcon=null;
-        //this.readyActionType=null;
-        //this.actionTarget=null;
-        //this.fromDoor=null;
-        //this.isWraping=false;
     }
-    /*init(data){
-        this.fromDoor=data.fromDoor;
-    }*/
     create(data){
         super.create(data);
 
@@ -34,7 +20,6 @@ export default class House extends BaseScene{
 
         const map=this.createMap('house','Serene_Village_48x48','tileset');
 
-        //this.player = this.physics.add.sprite(0, 0, 'player').setScale(0.1);
         this.player=new Player(this,0,0,'player');
 
         this.setPlayerSpawnPoint(data);
@@ -50,88 +35,19 @@ export default class House extends BaseScene{
         ];
 
         villagerData.forEach(data=>{
-            //第五引数のdataはNPC.jsでconfigとして受け取る。必要に応じてconfig.startIdで取得できる。第六まで増やす必要もない。
-            const newVillager=new NPC(this,data.x,data.y,data.key,data);//this忘れ、どこに書けばいいかわからなかったことによるエラー。
+            const newVillager=new NPC(this,data.x,data.y,data.key,data);
             this.villagers.add(newVillager);
 
             this.interactables.push({type:'npc',instance:newVillager});
         });
-
-        /*this.villagers.getChildren().forEach(v=>{
-            this.interactables.push({type:'npc',instance:v,x:v.x,y:v.y});
-        });*/
 
         this.setupCollisions(this.player);
         this.setupCollisions(this.villagers);
 
         this.physics.add.collider(this.player,this.villagers);
         this.physics.add.collider(this.villagers,this.villagers);
-        /*this.dialogManager = new DialogManager(this);
-
-        const map = this.make.tilemap({ key: 'shop' });
-    
-        const tileset = map.addTilesetImage('Serene_Village_48x48','tileset');
-        
-        this.GroundLayer = map.createLayer('Ground', tileset, 0, 0); 
-        //this.HouseLayer = map.createLayer('House', tileset, 0, 0);
-        this.OnGroundLayer = map.createLayer('OnGround', tileset, 0, 0);
-
-        //this.HouseLayer.setCollisionByProperty({ collides: true });
-        this.OnGroundLayer.setCollisionByProperty({ collides: true });*/
-
-        /*this.physics.add.collider(this.player, this.HouseLayer);
-        this.physics.add.collider(this.player, this.OnGroundLayer);
-
-        this.physics.world.setBounds(0,0,map.widthInPixels,map.heightInPixels);
-
-        this.cursors = this.input.keyboard.createCursorKeys();*/
-
-        /*const objectLayer=map.getObjectLayer('Object');
-        
-        //this.isWraping = false;
-
-        //const objectLayer=map.getObjectLayer('Object');
-        if(objectLayer){//家に入る、機械を開いたり、▼が出るアクション
-            objectLayer.objects.forEach(object=>{
-                if(object.name==='door' || object.name==='machine'){
-                    this.interactables.push({
-                        type:object.name,
-                        data:object,
-                        x:object.x+(object.width/2||0),
-                        y:object.y+(object.height/2||0),
-                    });
-                }
-            });
-        }
-
-        this.readyIcon=this.add.text(0,0,'▼',
-            {fontSize:'24px'}
-        ).setOrigin(0.5).setVisible(false).setDepth(10);
-        if(objectLayer){
-            objectLayer.objects.forEach(obj=>{
-                if(obj.name==='exit'){
-                    const exitRegion=this.add.zone(obj.x+obj.width/2,obj.y+obj.height/2,200,50);
-                    this.physics.add.existing(exitRegion,true);
-
-                    this.physics.add.overlap(this.player,exitRegion,()=>{
-                        if(!this.isWraping){
-                            this.isWraping=true;
-                            this.player.body.enable=false;
-
-                            this.cameras.main.fadeOut(1000,0,0,0);
-                            this.cameras.main.once('camerafadeoutcomplete',()=>{
-                                this.scene.start('World',{returnTo:this.fromDoor});
-                            });
-                        }
-                    })
-                }
-            })
-        }*/
 
         this.setupCamera(this.player);
-        /*this.cameras.main.startFollow(this.player,true,0.1,0.1);
-        this.cameras.main.setBounds(0,0,map.widthInPixels,map.heightInPixels);*/
-
     }
     update(time,delta){
         super.update(time, delta);
@@ -140,15 +56,6 @@ export default class House extends BaseScene{
         this.updatePlacementPreview();
 
         this.player.update();
-
-        /*const speed = 200;
-        this.player.setVelocity(0);
-
-        if (this.cursors.left.isDown) this.player.setVelocityX(-speed);
-        else if (this.cursors.right.isDown) this.player.setVelocityX(speed);
-
-        if (this.cursors.up.isDown) this.player.setVelocityY(-speed);
-        else if (this.cursors.down.isDown) this.player.setVelocityY(speed);*/
 
         this.villagers.getChildren().forEach(v=>v.update(time,delta));
     }

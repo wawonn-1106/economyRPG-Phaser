@@ -1,23 +1,13 @@
 export default class MenuContent{
-    constructor(scene,menuManager){
+    constructor(scene,menuManager){//MenuManagerを経由してBaseSceneとMenuManagerのsceneを受け取る
         this.scene=scene;
         this.menuManager=menuManager;
     }
     createView(){
         const container=this.scene.add.container(0,0);
-        //container.classList.add('menu-content');
+
         const bg=this.scene.add.image(0,0,'menu-bg');
         bg.setDisplaySize(1000,600);
-        /*const bg=this.scene.add.graphics();
-
-        bg.fillStyle(0x000000,0.8);
-        bg.lineStyle(6,0xffffff,1);
-
-        const width=1000;
-        const height=600;
-
-        bg.fillRoundedRect(-width/2,-height/2,width,height,20);
-        bg.strokeRoundedRect(-width/2,-height/2,width,height,20);*/
         container.add(bg);
 
         const menuItem=[

@@ -90,8 +90,7 @@ export default class ReviewContent{
                 shape.destroy();
             });
 
-            return container;
-        //return container;
+        return container;
     }
     createReviewRow(x,y,data){
         const rowGroup=this.uiScene.add.container(x,y);
@@ -112,8 +111,6 @@ export default class ReviewContent{
             color:'#000000',
             wordWrap:{width:350}
         }).setOrigin(0,0.5);
-
-        //
 
         rowGroup.add([dayText,ratingText,commentText]);
 

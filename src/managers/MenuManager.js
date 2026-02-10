@@ -16,13 +16,9 @@ export default class MenuManager{
         this.currentTab='menu';
         this.currentView=null;
 
-        /*this.window=document.getElementById('menu-window');
-        this.contentArea=document.getElementById('menu-content');*/
-
-        //インスタンスは作っておく
         this.contents={
-            'menu':new MenuContent(uiScene,this),//thisはMenuManager自身、MenuContentは仲介をするので、アクセスできるようにしておく
-            'inventory':new InventoryContent(uiScene),//scene渡さなくてもよさそうだけど
+            'menu':new MenuContent(uiScene,this),
+            'inventory':new InventoryContent(uiScene),
             'profile':new ProfileContent(uiScene,0,0),
             'review':new ReviewContent(uiScene),
             'ranking':new RankingContent(uiScene),
@@ -32,11 +28,6 @@ export default class MenuManager{
             'machine':new MachineContent(uiScene)
         };
     }
-    /*update(){
-        if(this.isOpenMenu && this.currentTab==='profile'){
-            this.contents['profile'].updatePosition();
-        }
-    }*/
     toggle(tabId='menu'){
         if(this.worldScene.dialogManager.inputMode||this.worldScene.dialogManager.isTalking)return;
 
@@ -54,21 +45,16 @@ export default class MenuManager{
         if(this.worldScene.dialogManager.inputMode||this.worldScene.dialogManager.isTalking)return;
 
         this.isOpenMenu=true;
-        //this.window.classList.remove('hidden');
         this.switchTab(tabId);
     }
     closeMenu(){
         this.isOpenMenu=false;
-        //this.window.classList.add('hidden');
+
         if(this.currentView){
             this.currentView.destroy();
             this.currentView=null;
         }
 
-        /*const currentContent=this.contents[this.currentTab];
-        if(currentContent && currentContent.setVisible){//Phaserのグラフがあったら消す
-            currentContent.setVisible(false);
-        }*/
     }
     switchTab(tabId){
         this.currentTab=tabId;
@@ -79,7 +65,6 @@ export default class MenuManager{
                 this.uiScene.cameras.main.fadeOut(1000,0,0,0);
 
                 this.worldScene.cameras.main.once('camerafadeoutcomplete',()=>{
-                    //this.window.classList.add('hidden');
 
                     this.worldScene.scene.start('Title');//scene.sceneでconfigの配列に登録してるのは何でも表示できる！！！
                     //uiSceneの方がいいのかな
@@ -99,7 +84,5 @@ export default class MenuManager{
                 this.uiScene.scale.height/2,
             );
         }
-
-
     }
 }

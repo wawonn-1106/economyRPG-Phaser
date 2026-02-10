@@ -344,7 +344,7 @@ export default class BaseScene extends Phaser.Scene{
     }
     performTransition(nextScene,spawnPoint){
         if(this.isWraping) return;
-        //this.isWraping=true;
+        this.isWraping=true;
 
         this.player.body.enable=false;
 
@@ -412,7 +412,7 @@ export default class BaseScene extends Phaser.Scene{
             this.groundItems.add(item);
         }*///後で作る用
     }
-    damageInteractable(target){
+    /*damageInteractable(target){
         console.log('ダメージを受けてる');
         if(!target.hp&& target.hp!==0){
             target.hp=2;
@@ -432,7 +432,7 @@ export default class BaseScene extends Phaser.Scene{
 
             this.destroyAndDrop(target);
         }
-    }
+    }*/
     showItemHealthBar(target){
         if(!target.healthbarContainer){
             const x=target.instance.x;
@@ -553,7 +553,7 @@ export default class BaseScene extends Phaser.Scene{
    }
     updatePlacementPreview(){
         if(!this.isDecorationMode)return;
-        
+
         const ui=this.scene.get('UIScene');
         if(!this.inventoryData)return;
 
@@ -650,6 +650,13 @@ export default class BaseScene extends Phaser.Scene{
 
         if(selectedItem.count<=0){
             inventory[ui.selectedSlotIndex]=null;
+
+            //手に持ってるものを消す処理の追加
+            if(this.player&& this.player.updateHeldItem){
+                this.player.updateHeldItem(null);
+            }
+            this.placePreview.setVisible(false);
+            this.canPlace=false;
         }
 
         this.registry.set('inventoryData',inventory);

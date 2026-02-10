@@ -1,4 +1,7 @@
 export default class Player extends Phaser.Physics.Arcade.Sprite{
+    /*thisは常にそのSceneクラス(親)、もしくはSpriteクラス(子)を表す。このファイルのthisはSprite自身を表すもの。
+    WorldSceneではPlayerクラスをthis.playerと呼んでいるが、Playerは自分のことをthisと呼ぶ
+    例）自分を呼ぶとき僕、親が自分を呼ぶときは名前で呼ぶ、この違い*/
     constructor(scene,x,y,texture,frame){
         super(scene,x,y,texture,frame);
 
@@ -14,7 +17,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
 
         this.heldItem=scene.add.image(x,y,null).setVisible(false);
         this.heldItem.setScale(0.5);
-        this.heldItem.setDepth(this.depth+1);
+        this.heldItem.setDepth(this.depth+1);//setDepth = z-index
+
+        this.uiScene = scene.scene.get('UIScene');
 
         this.cursors=scene.cursors;
     }
@@ -27,29 +32,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         }
     }
     update(){
-        if(!this.active) return;//体力があるかどうか？？
-        let moving=false;//アニメーションを再生するかのブーリアン
+        if(!this.active) return;
+        let moving=false;
 
         const isRightDown=this.cursors.right.isDown;
         const isLeftDown=this.cursors.left.isDown;
         const isUpDown=this.cursors.up.isDown;
         const isDownDown=this.cursors.down.isDown;
-        
-        //会話中、インベントリを開いてる間は動けなくする
-        /*if(this.scene.dialogManager.isTalking){
-            this.setVelocity(0);
-            this.anims.play('idle',true);
-            return;
-        }
-        if(this.scene.menuManager.isOpenMenu){
-            this.setVelocity(0);
-            this.anims.play('idle',true);
-            return;
-        }
-        /*if(this.scene.inventoryManager.isOpenInv){
-            this.setVelocity(0);
-            return;
-        }*/
 
         if(isRightDown){
             this.setVelocityX(this.speed);
@@ -78,9 +67,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
             //this.anims.play('idle',true);
         }
 
-        if(this.heldItem.visible){
-            this.heldItem.setPosition(this.x+25,this.y+15).setDisplaySize(30,30);
-            //this.x,yがプレイヤーのいる位置
+        if(this.heldItem){
+            const isDecorating=this.uiScene.isDecorationMode;
+            const hasItem=this.heldItem.texture.key&& this.heldItem.texture.key!=='__MISSING';
+
+            this.heldItem.setVisible(isDecorating &&hasItem);
+
+            this.heldItem.setPosition(this.x+25,this.y+15);
         }
         
         if (this.body.velocity.x !== 0 && this.body.velocity.y !== 0) {
