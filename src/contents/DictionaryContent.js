@@ -51,10 +51,26 @@ export default class DictionaryContent{
     createView(){
         const container=this.uiScene.add.container(0,0);
 
-        const bg=this.uiScene.add.image(0,0,'menu-bg').setDisplaySize(1000,600);
+        const bg=this.uiScene.add.image(0,0,'dictionary-bg').setDisplaySize(1000,600);
         container.add(bg);
         //const container=document.createElement('div');
         //container.classList.add('dictionary-content');//ここは変えてね
+
+        const listX=-300;
+        const listY=-200;
+        const listWidth=420;
+        const listHeight=450;
+
+        const scrollContent=this.uiScene.add.container(listX,listY);
+        container.add(scrollContent);
+
+        const maskShape=this.uiScene.make.graphics();
+        
+        maskShape.fillStyle(0xffffff);
+        maskShape.fillRect(640+listX,360+listY,listWidth,listHeight);
+
+        const mask=maskShape.createGeometryMask();
+        scrollContent.setMask(mask);
 
 
         const terms=this.worldScene.dictionaryManager.getTerms();//DictionaryManagerがjsonでデータを取る
@@ -90,7 +106,7 @@ export default class DictionaryContent{
         detailContainer.add([wordTitle,categoryLabel,descriptionText,exampleText]);//wordTitleもいるなら
 
         terms.forEach((term,index)=>{//相対座標にするから毎回index使う、他の場所でも
-            const y=index*45;
+            const y=index*55;
             const termButton=this.uiScene.add.text(0,y,`${term.word}`,{
                 fontSize:'24px',
                 color:'#000000'
@@ -104,7 +120,11 @@ export default class DictionaryContent{
                exampleText.setText(term.example ||'例文はありません'); 
             });
 
-            listContainer.add(termButton);
+            termButton.on('pointerover',()=>termButton.setColor('#ffffff'));
+            termButton.on('pointerout',()=>termButton.setColor('#000000'));
+
+            //listContainer.add(termButton);
+            scrollContent.add(termButton);
             /*const item=document.createElement('div');
             item.classList.add('dictionary-item');
 
@@ -130,6 +150,17 @@ export default class DictionaryContent{
             item.appendChild(example);
 
             container.appendChild(item);*/
+        });
+
+        const contentHeight=terms.length*55;
+        const scrollLimit=contentHeight>listHeight?contentHeight-listHeight:0;
+
+        bg.setInteractive();
+        bg.on('wheel',(pointer,deltaX,deltaY)=>{
+
+            scrollContent.y-=deltaY;
+
+            scrollContent.y=Phaser.Math.Clamp(scrollContent.y,listY-scrollLimit,listY);
         });
 
         return container;

@@ -552,6 +552,8 @@ export default class BaseScene extends Phaser.Scene{
     }
    }
     updatePlacementPreview(){
+        if(!this.isDecorationMode)return;
+        
         const ui=this.scene.get('UIScene');
         if(!this.inventoryData)return;
 

@@ -151,17 +151,23 @@ export default class UIScene extends Phaser.Scene{
 
     }//↓明日書き直す
     createHotbar(){
+        //if(!this.isDecorationMode)return;
+
         const gameWidth=this.scale.width;
         const gameHeight=this.scale.height;
 
         const y=gameHeight-50;
 
-        this.hotbar=this.add.image(gameWidth/2,y,'hotbar').setScale(1.8,0.3);//'hotbar
+        this.hotbar=this.add.image(gameWidth/2,y,'hotbar')
+            .setScale(1.8,0.3)
+            .setVisible(this.isDecorationMode);//'hotbar
         /*const slotCount=9;
         const slotSize=60;*/
         
         const spacing=33;
         const startX=(gameWidth/2)-(spacing*4);
+
+        this.hotbarSlots=[];
         
         for(let i=0;i<9;i++){
 
@@ -174,10 +180,15 @@ export default class UIScene extends Phaser.Scene{
             this.hotbarIcons.push(null);
             this.hotbarTexts.push(null);
         }
-        this.selector=this.add.image(this.hotbarSlots[0].x,y,'hotbar').setScale(0.2).setDepth(10);
+        this.selector=this.add.image(this.hotbarSlots[0].x,y,'hotbar')
+            .setScale(0.2)
+            .setDepth(10)
+            .setVisible(this.isDecorationMode);
         //選ばれてるときわかりやすく
     }
     updateHotbar(inventoryData){
+        //if(!this.isDecorationMode)return;
+
         inventoryData.forEach((item,index)=>{
             if(index>=9)return;
 
@@ -189,12 +200,13 @@ export default class UIScene extends Phaser.Scene{
             if(item && item.count>0){
 
                 this.hotbarIcons[index]=this.add.image(slotPos.x,slotPos.y,item.id)
-                    .setDisplaySize(30,30);//元の画像の大きさが違っても無理やり統一
+                    .setDisplaySize(30,30)
+                    .setVisible(this.isDecorationMode);//元の画像の大きさが違っても無理やり統一
 
                 this.hotbarTexts[index]=this.add.text(slotPos.x+10,slotPos.y+10,item.count,{
                     fontSize:'24px',
                     color:'#ffffff'
-                }).setOrigin(0.5);//12pxくらい
+                }).setOrigin(0.5).setVisible(this.isDecorationMode);//12pxくらい
             }
         })
     }
@@ -598,6 +610,12 @@ export default class UIScene extends Phaser.Scene{
     }
     toggleDecorationMode(){
         this.isDecorationMode=!this.isDecorationMode;
+
+        this.hotbar?.setVisible(this.isDecorationMode);
+        this.selector?.setVisible(this.isDecorationMode);
+
+        this.hotbarIcons.forEach(icon=>icon?.setVisible(this.isDecorationMode));
+        this.hotbarTexts.forEach(text=>text?.setVisible(this.isDecorationMode));
 
         //const worldScene=this.scene.get('World');
         const activeScene=this.scene.manager.getScenes(true).find(s=>s.scene.key!=='UIScene');
