@@ -1,7 +1,6 @@
 import MenuManager from "../managers/MenuManager.js";
 import DictionaryContent from "../contents/DictionaryContent.js";
 import MachineContent from "../contents/MachineContent.js";
-//import DictionaryManager from "../managers/DictionaryManager.js";
 
 export default class UIScene extends Phaser.Scene{
     constructor(){
@@ -24,11 +23,6 @@ export default class UIScene extends Phaser.Scene{
 
         this.maxHp=10;
 
-        /*this.draggedItem=null;
-        this.dragStartIndex=null;
-        this.dragIcon=null;
-        this.dragCountText=null;
-        this.processingItem=false;*/
         this.heldItem=null;
         this.cursorIcon=null;
         this.cursorCountText=null;
@@ -42,8 +36,6 @@ export default class UIScene extends Phaser.Scene{
         this.timeBg=null;
         this.dayText=null;
         this.clockText=null;
-
-        //this.dictionaryContent = new DictionaryContent(this);
     }
     create(){
         const worldScene=this.scene.get('World');
@@ -214,35 +206,6 @@ export default class UIScene extends Phaser.Scene{
         const targetPos=this.hotbarSlots[this.selectedSlotIndex];
         this.selector.setPosition(targetPos.x,targetPos.y);
     }
-    /*startDragItem(index){
-        if(this.processingItem)return;
-
-        if (this.draggedItem) {
-            this.dropItem(index);
-            return;
-        }
-        this.processingItem=true;
-
-        const inventory=this.registry.get('inventoryData');
-
-        if(inventory &&inventory[index] && inventory[index].id!==null){
-            this.dragStartIndex=index;
-
-            //this.draggedItem={...inventory[index]};
-            this.draggedItem=JSON.parse(JSON.stringify(inventory[index]));
-
-            //inventory[index]=null;
-            inventory[index] = { id: null, count: 0 };
-            this.registry.set('inventoryData',inventory);
-
-            this.dragIcon.setTexture(this.heldItem.id).setVisible(true);
-            this.dragCountText.setText(this.heldItem.count).setVisible(true);
-
-            this.updateHotbar(inventory);
-
-            this.time.delayedCall(50,()=>{this.processingItem=false;});
-        }
-    }*/
     handleInteraction(targetIndex){
         //if(!this.draggedItem)return;
 
@@ -273,52 +236,8 @@ export default class UIScene extends Phaser.Scene{
 
                 this.heldItem=tempItem===null? null:tempItem;
             }
-            
-
-            /*if(amountAdd>0){
-                targetItem.count+=amountAdd;
-
-                this.draggedItem.count-=amountAdd;
-            }*/
-            
-            /*if(this.draggedItem.count<=0){
-                this.draggedItem=null;
-                this.dragStartIndex = null;
-
-                this.dragIcon.setVisible(false);
-                this.dragCountText.setVisible(false);
-            }else{
-                //inventory[this.dragStartIndex]=null;
-                this.dragCountText.setText(this.draggedItem.count);
-            }*/
-
         }
-            //const tempItem=JSON.parse(JSON.stringify(targetItem))||{id:null,count:0};
-
-            /*//inventory[this.dragStartIndex]=targetItem;
-            inventory[targetIndex]=JSON.parse(JSON.stringify(this.draggedItem));
-
-            if(tempItem && tempItem.id!==null){
-                this.draggedItem=tempItem;
-
-                this.dragIcon.setTexture(this.draggedItem.id).setVisible(true);
-                this.dragCountText.setText(this.draggedItem.count).setVisible(true);
-
-                this,this.dragStartIndex=targetIndex;
-            }else{
-                this.draggedItem=null;
-                this.dragStartIndex = null;
-
-                this.dragIcon.setVisible(false);
-                this.dragCountText.setVisible(false);
-            }*/
         this.registry.set('inventoryData',inventory);
-
-        /*this.draggedItem=null;
-        this.dragStartIndex=null;
-
-        this.dragIcon.setVisible(false);
-        this.dragCountText.setVisible(false);*/
 
         this.updateHotbar(inventory);
         this.updateCursorVisual();
@@ -400,7 +319,7 @@ export default class UIScene extends Phaser.Scene{
             area:true*/
         }).setDepth(4005).setVisible(false);
 
-        this.dialogContentText.setInteractive();//あああああああああああ
+        this.dialogContentText.setInteractive();
 
         this.dialogGroup.add([winBg,this.portrait,this.dialogNameText,this.dialogContentText]);
         this.dialogGroup.removeInteractive();
@@ -449,29 +368,6 @@ export default class UIScene extends Phaser.Scene{
             .setInteractive({useHandCursor:true})
             //.setOrigin(0.5)
             .setDepth(10000000);
-    
-        /*let currentText='';
-        const inputTextDisplay=this.add.text(gameWidth/2,gameHeight/2-20,'',{
-            fontSize:'32px',
-            color:'#000000'
-        }).setOrigin(0.5).setDepth(5001);*/
-                
-        /*const submitText=this.add.text(gameWidth/2,gameHeight/2+60,'決定',{
-            fontSize:'20px'
-        }).setOrigin(0.5).setDepth(5002);*/
-
-        /*const keyHandler=(event)=>{
-            if(event.key==='Enter'){
-                confirmInput();
-            }else if(event.key==='Backspace'){
-                currentText=currentText.slice(0,-1);
-            }else if(event.key.length===1){
-                currentText+=event.key;
-            }
-            //inputTextDisplay.setText(currentText+'|');
-        };
-
-        this.input.keyboard.on('keydown',keyHandler);*/
 
         const confirmInput=()=>{
             //if(currentText.trim()==='')return;
@@ -623,47 +519,6 @@ export default class UIScene extends Phaser.Scene{
         if(activeScene){
             activeScene.setDecorationMode(this.isDecorationMode);
         }
-    }
-    startFishing(callback){
-        const gameWidth=this.scale.width;
-        const gameHeight=this.scale.height;
-
-        this.fishingGroup=this.add.container(gameWidth/2,gameHeight/2).setDepth(5000);
-
-        const bar=this.add.image(0,0,'fishing-bar');//釣りのゲームの棒
-
-        const zone=this.add.image(0,Phaser.Math.Between(-80,80),'fishing-target');
-
-        const cursor=this.add.image(0,120,'fishing-cursor').setDepth(5000);
-
-        this.fishingGroup.add([bar,zone,cursor]);
-
-        const tween=this.tweens.add({
-            targets:cursor,
-            y:-120,
-            duration:800,
-            yoyo:true,
-            loop:-1,
-            ease:'Linear'
-        });
-
-        const catchHandler=(event)=>{
-            if(event.code==='Space'){
-                this.input.keyboard.off('keydown',catchHandler);
-                tween.stop();
-
-                const diff=Math.abs(cursor.y-zone.y);//絶対値
-                const isSuccess=diff<30;//30の差があっても成功
-
-                this.time.delayedCall(500,()=>{
-                    this.fishingGroup.destroy();
-
-                    callback(isSuccess);
-                });
-            }
-        };
-
-        this.input.keyboard.on('keydown',catchHandler);
     }
     update(time,delta){
         const world=this.scene.get('World');

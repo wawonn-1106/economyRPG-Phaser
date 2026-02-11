@@ -3,10 +3,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
     WorldSceneではPlayerクラスをthis.playerと呼んでいるが、Playerは自分のことをthisと呼ぶ
     例）自分を呼ぶとき僕、親が自分を呼ぶときは名前で呼ぶ、この違い*/
     constructor(scene,x,y,texture,frame){
-        super(scene,x,y,texture,frame);
+        super(scene,x,y,texture,frame);//frameはBase→World→Playerの順で渡される
 
-        scene.physics.world.enable(this);
-        scene.add.existing(this);
+        scene.physics.world.enable(this);//当たり判定の準備、this.bodyが使えるようになる
+        scene.add.existing(this);//sceneにthis(this.player)を追加する。このsceneはWorld,House,Shopとか
 
         this.setScale(0.1).refreshBody();
         this.setCollideWorldBounds(true);
@@ -78,6 +78,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         
         if (this.body.velocity.x !== 0 && this.body.velocity.y !== 0) {
             this.body.velocity.normalize().scale(this.speed);
-        }
+        }/*normalize()→方向はそのままで速さを１に固定。そこにscale(this.speed)をかけて
+        斜めに進んでも加速しなくなる*/
     }
 }

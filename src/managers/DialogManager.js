@@ -9,21 +9,10 @@ export default class DialogManager {
         this.playerName = "名無し";
         this.inputMode = false; 
         this.onChoice = null;
-
-        /*this.elements={
-            window:document.getElementById('dialog-window'),
-            name:document.getElementById('dialog-name'),
-            text:document.getElementById('dialog-text'),
-            inputContainer:document.getElementById('dialog-input'),
-            inputField:document.getElementById('player-name-input'),
-            inputSubmit:document.getElementById('player-name-submit'),
-            choiceContainer:document.getElementById('dialog-choices'),
-        }*/
     }
     setUIScene(uiScene){
         this.uiScene=uiScene;
     }
-//textContentはinnerTextの上位互換
     start(dataKey,startId=null,speakerName=null) {
         //null
         //dataKeyはch1Dataだけ読み込むならいらない 、が隠しイベントを追加する予定もあるから、置いておく。
@@ -43,7 +32,6 @@ export default class DialogManager {
         this.isTalking = true;
 
         this.uiScene.showDialogWindow();
-        //this.elements.window.classList.remove('hidden');//id class両方持つものからclassを取る
         this.showLine();
     }
     showLine() {
@@ -55,12 +43,6 @@ export default class DialogManager {
 
         const line=this.currentSequence[this.currentIndex];
 
-        
-        /*const nameEl = document.getElementById('dialog-name');
-        const textEl = document.getElementById('dialog-text');
-
-        nameEl.innerText = line.name;*/
-
         const displayText = (line.text || '')
             .replaceAll('[[NAME]]', this.playerName); //全てのdialogは一回ここを通る
           //.replaceAll([[]],this);
@@ -70,13 +52,9 @@ export default class DialogManager {
 
         this.updateTextDisplay(displayText);
 
-        /*this.elements.name.textContent=this.activeSpeakerName || line.name;
-        this.elements.text.textContent=displayText;*/
-
         switch (line.type) {
             case "text":
                 this.inputMode = false;
-                //this.currentIndex++;をやめた
                 if(!line.next){
                     this.currentIndex++;
                 }
@@ -87,7 +65,6 @@ export default class DialogManager {
                 this.uiScene.showInputField((name)=>{
                     this.handleInputResult(name);
                 });
-                //this.handleInput();
                 break;
 
             case "choice":
@@ -95,21 +72,10 @@ export default class DialogManager {
                 this.uiScene.showChoices(line.choices,(choice)=>{
                     this.handleChoiceResult(choice);
                 });
-                //this.handleChoice(line.choices);
                 break;
         }
     }
-    handleInputResult(name){
-        /*this.elements.inputContainer.classList.remove('hidden');
-        this.elements.inputField.focus();*/
-
-        /*const submitHandler=()=>{
-            const val=this.elements.inputField.value.trim();
-            if(val!==""){
-                this.playerName=val;
-                this.elements.inputContainer.classList.add('hidden');
-                this.elements.inputSubmit.removeEventListener('click',submitHandler);
-                //使い捨てのaddEventだからremoveしておく。*/    
+    handleInputResult(name){   
                 if(name&&name.trim()!==''){
                     this.playerName=name;
                 }else{
@@ -119,23 +85,8 @@ export default class DialogManager {
                 this.inputMode=false;
                 this.currentIndex++;
                 this.showLine();
-            /*}else{
-                alert('名前を入力してください。');
-                this.elements.inputField.focus();
-            }    
-        };
-        this.elements.inputSubmit.addEventListener('click',submitHandler);*/
     }
     handleChoiceResult(choice){
-        /*this.elements.choiceContainer.classList.remove('hidden');
-        
-        choices.forEach(choice=>{
-            const btn=document.createElement('button');
-            btn.textContent=choice.text;//line.choice→choices→choice→choice.text実質line.choice.text
-            btn.classList.add('choice-btn');
-
-            btn.addEventListener('click',()=>{
-                this.clearContent();*/
                 this.inputMode=false;
                 
                 if(this.onChoice) this.onChoice(choice);
@@ -147,17 +98,7 @@ export default class DialogManager {
                     this.currentIndex++;
                     this.showLine();
                 }
-            /*});
-            this.elements.choiceContainer.appendChild(btn); //createElementで作ったものをHTMLに張り付ける
-        });*/
     }
-    /*clearContent(){
-        //明日する
-        while(this.elements.choiceContainer.firstChild){
-            this.elements.choiceContainer.removeChild(this.elements.choiceContainer.firstChild);
-        }
-        this.elements.choiceContainer.classList.add('hidden');
-    }*/
     jumpTo(nextId){
         if(nextId==='end'){
             //dialog.jsonでendってやつを作って目印にするだけ。showLineとは違って自動でしてくれない
@@ -177,8 +118,6 @@ export default class DialogManager {
     }
     updateTextDisplay(displayTerm){
 
-        /*this.uiScene.dialogContentText.off('area.down');
-        this.uiScene.dialogContentText.setText(displayText);*/
         const textContent=this.uiScene.dialogContentText;
 
         if(!textContent)return;
@@ -187,23 +126,12 @@ export default class DialogManager {
 
         textContent.setText(displayTerm);
 
-        /*if (textContent.updateInteractive) {
-            textContent.updateInteractive();
-        }*/
-
         textContent.on('areaclick',(areaKey)=>{
-            //const termsData=this.scene.dictionaryManager.getTermByWord(areaKey);
-            /*const termsData = this.scene.cache.json.get('termsData');
-            const termData=termsData.terms.find(term=>term.word===areaKey);*/
             const world=this.scene;
             const termData = world.dictionaryManager.getTermByWord(areaKey);
 
             if(termData){
                 this.uiScene.dictionaryContent.createQuickView(termData);
-
-                /*this.scene.input.once('pointerdown',()=>{
-                    quickView.destroy();
-                });*/
             }
         });
     }
@@ -212,8 +140,5 @@ export default class DialogManager {
         this.inputMode = false;
         this.uiScene.dictionaryContent.hide();
         this.uiScene.hideDialogWindow();
-
-        /*this.elements.window.classList.add('hidden');
-        this.elements.text.textContent= "";*/
     }
 }

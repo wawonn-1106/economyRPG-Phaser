@@ -1,5 +1,3 @@
-//import InventoryManager from "../managers/InventoryManager.js";
-
 export default class InventoryContent{
     constructor(uiScene){
         this.uiScene=uiScene;
@@ -71,16 +69,13 @@ export default class InventoryContent{
                 isDragging=true;
                 //if(!item|| item.count<=0)return;
 
-                //itemContainer.setVisible(false);
                 if(this.clickTimer)this.clickTimer.remove();
                 if(this.descPanel) this.descPanel.destroy();
 
                 this.uiScene.handleInteraction(index);
-                //tooltip.setVisible(false);
             });
 
         });
-        //container.appendChild(ul);
 
         return container;
     }

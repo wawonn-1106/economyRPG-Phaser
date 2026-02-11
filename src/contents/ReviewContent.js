@@ -24,7 +24,6 @@ export default class ReviewContent{
         const container=this.uiScene.add.container(0,0);
 
         const bg=this.uiScene.add.image(0,0,'menu-bg').setDisplaySize(1000,600);//review-bg
-        container.add(bg);
 
         const title=this.uiScene.add.text(0,-250,'口コミ',{
             fontSize:'32px',
@@ -32,19 +31,15 @@ export default class ReviewContent{
             fontStyle:'bold'
         }).setOrigin(0.5);
 
-        //const headerY=-180;
-        const headers=this.uiScene.add.text(0,-180,'日付　｜　評価　｜',{
+        const headers=this.uiScene.add.text(0,-180,'日付　｜　評価',{
             fontSize:'20px',
             color:'#000000',
-            //backgroundColor:'#eeeeee'
         }).setOrigin(0.5);
-        //container.add(headers);
 
         container.add([bg,title,headers]);
 
         const viewWidth=900;
         const viewHeight=350;
-        //const viewX=-viewWidth/2;
         const viewY=-150;
 
         const scrollContainer=this.uiScene.add.container(0,0);

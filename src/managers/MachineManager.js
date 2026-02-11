@@ -2,14 +2,7 @@ export default class MachineManager{
     constructor(scene){
         this.scene=scene;
 
-        this.recipes=this.scene.cache.json.get('recipesData').recipes;//UISceneでダウンロードしておく
-        /*this.recipes=[
-            {id:'bread',name:'パン',ingredients:[{id:'wheat',count:3}],result:'bread'},
-            {id:'bread',name:'パン',ingredients:[{id:'wheat',count:3}],result:'bread'},
-            {id:'bread',name:'パン',ingredients:[{id:'wheat',count:3}],result:'bread'},
-            {id:'bread',name:'パン',ingredients:[{id:'wheat',count:3}],result:'bread'},
-            {id:'bread',name:'パン',ingredients:[{id:'wheat',count:3}],result:'bread'},
-        ];//将来的にjsonで管理*/
+        this.recipes=this.scene.cache.json.get('recipesData').recipes;
     }
     canCraft(recipe,inventoryData){
         //const recipe=this.recipes.find(r=>r.id===recipeId);
@@ -26,10 +19,9 @@ export default class MachineManager{
         return missingCount;//レシピの材料の種類から足りない個数を渡す。
         
     }
-    calculateQuality(rank){//加工の成功率を計算、粗悪品、普通品？、高品質の三段階
+    calculateQuality(rank){//加工の成功率を計算、粗悪品、普通品、高品質の三段階
         //const baseRate=parseFloat(process.env.SUCCESS_BASE_RATE);
         const baseRate=parseFloat(12);
-        //一応.envでまとめておく
 
         let bonus=0;
         /*switch(rank){
@@ -48,7 +40,7 @@ export default class MachineManager{
             case '1':
                 bonus=parseFloat(process.env.BONUS_RANK_1);
                 break;
-        }*///process.env使えなかったからいったんこれで↓。出力はできたからok。UIはごちゃごちゃ
+        }*///process.env使えなかったからいったんこれで↓。出力はできたからok。
         switch(rank){
             case '5':
                 bonus=parseFloat(12);

@@ -1,15 +1,9 @@
 import DialogManager from "../managers/DialogManager.js";
-import Player from '../entities/Player.js';
-//import DialogManager from '../managers/DialogManager.js';
-import NPC from '../entities/NPC.js';
-//import House from './House.js';
 import MenuManager from '../managers/MenuManager.js';
 import InventoryManager from '../managers/InventoryManager.js';
 import ProfileManager from '../managers/ProfileManager.js';
 import DictionaryManager from '../managers/DictionaryManager.js';
-//import ProfileContent from '../contents/ProfileContent.js';
 import MachineManager from '../managers/MachineManager.js';
-//import UIScene from "./UIScene.js";
 
 export default class BaseScene extends Phaser.Scene{
     constructor(config){
@@ -24,7 +18,10 @@ export default class BaseScene extends Phaser.Scene{
 
         this.placePreview=null;
         this.canPlace=false;
+
+        //this.SERVER_URL='http://localhost:3000';
     }
+    //----------初期化-------------------------------------------------------------------------------------------
     create(data){
         this.initData = data;
         this.isWraping = false;
@@ -37,6 +34,14 @@ export default class BaseScene extends Phaser.Scene{
             this.registry.set('inventoryData',inventory);
         }
 
+        /*if(this.currentWeather==='Rain'){
+            this.createRain();
+        }else if(this.currentWeather==='Snow'){
+            this.createSnow();
+        }else if(this.currentWeather==='Clouds'){
+                    this.createClouds();
+        }*/
+
         this.inventoryData=inventory;
 
         this.initPlacementPreview();
@@ -44,7 +49,6 @@ export default class BaseScene extends Phaser.Scene{
     initManagers(){
         this.dialogManager=new DialogManager(this);
         this.profileManager=new ProfileManager(this); 
-        //this.dialogManager=new DialogManager(this);
         this.machineManager=new MachineManager(this);
         this.dictionaryManager=new DictionaryManager(this);
         this.inventoryManager=new InventoryManager(this);   
@@ -71,6 +75,7 @@ export default class BaseScene extends Phaser.Scene{
         this.decorationGrid=this.add.graphics();
         this.decorationGrid.setDepth(20000);
     }
+    //----------マップ(当たり判定、カメラ含む)-------------------------------------------------------------------------------------------
     createMap(mapKey,tilesetName,tilesetKey){
         this.map=this.make.tilemap({key:mapKey});
         this.tileset=this.map.addTilesetImage(tilesetName,tilesetKey);
@@ -82,7 +87,7 @@ export default class BaseScene extends Phaser.Scene{
 
         [this.groundLayer,this.onGroundLayer,this.houseLayer].forEach(layer=>{
             if(layer) layer.setCollisionByProperty({collides:true});
-        });//forEachとかは配列にしか使えない。{}で分割代入はできないよ、Object.()を使うならできる
+        });//forEachとかは配列にしか使えない。{}で分割代入のようにはできない、Object.()を使うならできる
 
         this.physics.world.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
 
@@ -101,6 +106,236 @@ export default class BaseScene extends Phaser.Scene{
             }
         })
     }
+    setupCamera(target){
+        this.cameras.main.startFollow(target,true,0.1,0.1);
+        this.cameras.main.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
+    }
+    //----------マップ移動-------------------------------------------------------------------------------------------
+    setupSceneTransitions(map,player){
+        const objectLayer=map.getObjectLayer('Object');
+        if(!objectLayer) return;
+
+        objectLayer.objects.forEach(obj=>{
+            if(obj.name==='wrap'){
+                const zone=this.add.zone(obj.x+obj.width/2,obj.y+obj.height/2,obj.width,obj.height);
+                this.physics.add.existing(zone,true);
+
+                const targetScene=obj.properties?.find(p=>p.name==='target')?.value;
+                const spawnPointName=obj.properties?.find(p=>p.name==='spawnPoint')?.value;
+
+                this.physics.add.overlap(player,zone,()=>{
+                    if(targetScene&& !this.isWraping){
+                        this.performTransition(targetScene,spawnPointName);
+                    }
+                });
+            }
+
+            if(obj.name==='door' || obj.name==='exit'){
+                this.interactables.push({
+                    type:'door',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
+
+            if(obj.name==='machine'){
+                this.interactables.push({
+                    type:'machine',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
+
+            if(obj.name==='displayShelf'){
+                this.interactables.push({
+                    type:'displayShelf',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
+
+            if(obj.name==='fishingSpot'){
+
+                const fishIcon=this.add.image(obj.x+(obj.width/2),obj.y+(obj.height/2),'fishIcon')
+                    .setDepth(5)
+                    .setVisible(true);
+
+                this.interactables.push({
+                    type:'fishingSpot',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2),
+                    isAvailable:true,
+                    markerIcon:fishIcon
+                });
+            }
+
+            if(obj.name==='rock'){
+                const durability=obj.properties?.find(p=>p.name==='durability')?.value;
+                const subType=obj.type || 'stone';
+
+                const rockSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),subType)
+                    .setDepth(5);
+
+                this.physics.add.existing(rockSprite,true);
+                this.physics.add.collider(this.player,rockSprite);//NPCにもつける
+
+                this.interactables.push({
+                    type:'rock',
+                    subType:subType,
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2),
+                    hp:durability,
+                    instance:rockSprite
+                });
+            }
+        });
+    }
+    performTransition(nextScene,spawnPoint){
+        if(this.isWraping) return;
+        this.isWraping=true;
+
+        this.player.body.enable=false;
+
+        this.cameras.main.fadeOut(1000,0,0,0);
+        this.cameras.main.once('camerafadeoutcomplete',()=>{
+            //this.isWraping=false;
+
+            this.scene.start(nextScene,{spawnPoint:spawnPoint});
+           // this.scene.start(nextScene,spawnPoint);
+        });
+    }
+    setPlayerSpawnPoint(data){
+        if(!data) return;
+
+        const objectLayer=this.map.getObjectLayer('Object');
+        
+        const spawnHolder=objectLayer.objects.find(obj=>{
+            const prop=obj.properties?.find(p=>p.name==='spawnHolder');
+            return prop?.value===data.spawnPoint;
+        })
+
+        if(spawnHolder){
+            const x=spawnHolder.x+(spawnHolder.width/2);
+            const y=spawnHolder.y+(spawnHolder.height/2);
+
+            this.player.setPosition(x,y);
+        }
+    }
+    //----------天気-------------------------------------------------------------------------------------------
+    /*async fetchWeather(){//Rain,Snowを取得。
+            const API_KEY=process.env.WEATHER_API_KEY;
+            const lat=34.40;
+            const lon=133.20;
+            const URL=`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+    
+            try{
+                const response=await fetch(URL);
+                if(!response.ok) throw new Error('天気データの取得に失敗しました');
+    
+                const data=await response.json();
+    
+                this.currentWeather=data.weather[0].main;
+                console.log('現在の尾道の天気：',this.currentWeather);
+    
+            }catch(error){
+                console.error('天気データの取得に失敗しました：',error);
+                this.currentWeather='Clear';//失敗したら晴れ
+            }//明日ぐらいにやる
+        }*/
+        /*createRain(){
+            this.weatherEffect=this.add.particles(0,0,'rain',{//画像のダウンロード必要、snowも
+                x:{min:0,max:1280},
+                y:-10,
+                lifespan:2000,
+                speedY:{min:400,max:600},
+                quality:5,
+                scrollFactor:0
+            });
+        }
+        createSnow(){
+            this.weatherEffect=this.add.particles(0,0,'snow',{
+                x:{min:0,max:1280},
+                y:-10,
+                lifespan:8000,
+                speedX:{min:50,max:100},
+                speedY:{min:-20,max:20},
+                quality:2,
+                scrollFactor:0
+            });
+        }
+        createClouds(){
+            const overlay=this.add.rectangle(0,0,1280,720,0x333344,0.4);//画面全体を曇らせる
+    
+            overlay.setOrigin(0,0);
+            overlay.setScrollFactor(0);
+            overlay.setDepth(2000);
+        }*/
+    //----------データ取得-------------------------------------------------------------------------------------------
+    /*async syncMoneyWithServer(newMoney){
+        try{
+            const response=await fetch(`${this.SERVER_URL}/save`,{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({money:newMoney})
+            });
+            const result=await response.json();
+            console.log('DB保存完了、今の所持金：',newMoney);
+        }catch(error){
+            console.error('通信エラー：',error);
+        }
+    }*/
+    /*async loadPlayerData() {
+        try {
+            const response = await fetch(`${this.SERVER_URL}/load`);
+            const data = await response.json();
+            
+            this.money = data.money || 0;
+            
+            if (this.moneyText) {
+                this.moneyText.setText(`所持金：${this.money}`);
+            }
+            console.log('クラウドから復旧完了！:', this.money);
+        } catch (error) {
+            console.log('読み込み失敗、0円から開始します', error);
+        }
+    }*/
+    //----------アニメーション-------------------------------------------------------------------------------------------
+    /*this.anims.create({
+                key:'walking-down',
+                frames:this.anims.generateFrameNumbers('player-walk-down',{start:0,end:12}),
+                frameRate:12,
+                repeat:-1
+            });
+            this.anims.create({
+                key:'walking-up',
+                frames:this.anims.generateFrameNumbers('player-walk-up',{start:0,end:11}),
+                frameRate:12,
+                repeat:-1
+            });
+            this.anims.create({
+                key:'walking-right',
+                frames:this.anims.generateFrameNumbers('player-walk-right',{start:0,end:11}),
+                frameRate:12,
+                repeat:-1
+            });
+            this.anims.create({
+                key:'walking-left',
+                frames:this.anims.generateFrameNumbers('player-walk-left',{start:0,end:11}),
+                frameRate:12,
+                repeat:-1
+            });
+            this.anims.create({
+                key:'idle',
+                frames:[{key:'player-walk-down',frame:0}],
+                frameRate:20,
+                //repeat:0の省略(-1は無限、0は１回)
+            });*/
+    //----------アクション系-------------------------------------------------------------------------------------------
     handleAction(){
         if (this.dialogManager.inputMode) return;
 
@@ -189,333 +424,12 @@ export default class BaseScene extends Phaser.Scene{
                 const inventory=this.registry.get('inventoryData');
                 const selectedItem=inventory[ui.selectedSlotIndex];
                 const toolId=selectedItem? selectedItem.id:'hand';
-
-                let canBreak=false;
-
-                switch(target.type){
-                    case 'rock':
-                        if(toolId==='pickaxe') canBreak=true;
-                        break;
-                    case 'wood':
-                    case 'chest':
-                        if(toolId==='axe')canBreak=true;
-                        break;
-                    case 'equipment':
-                        if(toolId==='pickaxe')canBreak=true;
-                        break;
-                    case 'fence':
-                    case 'tile':
-                    case 'furniture':
-                        canBreak=true;
-                        break;
-                }
-
-                if(canBreak){
-                    this.damageInteractable(target);
-                }else{
-                    //ここで惚れない時の音とか
-                }
                 break;
-                    //const rock=this.actionTarget;
-                    /*const rock=this.interactables.find(i=>i.instance===this.actionTarget.instance);
-
-                    rock.hp--;
-                    console.log(rock.hp);
-
-                    if(rock.hp<=0){
-                        rock.instance.destroy();
-
-                        this.interactables=this.interactables.filter(i=>i!==rock);
-                        this.readyIcon.setVisible(false);//ない方がいいかも
-                    }
-                    break;*/
-
-                    //const doorName=this.actionTarget.data.name;
-
-                    /*this.player.body.enable=false;
-                    this.cameras.main.fadeOut(1000,0,0,0);
-
-                    this.cameras.main.once('camerafadeoutcomplete',()=>{*/
-                    //const data={fromDoor:targetValue};
-
-                        /*switch(targetValue){
-                            case 'house':
-                                this.scene.start('House',data);
-                                break;
-                            case 'shop':
-                                this.scene.start('Shop',data);
-                                break;
-                            case 'machine':
-                                //加工画面を開く
-                                this.menuManager.toggle('machine');
-                                break;
-                            case 'displayShelf':
-                                //店に並べる画面
-                                console.log('クリックされた');
-                                break;
-                        }*/
-                    //});
-                }
-            }                
-    }
-    setupSceneTransitions(map,player){
-        const objectLayer=map.getObjectLayer('Object');
-        if(!objectLayer) return;
-
-        objectLayer.objects.forEach(obj=>{
-            if(obj.name==='wrap'){
-                const zone=this.add.zone(obj.x+obj.width/2,obj.y+obj.height/2,obj.width,obj.height);
-                this.physics.add.existing(zone,true);
-
-                const targetScene=obj.properties?.find(p=>p.name==='target')?.value;
-                const spawnPointName=obj.properties?.find(p=>p.name==='spawnPoint')?.value;
-
-                this.physics.add.overlap(player,zone,()=>{
-                    if(targetScene&& !this.isWraping){
-                        this.performTransition(targetScene,spawnPointName);
-                    }
-                });
             }
-
-            if(obj.name==='door' || obj.name==='exit'){
-                this.interactables.push({
-                    type:'door',
-                    data:obj,
-                    x:obj.x+(obj.width/2),
-                    y:obj.y+(obj.height/2)
-                });
-            }
-
-            if(obj.name==='machine'){
-                this.interactables.push({
-                    type:'machine',
-                    data:obj,
-                    x:obj.x+(obj.width/2),
-                    y:obj.y+(obj.height/2)
-                });
-            }
-
-            if(obj.name==='displayShelf'){
-                this.interactables.push({
-                    type:'displayShelf',
-                    data:obj,
-                    x:obj.x+(obj.width/2),
-                    y:obj.y+(obj.height/2)
-                });
-            }
-
-            if(obj.name==='fishingSpot'){
-
-                const fishIcon=this.add.image(obj.x+(obj.width/2),obj.y+(obj.height/2),'fishIcon')
-                    .setDepth(5)
-                    .setVisible(true);
-
-                this.interactables.push({
-                    type:'fishingSpot',
-                    data:obj,
-                    x:obj.x+(obj.width/2),
-                    y:obj.y+(obj.height/2),
-                    isAvailable:true,
-                    markerIcon:fishIcon
-                });
-            }
-
-            if(obj.name==='rock'){
-                const durability=obj.properties?.find(p=>p.name==='durability')?.value;
-                const subType=obj.type || 'stone';
-
-                const rockSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),subType)
-                    .setDepth(5);
-
-                this.physics.add.existing(rockSprite,true);
-                this.physics.add.collider(player,rockSprite);//NPCにもつける
-
-                this.interactables.push({
-                    type:'rock',
-                    subType:subType,
-                    data:obj,
-                    x:obj.x+(obj.width/2),
-                    y:obj.y+(obj.height/2),
-                    hp:durability,
-                    instance:rockSprite
-                });
-            }
-        });
+        }                
     }
-    performTransition(nextScene,spawnPoint){
-        if(this.isWraping) return;
-        this.isWraping=true;
-
-        this.player.body.enable=false;
-
-        this.cameras.main.fadeOut(1000,0,0,0);
-        this.cameras.main.once('camerafadeoutcomplete',()=>{
-            //this.isWraping=false;
-
-            this.scene.start(nextScene,{spawnPoint:spawnPoint});
-           // this.scene.start(nextScene,spawnPoint);
-        });
-    }
-    setPlayerSpawnPoint(data){
-        if(!data) return;
-
-        const objectLayer=this.map.getObjectLayer('Object');
-        
-        const spawnHolder=objectLayer.objects.find(obj=>{
-            const prop=obj.properties?.find(p=>p.name==='spawnHolder');
-            return prop?.value===data.spawnPoint;
-        })
-
-        if(spawnHolder){
-            const x=spawnHolder.x+(spawnHolder.width/2);
-            const y=spawnHolder.y+(spawnHolder.height/2);
-
-            this.player.setPosition(x,y);
-        }
-    }
-    spawnItemNearPlayer(itemData){
-        if(!itemData) return;
-
-        let offsetX=0;
-        let offsetY=0;
-        const distance=45;
-
-        const dir=this.player.direction;//まだ定義してない
-
-        switch(dir){
-            case 'left':
-                offsetX=-distance;
-                break;
-            case 'right':
-                offsetX=distance;
-                break;
-            case 'up':
-                offsetY=-distance;
-                break;
-            case 'down':
-                offsetY=distance;
-                break;
-            default:
-                offsetY=10; 
-        }
-
-        const dropX=this.player.x+offsetX;
-        const dropY=this.player.y+offsetY;
-
-        const item=this.physics.add.sprite(dropX,dropY,itemData.id);
-
-        item.setScale(0.8).setDepth(dropY);
-
-        item.setData('info',JSON.parse(JSON.stringify(itemData)));
-
-        /*if(this.groundItems){
-            this.groundItems.add(item);
-        }*///後で作る用
-    }
-    /*damageInteractable(target){
-        console.log('ダメージを受けてる');
-        if(!target.hp&& target.hp!==0){
-            target.hp=2;
-            target.maxHp=2;
-        }
-
-        target.hp--;
-
-        this.showItemHealthBar(target);
-
-        if(target.healthbar)target.healthbar.destroy();
-
-        //----------------------画像orグラフで耐久値の表示↓
-
-        if(target.hp<=0){
-            if(target.healthbar)target.healthbar.destroy();
-
-            this.destroyAndDrop(target);
-        }
-    }*/
-    showItemHealthBar(target){
-        if(!target.healthbarContainer){
-            const x=target.instance.x;
-            const y=target.instance.y;
-
-            const container=this.add.container(x,y);
-
-            const bg=this.add.image(0,0,'bar-bg').setOrigin(0.5);
-
-            const fill=this.add.image(-(bg.displayWidth/2),0,'bar-fill').setOrigin(0,0.5);
-
-            container.add([bg,fill]);
-            container.setDepth(10000);
-
-            target.healthbarContainer=container;
-            target.healthbarFill=fill;
-            target.barFullWidth=bg.displayWidth;
-        }else{
-            target.healthbarContainer.setAlpha(1);
-        }
-
-        const barPercent=target.hp/target.maxHp;
-
-        const targetScaleX=(target.barFullWidth*barPercent)/target.healthbarFill.displayWidth;
-
-        this.tweens.add({
-            targets:target.healthbarFill,
-            scaleX:targetScaleX,
-            duration:150,
-            ease:'Cubic easeOut'
-        });
-
-        if(target.barTimer)target.barTimer.remove();
-
-        target.barTimer=this.time.delayedCall(2000,()=>{
-            if(target.healthbarContainer){
-
-                this.tweens.add({
-                    targets:target.healthbarContainer,
-                    alpha:0,
-                    duration:400,
-                    onComplete:()=>{
-                        target.healthbarContainer?.destroy();
-                        target.healthbarContainer=null;
-                    }
-                });
-            }
-        });
-    }
-    destroyAndDrop(target){
-        const itemData=target.data|| {id:target.type};
-
-        const x=target.instance.x;
-        const y=target.instance.y;
-
-        target.instance.destroy();
-        this.interactables=this.interactables.filter(item=>item!==target);
-
-        this.spawnItemAtPoint(x,y,itemData);
-    }
-    spawnItemAtPoint(x,y,itemData){
-        const item=this.physics.add.sprite(x,y,itemData.id);
-
-        item.setScale(0.8).setDepth(y+10);
-        item.setData('info',itemData);
-        item.setData('canPickup',false);
-
-        this.time.delayedCall(1000,()=>{
-            if(item.active) item.setData('canPickup',true);
-        });
-
-        if(this.groundItems)this.groundItems.add(item);
-    }
-    /*wrapToScene(targetKey){
-        this.player.body.enable=false;
-
-        this.cameras.main.fadeOut(1000,0,0,0);
-        this.cameras.main.once('camerafadeoutcomplete',()=>{
-            this.scene.start(targetKey,{fromDoor:targetKey});
-        })
-
-    }*/
-   setDecorationMode(active){
+    //----------デコレーションモード-------------------------------------------------------------------------------------------
+    setDecorationMode(active){
         this.isDecorationMode=active;
         this.decorationGrid.clear();
 
@@ -663,10 +577,7 @@ export default class BaseScene extends Phaser.Scene{
 
         ui.updateHotbar(inventory);
     }
-    setupCamera(target){
-        this.cameras.main.startFollow(target,true,0.1,0.1);
-        this.cameras.main.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
-    }
+    //-----------------Interactablesの更新------------------------------------------------------------------------------------
     updateInteractables(player){
         let minDistance=100;
         let closestItem=null;//機械、ドア、NPCで近いものに▼マークを付ける

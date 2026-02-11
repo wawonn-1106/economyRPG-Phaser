@@ -1,23 +1,13 @@
 export default class GuideContent{
     constructor(uiScene){
-        this.uiScene=uiScene;
-        
+        this.uiScene=uiScene;     
     }
     createView(){
         const container=this.uiScene.add.container(0,0);
 
         const bg=this.uiScene.add.image(0,0,'menu-bg').setDisplaySize(1000,600);
         container.add(bg);
-        /*const container=document.createElement('div');
-        container.classList.add('guide-container');
-
-        const title=document.createElement('h2');
-        title.classList.add('guide-title');
-        title.textContent='遊び方';
-        container.appendChild(title);
-
-        const list=document.createElement('ul');*/
-
+       
         const controls=[
             {key:'矢印キー',action:'プレイヤーの移動'},
             {key:'SPACE',action:'会話 / 決定'},
@@ -40,25 +30,8 @@ export default class GuideContent{
             }).setOrigin(0,0.5);
 
             container.add([keyLabel,actionLabel]);
-            /*const listItem=document.createElement('li');
-            listItem.classList.add('guide-item');
-
-            const keySpan=document.createElement('span');
-            keySpan.classList.add('guide-key');
-            keySpan.textContent=control.key;
-
-            const actionSpan=document.createElement('span');
-            actionSpan.classList.add('guide-action');
-            actionSpan.textContent=`：${control.action}`;
-
-            listItem.appendChild(keySpan);
-            listItem.appendChild(actionSpan);
-            list.appendChild(listItem);*/
-
         });
-        //container.appendChild(list);
 
         return container;
-
     }
 }
