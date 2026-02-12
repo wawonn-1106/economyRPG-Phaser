@@ -9,12 +9,6 @@ export default class Forest extends BaseScene{
     create(data){
         super.create(data); 
 
-        this.initManagers();
-        this.initInput();
-        this.initPlacementPreview();
-        this.initDecorationGrid();
-
-
         this.scene.launch('UIScene');
 
         const map=this.createMap('house','Serene_Village_48x48','tileset');//いったんhouseで代用

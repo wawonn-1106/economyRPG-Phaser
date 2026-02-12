@@ -79,6 +79,7 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.image('inventory','assets/images/inventory.png');
         this.load.image('dictionary','assets/images/dictionary.png');
         this.load.image('guide','assets/images/guide.png');
+        this.load.image('save','assets/images/save.png');//yet
     }
     create(){
         this.scene.start('Title');//全部ダウンロードしたら、Titleに飛ばす

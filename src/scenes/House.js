@@ -9,11 +9,6 @@ export default class House extends BaseScene{
     create(data){
         super.create(data);
 
-        this.initManagers();
-        this.initInput();
-        this.initPlacementPreview();
-        this.initDecorationGrid();
-
         //this.interactables=[];NPCもBaseでインスタンス化するようにしたのでこれも不要
         //これがあったら親でインスタンス化してもらったNPCのデータも空にしてしまう
 

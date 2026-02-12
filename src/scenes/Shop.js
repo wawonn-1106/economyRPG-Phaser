@@ -11,11 +11,6 @@ export default class Shop extends BaseScene{
         console.log("Shopシーン開始！");
         super.create(data);//親クラス(BaseScene)のcreate()を実行。そこにはinventoryDataをjsonから取得するのがある
 
-        this.initManagers();
-        this.initInput();
-        this.initPlacementPreview();
-        this.initDecorationGrid();
-
         this.scene.launch('UIScene');//Sceneは基本一個づつ表示だが、ShopではShopシーンを消さずにUISceneを立ち上げるように命令。他のSceneでもね。
 
         const map=this.createMap('shop','Serene_Village_48x48','tileset');

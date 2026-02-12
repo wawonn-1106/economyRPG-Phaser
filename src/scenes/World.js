@@ -14,12 +14,6 @@ export default class World extends BaseScene{
     }
     create(data){//このdataはscene.start('World')のときに渡される引数
         super.create(data);
-
-        this.initManagers();
-        this.initInput();
-        this.initPlacementPreview();
-        this.initDecorationGrid();
-
         //this.interactables=[];
 
         this.scene.launch('UIScene');
@@ -45,6 +39,8 @@ export default class World extends BaseScene{
         this.setupCamera(this.player);
     }
     update(time,delta){
+        //if(!this.player)return;
+        
         super.update(time, delta);
         //updateInteractables,placementPre3viewなどは、このsuper.update()でBaseSceneのものを実行
 

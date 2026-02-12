@@ -337,11 +337,11 @@ export default class UIScene extends Phaser.Scene{
 
         const inputField=dom.getChildByID('input-field');//IdではなくID
 
-        const submitBtn=this.add.image(gameWidth/2,gameHeight/2+300,'player')
-            .setScale(0.1)//↑submit-btn、playerで代用
+        const submitBtn=this.add.image(gameWidth/2,gameHeight/2+300,'submit-btn')
             .setInteractive({useHandCursor:true})
-            //.setOrigin(0.5)
-            .setDepth(10000000);
+            .setOrigin(0.5)
+            .setDisplaySize(100,70)
+            .setDepth(6000);
 
         const confirmInput=()=>{
             //if(currentText.trim()==='')return;

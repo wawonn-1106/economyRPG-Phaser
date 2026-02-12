@@ -7,6 +7,7 @@ import ReviewContent from '../contents/ReviewContent.js';
 import DictionaryContent from '../contents/DictionaryContent.js';
 import GuideContent from '../contents/GuideContent.js';
 import MachineContent from '../contents/MachineContent.js';
+import SaveContent from '../contents/SaveContent.js';
 
 export default class MenuManager{
     constructor(uiScene,worldScene){
@@ -25,7 +26,8 @@ export default class MenuManager{
             'settings':new SettingsContent(uiScene),
             'dictionary':new DictionaryContent(uiScene),
             'guide':new GuideContent(uiScene),
-            'machine':new MachineContent(uiScene)
+            'machine':new MachineContent(uiScene),
+            'save':new SaveContent(uiScene)
         };
     }
     toggle(tabId){

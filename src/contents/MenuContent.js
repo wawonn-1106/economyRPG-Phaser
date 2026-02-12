@@ -17,6 +17,7 @@ export default class MenuContent{
             {id:'ranking',label:'ランキング',icon:'ranking'},
             {id:'dictionary',label:'辞書',icon:'dictionary'},
             {id:'settings',label:'設定',icon:'settings'},
+            {id:'save',label:'日記',icon:'save'},
             {id:'returnTitle',label:'タイトルに戻る',icon:'returnTitle'}
         ];
 

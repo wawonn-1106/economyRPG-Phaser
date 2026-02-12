@@ -20,31 +20,83 @@ export default class BaseScene extends Phaser.Scene{
         this.placePreview=null;
         this.canPlace=false;
 
-        //this.SERVER_URL='http://localhost:3000';
+        this.SERVER_URL='http://localhost:3000';
     }
 //----------初期化-------------------------------------------------------------------------------------------
-    create(data){
+    async create(data){
         this.initData = data;
         this.isWraping = false;
+
+        this.initManagers();
+        this.initInput();
+        this.initPlacementPreview();
+        this.initDecorationGrid();
         this.initAnimations();
+        //this.initPlacementPreview();
+
+        //this.loadGameData();
+        let finalSaveData=null;
+
+        /*if(data&& data.isContinue){
+            try{
+                const response=await fetch(`${this.SERVER_URL}/load`);
+                finalSaveData=await response.json();
+
+                if(finalSaveData.playerPosition&& finalSaveData.playerPosition.scene!==this.scene.key){
+                    this.scene.start(finalSaveData.playerPosition.scene,{isContinue:true});
+
+                    return;
+                }
+            }catch(error){
+                console.log('ロードに失敗しました',error);
+            }
+        }*/
+
+        if(finalSaveData){
+            this.applySaveData(finalSaveData);
+        }else{
+            let inventory=this.registry.get('inventoryData');
+
+            if(!inventory){
+                const json=this.cache.json.get('inventoryData');
+                inventory=[...json.items];
+
+                this.registry.set('inventoryData',inventory);
+            }
+            this.inventoryData=inventory;
+        }
+
+        this.events.once('shutdown',()=>{
+            this.physics.world.colliders.destroy();
+        });
 
         //this.interactables=[];
 
-        let inventory=this.registry.get('inventoryData');
+        /*let inventory=this.registry.get('inventoryData');
         if(!inventory){
             const json=this.cache.json.get('inventoryData');
             inventory=[...json.items];
             //これでSceneで毎回jsonを取得しなくてよくなる
             this.registry.set('inventoryData',inventory);
-        }
+        }*/
 
-        const allNPCData=this.cache.json.get('NPCData');
+        //const allNPCData=this.cache.json.get('NPCData');
 
-        const currentSceneNPCs=allNPCData[this.scene.key];
+        //const currentSceneNPCs=allNPCData[this.scene.key];
 
         this.villagers=this.physics.add.group();
 
-        currentSceneNPCs.forEach(data=>{
+        if(finalSaveData&& finalSaveData.npcPositions){
+            finalSaveData.npcPositions.forEach(npcData=>{
+                const newVillager=new NPC(this,npcData.x,npcData.y,npcData.npcId,npcData);
+                newVillager.seyDepth(100);
+
+                this.villagers.add(newVillager);
+                this.interactables.push({type:'npc',instance:newVillager});
+            })
+        }
+
+        /*currentSceneNPCs.forEach(data=>{
             const newVillager=new NPC(this,data.x,data.y,data.key,data);
             newVillager.setDepth(100);
 
@@ -60,9 +112,7 @@ export default class BaseScene extends Phaser.Scene{
                     this.createClouds();
         }*/
 
-        this.inventoryData=inventory;
-
-        this.initPlacementPreview();
+        //this.inventoryData=inventory;
     }
     initManagers(){
         this.dialogManager=new DialogManager(this);
@@ -149,6 +199,8 @@ export default class BaseScene extends Phaser.Scene{
         return this.map;//SceneでcreateMap(情報をいれて);を呼ぶ形でマップは書く
     }
     setupCollisions(target){
+        if(!target)return;
+        
         const objectLayer=[this.groundLayer,this.onGroundLayer,this.houseLayer];
 
         objectLayer.forEach(layer=>{
@@ -327,34 +379,115 @@ export default class BaseScene extends Phaser.Scene{
             overlay.setDepth(2000);
         }*/
 //----------データ取得-------------------------------------------------------------------------------------------
-    /*async syncMoneyWithServer(newMoney){
+    async saveGameData(){
         try{
+            const payload={
+                money:this.registry.get('money')||0,
+                inventory:this.registry.get('inventoryData')||[],
+                placedItems:this.interactables
+                    .filter(item=>item.isPlaced)
+                    .map(item=>({id:item.type,x:item.x,y:item.y})),
+                
+                playerPosition:{
+                    x:this.player.x,
+                    y:this.player.y,
+                    scene:this.scene.key
+                },
+
+                npcPositions:this.villagers.getChildren().map(npc=>({
+                    npcId:npc.npcName,
+                    x:npc.x,
+                    y:npc.y
+                }))
+            };
+        
             const response=await fetch(`${this.SERVER_URL}/save`,{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({money:newMoney})
+                body:JSON.stringify(payload)
+            });
+
+            const result=await response.json();
+            console.log('セーブ成功',result);
+
+        }catch(error){
+            console.log('セーブ失敗',error);
+        }
+    }
+    async recordSale(saleInfo){
+        try{
+            const payload={
+                money:this.registry.get('money'),
+                newSale:{
+                    itemId:saleInfo.id,
+                    quality:saleInfo.quality,
+                    setQuality:saleInfo.setQuality,
+                    sellPrice:saleInfo.price,
+                    fairPrice:saleInfo.marketPrice,
+                    profit:saleInfo.price-(saleInfo.cost||0),
+                    npcId:saleInfo.npcId
+                }
+            };
+
+            const response=await fetch(`${this.SERVER_URL}/save`,{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify(payload)
             });
             const result=await response.json();
-            console.log('DB保存完了、今の所持金：',newMoney);
+
+            console.log('販売履歴を記録しました');
         }catch(error){
-            console.error('通信エラー：',error);
+            console.error('販売履歴の記録に失敗',error);
         }
-    }*/
-    /*async loadPlayerData() {
-        try {
+    }
+    async loadGameData(){
+        try{
             const response = await fetch(`${this.SERVER_URL}/load`);
             const data = await response.json();
             
-            this.money = data.money || 0;
-            
-            if (this.moneyText) {
-                this.moneyText.setText(`所持金：${this.money}`);
+            //this.money = data.money || 0;
+            this.registry.set('money',data.money||0);
+            this.registry.set('inventoryData',data.inventory||[]);
+
+            if(data.placedItems){
+                this.restorePlacedItems(data.placedItems);
             }
-            console.log('クラウドから復旧完了！:', this.money);
-        } catch (error) {
-            console.log('読み込み失敗、0円から開始します', error);
+
+            if(data.playerPosition&& data.playerPosition.scene===this.scene.key){
+                this.player.setPosition(data.playerPosition.x,data.playerPosition.y)
+            }
+
+            if(data.npcPosition){
+                data.npcPosition.forEach(npcPos=>{
+                    const npc=this.villagers.getChildren().find(v=>v.npcName===npcPos.npcId);
+
+                    if(npc){
+                        npc.setPosition(npcPos.x,npcPos.y);
+                    }
+                });
+            }
+            
+            /*if (this.moneyText) {
+                this.moneyText.setText(`所持金：${this.money}`);
+            }*/
+            console.log('ロード完了！:', this.money);
+        }catch(error){
+            console.log('ロード失敗、初期データを使用します', error);
         }
-    }*/
+    }
+    applySaveData(data){
+        this.registry.set('money',data.money||0);
+        this.registry.set('inventoryData',data.inventory||[]);
+
+        //this.events.once('update',()=>{
+            if(this.player&& data.playerPosition){
+                this.player.setPosition(data.playerPosition.x,data.playerPosition.y);
+            }
+
+            if(data.placedItems)this.restorePlacedItems(data.placedItems);
+        //});
+    }
 //----------アクション系-------------------------------------------------------------------------------------------
     handleAction(){
         if (this.dialogManager.inputMode) return;
@@ -603,7 +736,31 @@ export default class BaseScene extends Phaser.Scene{
             this.readyIcon.setVisible(false);
         }
     }
+    restorePlacedItems(items){
+        if(!items)return;
+
+        items.forEach(item=>{
+            const newItem=this.add.sprite(item.x,item.y,item.id).setDepth(item.y);
+
+            this.physics.add.existing(newItem,true);
+            this.physics.add.collider(this.player,newItem);
+
+            if(this.villagers){
+                this.physics.add.collider(this.villagers,newItem);
+            }
+
+            this.interactables.push({
+                type:item.id,
+                instance:newItem,
+                x:item.x,
+                y:item.y,
+                isPlaced:true
+            });
+        });
+    }
     update(time,delta){
+        if (!this.player||!this.player.body)return;
+
         if(this.isDecorationMode){
             this.updatePlacementPreview();
         }else{

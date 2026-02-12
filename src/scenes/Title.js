@@ -21,10 +21,9 @@ export default class Title extends Phaser.Scene{
             this.cameras.main.fadeOut(1000,0,0,0);
 
             this.cameras.main.once('camerafadeoutcomplete',()=>{
-                
-                this.scene.start('World');
+                this.scene.start('World',{isContinue:true});
             });
-        })
+        });
 
         startBtn.on('pointerdown',()=>{
             startBtn.disableInteractive();
@@ -34,7 +33,7 @@ export default class Title extends Phaser.Scene{
 
             this.cameras.main.once('camerafadeoutcomplete',()=>{
 
-                this.scene.start('World');
+                this.scene.start('World',{isContinue:false});//false→セーブした場所から始めない
             });
         });
     }
