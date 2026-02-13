@@ -8,7 +8,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         scene.physics.world.enable(this);//当たり判定の準備、this.bodyが使えるようになる
         scene.add.existing(this);//sceneにthis(this.player)を追加する。このsceneはWorld,House,Shopとか
 
-        this.setScale(3).refreshBody();
+        this.setScale(0.1).refreshBody();
         this.setCollideWorldBounds(true);
         this.setPushable(false);
 
@@ -42,29 +42,29 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
 
         if(isRightDown){
             this.setVelocityX(this.speed);
-            this.anims.play('walk-right',true);
+            //this.anims.play('walk-right',true);
             moving=true;
         }
         else if(isLeftDown){
             this.setVelocityX(-this.speed);
-            this.anims.play('walk-left',true);
+            //this.anims.play('walk-left',true);
             moving=true;
         }
 
         if(isUpDown){
             this.setVelocityY(-this.speed);
-            this.anims.play('walk-up',true);
+            //this.anims.play('walk-up',true);
             moving=true;
         }
         else if(isDownDown){
             this.setVelocityY(this.speed);
-            this.anims.play('walk-down',true);
+            //this.anims.play('walk-down',true);
             moving=true;
         }
 
         if(!moving){
             this.setVelocity(0);
-            this.anims.play('idle',true);
+            //this.anims.play('idle',true);
         }
 
         if(this.heldItem){

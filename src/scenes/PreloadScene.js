@@ -1,6 +1,7 @@
 export default class PreloadScene extends Phaser.Scene{
     constructor(){
         super({key:'PreloadScene'});
+        
     }
     preload(){
 //--------------------------------画像------------------------------------------------------
@@ -19,7 +20,7 @@ export default class PreloadScene extends Phaser.Scene{
 //--------------------------------tileset-----------------------------------------------------
         this.load.image('tileset','assets/tilesets/Serene_Village_48x48.png');
 //--------------------------------animation----------------------------------------------------
-        this.load.spritesheet('player-walk-down','assets/images/16x32 All Animations.png',{
+        /*this.load.spritesheet('player-walk-down','assets/images/16x32 All Animations.png',{
                 frameWidth:16,
                 frameHeight:32,
                 margin:0,
@@ -42,7 +43,7 @@ export default class PreloadScene extends Phaser.Scene{
                 frameHeight:32,
                 margin:0,
                 spacing:0
-        });
+        });*/
 //--------------------------------天気------------------------------------------------------
         this.load.image('rain','assets/images/player.png');
         this.load.image('snow','assets/images/player.png');
@@ -53,6 +54,8 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.json('playerData','assets/data/playerData.json');
         this.load.json('inventoryData','assets/data/inventory.json');
         this.load.json('NPCData','assets/data/NPC.json');
+
+        //this.load.json('saveData',`${this.SERVER_URL}/load`);
 //--------------------------------タイトル------------------------------------------------------       
         this.load.image('title','assets/images/title-image.png');
         this.load.image('start-btn','assets/images/start-btn.png');//その場しのぎの画像
@@ -80,6 +83,8 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.image('dictionary','assets/images/dictionary.png');
         this.load.image('guide','assets/images/guide.png');
         this.load.image('save','assets/images/save.png');//yet
+
+        
     }
     create(){
         this.scene.start('Title');//全部ダウンロードしたら、Titleに飛ばす

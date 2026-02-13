@@ -10,9 +10,9 @@ import MachineContent from '../contents/MachineContent.js';
 import SaveContent from '../contents/SaveContent.js';
 
 export default class MenuManager{
-    constructor(uiScene,worldScene){
+    constructor(uiScene){
         this.uiScene=uiScene;
-        this.worldScene=worldScene;
+        //this.worldScene=worldScene;
         this.isOpenMenu=false;
         this.currentTab='menu';
         this.currentView=null;
@@ -30,8 +30,12 @@ export default class MenuManager{
             'save':new SaveContent(uiScene)
         };
     }
+    get activeScene(){
+        return this.uiScene.scene.manager.getScenes(true).find(s=>s.scene.key!=='UIScene');
+    }
     toggle(tabId){
-        if(this.worldScene.dialogManager.inputMode||this.worldScene.dialogManager.isTalking)return;
+        const activeScene=this.activeScene;
+        if(activeScene.dialogManager.inputMode||activeScene.dialogManager.isTalking)return;
 
         if(!this.isOpenMenu){
             this.openMenu(tabId);
@@ -44,7 +48,8 @@ export default class MenuManager{
         }
     }
     openMenu(tabId){
-        if(this.worldScene.dialogManager.inputMode||this.worldScene.dialogManager.isTalking)return;
+        const activeScene=this.activeScene;
+        if(activeScene.dialogManager.inputMode||activeScene.dialogManager.isTalking)return;
 
         this.isOpenMenu=true;
         this.switchTab(tabId);
@@ -62,13 +67,15 @@ export default class MenuManager{
         this.currentTab=tabId;
         if(this.currentTab==='returnTitle'){
                 this.closeMenu();
+
+                const activeScene=this.activeScene;//ゲッターは関数じゃないから()は不要
                 
-                this.worldScene.cameras.main.fadeOut(1000,0,0,0);
+                activeScene.cameras.main.fadeOut(1000,0,0,0);
                 this.uiScene.cameras.main.fadeOut(1000,0,0,0);
 
-                this.worldScene.cameras.main.once('camerafadeoutcomplete',()=>{
+                activeScene.cameras.main.once('camerafadeoutcomplete',()=>{
 
-                    this.worldScene.scene.start('Title');//scene.sceneでconfigの配列に登録してるのは何でも表示できる！！！
+                    activeScene.scene.start('Title');//scene.sceneでconfigの配列に登録してるのは何でも表示できる！！！
                     //uiSceneの方がいいのかな
                 });
                 return;

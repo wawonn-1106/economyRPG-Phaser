@@ -5,6 +5,7 @@ import ProfileManager from '../managers/ProfileManager.js';
 import DictionaryManager from '../managers/DictionaryManager.js';
 import MachineManager from '../managers/MachineManager.js';
 import NPC from "../entities/NPC.js";
+import Player from "../entities/Player.js";
 
 export default class BaseScene extends Phaser.Scene{
     constructor(config){
@@ -23,7 +24,8 @@ export default class BaseScene extends Phaser.Scene{
         this.SERVER_URL='http://localhost:3000';
     }
 //----------初期化-------------------------------------------------------------------------------------------
-    async create(data){
+    create(data){
+        
         this.initData = data;
         this.isWraping = false;
 
@@ -35,73 +37,27 @@ export default class BaseScene extends Phaser.Scene{
         //this.initPlacementPreview();
 
         //this.loadGameData();
-        let finalSaveData=null;
+        const money=this.registry.get('money');
+        const inventory=this.registry.get('inventoryData');
+        const playerPos=this.registry.get('playerPosition');
+        const npcPos=this.registry.get('npcPositions');
+        const placedItems=this.registry.get('placedItems');
 
-        /*if(data&& data.isContinue){
-            try{
-                const response=await fetch(`${this.SERVER_URL}/load`);
-                finalSaveData=await response.json();
+        this.inventoryData=inventory;
 
-                if(finalSaveData.playerPosition&& finalSaveData.playerPosition.scene!==this.scene.key){
-                    this.scene.start(finalSaveData.playerPosition.scene,{isContinue:true});
-
-                    return;
-                }
-            }catch(error){
-                console.log('ロードに失敗しました',error);
-            }
-        }*/
-
-        if(finalSaveData){
-            this.applySaveData(finalSaveData);
-        }else{
-            let inventory=this.registry.get('inventoryData');
-
-            if(!inventory){
-                const json=this.cache.json.get('inventoryData');
-                inventory=[...json.items];
-
-                this.registry.set('inventoryData',inventory);
-            }
-            this.inventoryData=inventory;
+        this.createEntities(playerPos,npcPos);
+        
+        if(data&& data.spawnPoint){
+            this.setPlayerSpawnPoint(data);/*createEntitesでplayer作る前に実行するとエラーになる。
+            かといって、createEntitiesの後に書くと、座標が上書きされて前回の位置からできないから、片方のみ実行*/
         }
 
-        this.events.once('shutdown',()=>{
+        if(placedItems&& placedItems.length>0){
+            this.restorePlacedItems(placedItems);
+        }
+
+        this.events.once('shoutdown',()=>{
             this.physics.world.colliders.destroy();
-        });
-
-        //this.interactables=[];
-
-        /*let inventory=this.registry.get('inventoryData');
-        if(!inventory){
-            const json=this.cache.json.get('inventoryData');
-            inventory=[...json.items];
-            //これでSceneで毎回jsonを取得しなくてよくなる
-            this.registry.set('inventoryData',inventory);
-        }*/
-
-        //const allNPCData=this.cache.json.get('NPCData');
-
-        //const currentSceneNPCs=allNPCData[this.scene.key];
-
-        this.villagers=this.physics.add.group();
-
-        if(finalSaveData&& finalSaveData.npcPositions){
-            finalSaveData.npcPositions.forEach(npcData=>{
-                const newVillager=new NPC(this,npcData.x,npcData.y,npcData.npcId,npcData);
-                newVillager.seyDepth(100);
-
-                this.villagers.add(newVillager);
-                this.interactables.push({type:'npc',instance:newVillager});
-            })
-        }
-
-        /*currentSceneNPCs.forEach(data=>{
-            const newVillager=new NPC(this,data.x,data.y,data.key,data);
-            newVillager.setDepth(100);
-
-            this.villagers.add(newVillager);
-            this.interactables.push({type:'npc',instance:newVillager});
         });
 
         /*if(this.currentWeather==='Rain'){
@@ -112,7 +68,7 @@ export default class BaseScene extends Phaser.Scene{
                     this.createClouds();
         }*/
 
-        //this.inventoryData=inventory;
+        
     }
     initManagers(){
         this.dialogManager=new DialogManager(this);
@@ -142,6 +98,29 @@ export default class BaseScene extends Phaser.Scene{
     initDecorationGrid(){
         this.decorationGrid=this.add.graphics();
         this.decorationGrid.setDepth(20000);
+    }
+    createEntities(playerPos,npcPos){
+        console.log("渡されたdata:",playerPos.x,playerPos.y );
+        this.player=new Player(this,playerPos.x,playerPos.y,'player'); 
+
+        this.setupCamera(this.player);
+        this.setupCollisions(this.player);
+
+        this.villagers=this.physics.add.group();
+
+        const currentSceneNPCs=npcPos.filter(n=>n.scene===this.scene.key);
+
+        currentSceneNPCs.forEach(data=>{
+
+            const newVillager=new NPC(this,data.x,data.y,data.npcId,data);
+            newVillager.setDepth(100);
+
+            this.villagers.add(newVillager);
+
+            this.interactables.push({type:'npc',instance:newVillager});
+
+            this.physics.add.collider(this.player,newVillager);
+        });
     }
 //----------アニメーション-------------------------------------------------------------------------------------------
     initAnimations(){
@@ -441,7 +420,7 @@ export default class BaseScene extends Phaser.Scene{
             console.error('販売履歴の記録に失敗',error);
         }
     }
-    async loadGameData(){
+    /*async loadGameData(){
         try{
             const response = await fetch(`${this.SERVER_URL}/load`);
             const data = await response.json();
@@ -467,15 +446,11 @@ export default class BaseScene extends Phaser.Scene{
                     }
                 });
             }
-            
-            /*if (this.moneyText) {
-                this.moneyText.setText(`所持金：${this.money}`);
-            }*/
             console.log('ロード完了！:', this.money);
         }catch(error){
             console.log('ロード失敗、初期データを使用します', error);
         }
-    }
+    }*/
     applySaveData(data){
         this.registry.set('money',data.money||0);
         this.registry.set('inventoryData',data.inventory||[]);

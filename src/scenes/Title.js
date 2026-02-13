@@ -1,6 +1,7 @@
 export default class Title extends Phaser.Scene{
     constructor(){
         super({key:'Title'});
+        this.SERVER_URL='http://localhost:3000';
     }
     create(){
         if (this.scene.isActive('UIScene')) {
@@ -12,29 +13,70 @@ export default class Title extends Phaser.Scene{
         this.add.image(640,360,'title');
 
         const continueBtn=this.add.image(640,300,'continue-btn').setInteractive({useHandCursor:true});
-        const startBtn=this.add.image(640,550,'start-btn').setInteractive({useHandCursor:true});
 
-        continueBtn.on('pointerdown',()=>{
+        const savedPos=this.registry.get('playerPosition');
+        const hasSaveData=savedPos!==null;
+
+        if(!hasSaveData){
+            continueBtn.setAlpha(0.5);
+            continueBtn.disableInteractive();
+        }
+
+        continueBtn.on('pointerdown',async()=>{
             startBtn.disableInteractive();
             continueBtn.disableInteractive();
 
-            this.cameras.main.fadeOut(1000,0,0,0);
+            try{
+                const response=await fetch(`${this.SERVER_URL}/load`);
+                const data=await response.json();
 
-            this.cameras.main.once('camerafadeoutcomplete',()=>{
-                this.scene.start('World',{isContinue:true});
-            });
+                this.registry.set('money',data.money||0);
+                this.registry.set('inventoryData',data.inventory||[]);
+                this.registry.set('placedItems',data.placedItems||[]);
+                this.registry.set('playerPosition',data.playerPosition||null);
+                this.registry.set('npcPositions',data.npcPositions||[]);
+                this.registry.set('salesHistory',data.salesHistory||[]);
+
+                const playerPos=data.playerPosition;
+
+                if(playerPos&& playerPos.scene){
+                    this.cameras.main.fadeOut(1000,0,0,0);
+
+                    this.cameras.main.once('camerafadeoutcomplete',()=>{
+                        this.scene.start(playerPos.scene);//座標はBaseSceneで
+                    });
+                }else{
+                    console.error('セーブデータが不完全です',error);
+                }
+            }catch(error){
+                console.error('ロード失敗',error);
+            }
         });
+
+        const startBtn=this.add.image(640,550,'start-btn').setInteractive({useHandCursor:true});
 
         startBtn.on('pointerdown',()=>{
             startBtn.disableInteractive();
-            continueBtn.disableInteractive();
+            //continueBtn.disableInteractive();
+
+            this.resetGameRegistry();
 
             this.cameras.main.fadeOut(1000,0,0,0);
 
             this.cameras.main.once('camerafadeoutcomplete',()=>{
 
-                this.scene.start('World',{isContinue:false});//false→セーブした場所から始めない
+                this.scene.start('World');
             });
         });
+    }
+    resetGameRegistry(){
+        const defaultInventory=this.cache.json.get('inventoryData');
+
+        this.registry.set('money',0);
+        this.registry.set('inventoryData',defaultInventory?.item||[]);
+        this.registry.set('placedItems',[]);
+        this.registry.set('playerPosition',null);
+        this.registry.set('npcPositions',[]);
+        this.registry.set('salesHistory',[]);
     }
 }
