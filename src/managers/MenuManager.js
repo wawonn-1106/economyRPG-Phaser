@@ -78,7 +78,6 @@ export default class MenuManager{
                 activeScene.cameras.main.once('camerafadeoutcomplete',()=>{
 
                     activeScene.scene.start('Title');//scene.sceneでconfigの配列に登録してるのは何でも表示できる！！！
-                    //uiSceneの方がいいのかな
                 });
                 return;
         }

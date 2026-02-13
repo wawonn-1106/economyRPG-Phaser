@@ -20,6 +20,26 @@ export default class SettingsContent{
         });
         container.add(bgmSlider);
 
+        const returnBtn=this.uiScene.add.text(0,150,'タイトルに戻る',{
+            fontSize:'28px',
+            padding:{x:10},
+            color:'#000'
+        }).setOrigin(0.5).setInteractive({usaHandCursor:true});
+
+        returnBtn.on('pointerdown',()=>{
+            const activeScene=this.uiScene.scene.manager.getScenes(true).find(s=>s.scene.key!=='UIScene');
+
+            if(activeScene){
+                activeScene.cameras.main.fadeOut(1000,0,0,0);
+                this.uiScene.cameras.main.fadeOut(1000,0,0,0);
+
+                activeScene.cameras.main.once('camerafadeoutcomplete',()=>{
+                    activeScene.scene.start('Title');
+                });
+            }
+        });
+        container.add(returnBtn);
+
         return container;
     }
     createSlider(x,y,labelText,callback){

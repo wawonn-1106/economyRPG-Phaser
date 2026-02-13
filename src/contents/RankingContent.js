@@ -70,13 +70,15 @@ export default class RankingContent{
             tabText.on('pointerdown',()=>{
                 this.currentTab=tabInfo.id;
 
-                this.refreshRanking(scrollContainer);
+                
 
                 this.tabButtons.forEach(btn=>{
                     const active=(btn.id===this.currentTab);
 
                     btn.text.setColor(active? '#0000ff':'#666666');
                     btn.line.setVisible(active);
+
+                    this.refreshRanking(scrollContainer);
                 });                
             });
             container.add([tabText,line]);

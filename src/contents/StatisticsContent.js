@@ -59,7 +59,7 @@ export default class RankingContent{
             tabText.on('pointerdown',()=>{
                 this.currentTab=tabInfo.id;
 
-                this.refreshRanking(scrollContainer);
+                //this.refreshRanking(scrollContainer);
 
                 this.tabButtons.forEach(btn=>{
                     const active=(btn.id===this.currentTab);
@@ -67,11 +67,12 @@ export default class RankingContent{
                     btn.text.setColor(active? '#0000ff':'#666666');
                     btn.line.setVisible(active);
 
-                    this.updateTabs();
                     this.drawChart();
                 });                
             });
             this.mainContainer.add([tabText,line]);
+
+            
         });
         
         this.drawChart();
@@ -125,9 +126,11 @@ export default class RankingContent{
             const px=startX+(index*stepX);
             const py=startY-((val-displayMin)/displayRange*chartHeight);
 
+            this.chartGraphics.lineStyle(3,0x0000ff,1);
+
             if(index>0){
                 const prevX=startX+((index-1)*stepX);
-                const prevY=startY-((history[index-1]/displayMax)/displayRange*chartHeight);
+                const prevY=startY-((history[index-1]-displayMin)/displayRange*chartHeight);
 
                 this.chartGraphics.lineBetween(prevX,prevY,px,py);
             }

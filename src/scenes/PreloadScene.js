@@ -69,6 +69,8 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.image('choice-btn','assets/images/choice-btn.png');
         this.load.image('decoration-btn','assets/images/decoration-btn.png');
         this.load.image('menu-btn','assets/images/menu-btn.png');
+        this.load.image('profile-front-bg','assets/images/profile-front-bg.png');
+        this.load.image('profile-back-bg','assets/images/profile-back-bg.png');
 
         this.load.image('menu-bg','assets/images/menu-bg.png');
         this.load.image('dialog-bg','assets/images/machine-bg.png');//dialog-bg用意する
