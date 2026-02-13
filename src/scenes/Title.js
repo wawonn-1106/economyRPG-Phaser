@@ -70,13 +70,16 @@ export default class Title extends Phaser.Scene{
         });
     }
     resetGameRegistry(){
-        const defaultInventory=this.cache.json.get('inventoryData');
+        const defaultPlayerData=this.cache.json.get('playerData');
+        const defaultNPCData=this.cache.json.get('NPCData');
 
         this.registry.set('money',0);
-        this.registry.set('inventoryData',defaultInventory?.item||[]);
+        this.registry.set('inventoryData',defaultPlayerData?.item||[]);
         this.registry.set('placedItems',[]);
-        this.registry.set('playerPosition',null);
-        this.registry.set('npcPositions',[]);
+        this.registry.set('playerPosition',defaultPlayerData.playerPosition);
+        this.registry.set('npcPositions',defaultNPCData.initialNPCs||[]);
         this.registry.set('salesHistory',[]);
+
+
     }
 }

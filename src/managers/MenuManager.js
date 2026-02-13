@@ -8,6 +8,7 @@ import DictionaryContent from '../contents/DictionaryContent.js';
 import GuideContent from '../contents/GuideContent.js';
 import MachineContent from '../contents/MachineContent.js';
 import SaveContent from '../contents/SaveContent.js';
+import StatisticsContent from '../contents/StatisticsContent.js';
 
 export default class MenuManager{
     constructor(uiScene){
@@ -27,7 +28,8 @@ export default class MenuManager{
             'dictionary':new DictionaryContent(uiScene),
             'guide':new GuideContent(uiScene),
             'machine':new MachineContent(uiScene),
-            'save':new SaveContent(uiScene)
+            'save':new SaveContent(uiScene),
+            'statistics':new StatisticsContent(uiScene)
         };
     }
     get activeScene(){

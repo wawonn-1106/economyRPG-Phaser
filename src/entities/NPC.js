@@ -2,6 +2,8 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
     constructor(scene,x,y,texture,config){
         super(scene,x,y,texture);
 
+        //this.npcId=texture;
+
         scene.physics.world.enable(this);
         scene.add.existing(this);
 

@@ -18,7 +18,8 @@ export default class MenuContent{
             {id:'dictionary',label:'辞書',icon:'dictionary'},
             {id:'settings',label:'設定',icon:'settings'},
             {id:'save',label:'日記',icon:'save'},
-            {id:'returnTitle',label:'タイトルに戻る',icon:'returnTitle'}
+            {id:'statistics',label:'統計',icon:'statistics'},
+            //{id:'returnTitle',label:'タイトルに戻る',icon:'returnTitle'}
         ];
 
         const columns=4;

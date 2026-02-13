@@ -1,9 +1,10 @@
 {
-    "World":[
+    "initialNPCs":[
         {
             "x":800,
             "y":800,
-            "key":"player",
+            "scene":"World",
+            "npcId":"player",
             "startId":"greed",
             "name":"マイク",
             "type":"villager"
@@ -11,7 +12,8 @@
         {
             "x":1200,
             "y":120,
-            "key":"player",
+            "scene":"World",
+            "npcId":"player",
             "startId":"start",
             "name":"ジェシカ",
             "type":"villager"
@@ -19,27 +21,26 @@
         {
             "x":1000,
             "y":1000,
-            "key":"player",
+            "scene":"World",
+            "npcId":"player",
             "startId":"daily",
             "name":"サンドラ",
             "type":"villager"
-        }
-    ],
-    "House":[
+        },
         {
             "x":500,
             "y":500,
-            "key":"player",
+            "scene":"House",
+            "npcId":"player",
             "startId":"greed",
             "name":"オーディン",
             "type":"villager"
-        }
-    ],
-    "Shop":[
+        },
         {
             "x":800,
             "y":800,
-            "key":"player",
+            "scene":"Shop",
+            "npcId":"player",
             "startId":"start",
             "name":"ペルセポネ",
             "type":"villager"

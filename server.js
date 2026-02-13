@@ -23,6 +23,16 @@ const SalesHistoryScheme=new mongoose.Schema({
     npcId:String
 });
 
+const NPCSchema=new mongoose.Schema({
+    npcId:String,
+    scene:String,
+    x:Number,
+    y:Number,
+    name:String,
+    type:String,
+    startId:String
+});
+
 const PlayerSchema=new mongoose.Schema({
     money:{type:Number,default:0},
     inventory:Array,
@@ -32,7 +42,7 @@ const PlayerSchema=new mongoose.Schema({
         y:Number,
         scene:String
     },
-    npcPositions:Array,
+    npcPositions:[NPCSchema],
     salesHistory:[SalesHistoryScheme]
 });
 
@@ -42,14 +52,16 @@ app.post('/save',async(req,res)=>{
     try{
         console.log('受信したデータ：',req.body);
 
+        const updateFields={};
+
+        if(req.body.money!==undefined)updateFields.money=req.body.money;
+        if(req.body.inventory!==undefined)updateFields.inventory=req.body.inventory;
+        if(req.body.placedItems!==undefined)updateFields.placedItems=req.body.placedItems;
+        if(req.body.playerPosition!==undefined)updateFields.playerPositions=req.body.playerPositions;
+        if(req.body.npcPositions!==undefined)updateFields.npcPositions=req.body.npcPositions;
+
         const updateData={
-            $set:{
-                money:req.body.money,
-                inventory:req.body.inventory,
-                placedItems:req.body.placedItems,
-                playerPosition:req.body.playerPosition,
-                npcPositions:req.body.npcPosition
-            }
+            $set:updateFields
         };
 
         if(req.body.newSale){

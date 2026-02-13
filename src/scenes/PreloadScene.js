@@ -78,11 +78,12 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.image('settings','assets/images/settings.png');
         this.load.image('ranking','assets/images/ranking.png');
         this.load.image('profile','assets/images/profile.png');
-        this.load.image('returnTitle','assets/images/returnTitle.png');
+        //this.load.image('returnTitle','assets/images/returnTitle.png');
         this.load.image('inventory','assets/images/inventory.png');
         this.load.image('dictionary','assets/images/dictionary.png');
         this.load.image('guide','assets/images/guide.png');
-        this.load.image('save','assets/images/save.png');//yet
+        this.load.image('save','assets/images/save.png');
+        this.load.image('statistics','assets/images/statistics.png');
 
         
     }

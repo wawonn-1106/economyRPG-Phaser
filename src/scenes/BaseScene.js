@@ -26,8 +26,8 @@ export default class BaseScene extends Phaser.Scene{
 //----------初期化-------------------------------------------------------------------------------------------
     create(data){
         
-        this.initData = data;
-        this.isWraping = false;
+        this.initData=data;
+        this.isWraping=false;
 
         this.initManagers();
         this.initInput();
@@ -50,11 +50,14 @@ export default class BaseScene extends Phaser.Scene{
         if(data&& data.spawnPoint){
             this.setPlayerSpawnPoint(data);/*createEntitesでplayer作る前に実行するとエラーになる。
             かといって、createEntitiesの後に書くと、座標が上書きされて前回の位置からできないから、片方のみ実行*/
+            data.spawnPoint=null;
         }
 
         if(placedItems&& placedItems.length>0){
             this.restorePlacedItems(placedItems);
         }
+
+        this.setupCamera(this.player);//playerの座標が確定した後に呼ばないと、グインってなる
 
         this.events.once('shoutdown',()=>{
             this.physics.world.colliders.destroy();
@@ -78,7 +81,7 @@ export default class BaseScene extends Phaser.Scene{
         this.inventoryManager=new InventoryManager(this);   
         this.menuManager=new MenuManager(this);
         //this.uiScene=new UIScene(this);勘違いしてた。Sceneはインスタンスじゃなくてscene.get('')で取得する
-        const ui = this.scene.get('UIScene'); 
+        const ui=this.scene.get('UIScene'); 
         this.dialogManager.setUIScene(ui);
     }
     initInput(){
@@ -102,8 +105,7 @@ export default class BaseScene extends Phaser.Scene{
     createEntities(playerPos,npcPos){
         console.log("渡されたdata:",playerPos.x,playerPos.y );
         this.player=new Player(this,playerPos.x,playerPos.y,'player'); 
-
-        this.setupCamera(this.player);
+        
         this.setupCollisions(this.player);
 
         this.villagers=this.physics.add.group();
@@ -189,6 +191,11 @@ export default class BaseScene extends Phaser.Scene{
         })
     }
     setupCamera(target){
+        if(!target)return;
+
+        this.cameras.main.scrollX=target.x-this.cameras.main.width/2;
+        this.cameras.main.scrollY=target.y-this.cameras.main.heigth/2;
+
         this.cameras.main.startFollow(target,true,0.1,0.1);
         this.cameras.main.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
     }
@@ -357,9 +364,31 @@ export default class BaseScene extends Phaser.Scene{
             overlay.setScrollFactor(0);
             overlay.setDepth(2000);
         }*/
-//----------データ取得-------------------------------------------------------------------------------------------
+//----------データ保存-------------------------------------------------------------------------------------------
     async saveGameData(){
         try{
+            //const villagersArray = this.villagers.getChildren();
+            //console.log("セーブ対象のNPC数:", villagersArray.length);
+            
+            const allNPCPOsitions=this.registry.get('npcPositions')||[];
+
+            const currentSceneNPCs=this.villagers.getChildren().map(npc=>({
+                npcId:npc.texture.key,
+                x:npc.x,
+                y:npc.y,
+                scene:this.scene.key,
+                startId:npc.startId,
+                type:'villager',
+                name:npc.npcName
+            }));
+
+            const updatedNPCPositions=[
+                ...allNPCPOsitions.filter(n=>n.scene!==this.scene.key),
+                ...currentSceneNPCs
+            ];
+
+            this.registry.set('npcPositions',updatedNPCPositions);
+
             const payload={
                 money:this.registry.get('money')||0,
                 inventory:this.registry.get('inventoryData')||[],
@@ -373,12 +402,10 @@ export default class BaseScene extends Phaser.Scene{
                     scene:this.scene.key
                 },
 
-                npcPositions:this.villagers.getChildren().map(npc=>({
-                    npcId:npc.npcName,
-                    x:npc.x,
-                    y:npc.y
-                }))
+                npcPositions:updatedNPCPositions
             };
+
+            console.log("送信データ:",payload);
         
             const response=await fetch(`${this.SERVER_URL}/save`,{
                 method:'POST',
@@ -393,7 +420,7 @@ export default class BaseScene extends Phaser.Scene{
             console.log('セーブ失敗',error);
         }
     }
-    async recordSale(saleInfo){
+    /*async recordSale(saleInfo){
         try{
             const payload={
                 money:this.registry.get('money'),
@@ -419,7 +446,7 @@ export default class BaseScene extends Phaser.Scene{
         }catch(error){
             console.error('販売履歴の記録に失敗',error);
         }
-    }
+    }*/
     /*async loadGameData(){
         try{
             const response = await fetch(`${this.SERVER_URL}/load`);
