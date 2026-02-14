@@ -1,5 +1,5 @@
 export default class InventoryManager{
-    constructor(scene){
+    constructor(scene){//なんのsceneかわからん
         this.scene=scene;
     }
     removeItem(itemId){

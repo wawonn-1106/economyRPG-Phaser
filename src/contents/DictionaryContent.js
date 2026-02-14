@@ -2,7 +2,7 @@ export default class DictionaryContent{
     constructor(uiScene){
         this.uiScene=uiScene;
 
-        this.worldScene=this.uiScene.scene.get('World');
+        //this.worldScene=this.uiScene.scene.get('World');
         this.quickViewContainer=null;
     }
     createQuickView(termData){
@@ -49,10 +49,15 @@ export default class DictionaryContent{
         return this.quickViewContainer;
     }
     createView(){
+        /*用語はあらかじめダウンロードしておいて、unlockedのjsonデータで表示するか否かを決めてる。
+        用語はこのファイルでダウンロードしてる*/
+        
         const container=this.uiScene.add.container(0,0);
 
         const bg=this.uiScene.add.image(0,0,'dictionary-bg').setDisplaySize(1000,600);
         container.add(bg);
+
+        const unlockedIds=this.uiScene.registry.get('unlockedIds')||[];
 
         const listX=-300;
         const listY=-200;
@@ -71,8 +76,9 @@ export default class DictionaryContent{
         scrollContent.setMask(mask);
 
 
-        const terms=this.worldScene.dictionaryManager.getTerms();//DictionaryManagerがjsonでデータを取る
-        //↑Worldで、this.dictionaryManager=new DictionaryManager(this)をやってる前提
+        const data=this.uiScene.cache.json.get('termsData');
+        const terms=data? data.terms:[];
+
         const listContainer=this.uiScene.add.container(-450,-200);
         container.add(listContainer);
 
@@ -105,22 +111,29 @@ export default class DictionaryContent{
 
         terms.forEach((term,index)=>{//相対座標にするから毎回index使う、他の場所でも
             const y=index*55;
-            const termButton=this.uiScene.add.text(0,y,`${term.word}`,{
+            const isUnlocked=unlockedIds.includes(term.id);
+            const displayText=isUnlocked? term.word:'？？？？？';
+
+            const termButton=this.uiScene.add.text(0,y,displayText,{
                 fontSize:'24px',
-                color:'#000000'
+                color:isUnlocked?'#000':'#999'
             }).setInteractive({useHandCursor:true});//ワードクリックしたら説明が出てくる感じに。
             //見開きの本みたいなUIにしよう
 
-            termButton.on('pointerdown',()=>{
-               wordTitle.setText(term.word);
-               categoryLabel.setText(`カテゴリ：${term.category}`);
-               descriptionText.setText(term.description ||'説明はありません');
-               exampleText.setText(term.example ||'例文はありません'); 
-            });
+            if(isUnlocked){
+                termButton.on('pointerdown',()=>{
+                    wordTitle.setText(term.word);
+                    categoryLabel.setText(`カテゴリ：${term.category}`);
+                    descriptionText.setText(term.description ||'説明はありません');
+                    exampleText.setText(term.example ||'例文はありません'); 
+                });
 
-            termButton.on('pointerover',()=>termButton.setColor('#ffffff'));
-            termButton.on('pointerout',()=>termButton.setColor('#000000'));
-
+                termButton.on('pointerover',()=>termButton.setColor('#000000'));
+                termButton.on('pointerout',()=>termButton.setColor('#00FFFF'));
+            }else{
+                termButton.setAlpha(0.7);
+            }
+            
             scrollContent.add(termButton);
         });
 

@@ -37,6 +37,7 @@ const PlayerSchema=new mongoose.Schema({
     money:{type:Number,default:0},
     inventory:Array,
     placedItems:Array,
+    unlockedIds:{type:[String],default:[]},
     playerPosition:{
         x:Number,
         y:Number,
@@ -58,6 +59,7 @@ app.post('/save',async(req,res)=>{
         const updateFields={};
 
         if(req.body.money!==undefined)updateFields.money=req.body.money;
+        if(req.body.unlockedIds!==undefined)updateFields.unlockedIds=req.body.unlockedIds;
         if(req.body.inventory!==undefined)updateFields.inventory=req.body.inventory;
         if(req.body.placedItems!==undefined)updateFields.placedItems=req.body.placedItems;
         if(req.body.playerPosition!==undefined)updateFields.playerPosition=req.body.playerPosition;
@@ -93,6 +95,7 @@ app.get('/load',async(req,res)=>{
         const player=await Player.findOne({});
         res.json(player || {
             money:0,
+            unlockedIds:[],
             inventory:[],
             placedItems:[],
             playerPosition:null,

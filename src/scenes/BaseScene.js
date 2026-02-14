@@ -84,6 +84,7 @@ export default class BaseScene extends Phaser.Scene{
         this.dictionaryManager=new DictionaryManager(this);
         this.inventoryManager=new InventoryManager(this);   
         this.menuManager=new MenuManager(this);
+        //this.shopManager=new ShopManager(this);
         //this.uiScene=new UIScene(this);勘違いしてた。Sceneはインスタンスじゃなくてscene.get('')で取得する
         const ui=this.scene.get('UIScene'); 
         this.dialogManager.setUIScene(ui);
@@ -257,7 +258,7 @@ export default class BaseScene extends Phaser.Scene{
                 });
             }
 
-            if(obj.name==='fishingSpot'){
+            /*if(obj.name==='fishingSpot'){
 
                 const fishIcon=this.add.image(obj.x+(obj.width/2),obj.y+(obj.height/2),'fishIcon')
                     .setDepth(5)
@@ -292,11 +293,15 @@ export default class BaseScene extends Phaser.Scene{
                     hp:durability,
                     instance:rockSprite
                 });
-            }
+            }*/
         });
     }
     performTransition(nextScene,spawnPoint){
         if(this.isWraping) return;
+
+        const ui=this.scene.get('UIScene');
+        ui.setVisibleUI(false);
+
         this.isWraping=true;
 
         this.player.body.enable=false;
@@ -304,6 +309,7 @@ export default class BaseScene extends Phaser.Scene{
         this.cameras.main.fadeOut(1000,0,0,0);
         this.cameras.main.once('camerafadeoutcomplete',()=>{
             //this.isWraping=false;
+            ui.setVisibleUI(true);
 
             this.scene.start(nextScene,{spawnPoint:spawnPoint});
            // this.scene.start(nextScene,spawnPoint);
@@ -385,6 +391,7 @@ export default class BaseScene extends Phaser.Scene{
             const payload={
                 money:this.registry.get('money')||0,
                 inventory:this.registry.get('inventoryData')||[],
+                unlockedIds:this.registry.get('unlockedIds')||[],
                 placedItems:this.interactables
                     .filter(item=>item.isPlaced)
                     .map(item=>({id:item.type,x:item.x,y:item.y})),
@@ -439,37 +446,6 @@ export default class BaseScene extends Phaser.Scene{
             console.log('販売履歴を記録しました');
         }catch(error){
             console.error('販売履歴の記録に失敗',error);
-        }
-    }*/
-    /*async loadGameData(){
-        try{
-            const response = await fetch(`${this.SERVER_URL}/load`);
-            const data = await response.json();
-            
-            //this.money = data.money || 0;
-            this.registry.set('money',data.money||0);
-            this.registry.set('inventoryData',data.inventory||[]);
-
-            if(data.placedItems){
-                this.restorePlacedItems(data.placedItems);
-            }
-
-            if(data.playerPosition&& data.playerPosition.scene===this.scene.key){
-                this.player.setPosition(data.playerPosition.x,data.playerPosition.y)
-            }
-
-            if(data.npcPosition){
-                data.npcPosition.forEach(npcPos=>{
-                    const npc=this.villagers.getChildren().find(v=>v.npcName===npcPos.npcId);
-
-                    if(npc){
-                        npc.setPosition(npcPos.x,npcPos.y);
-                    }
-                });
-            }
-            console.log('ロード完了！:', this.money);
-        }catch(error){
-            console.log('ロード失敗、初期データを使用します', error);
         }
     }*/
     applySaveData(data){
@@ -530,7 +506,8 @@ export default class BaseScene extends Phaser.Scene{
                     break;
                 case 'displayShelf':
                     //店に並べる画面
-                    console.log('クリックされた');
+                    
+                    this.menuManager.toggle('shop');
                     break;
             }
         }                

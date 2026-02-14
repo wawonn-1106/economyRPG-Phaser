@@ -49,6 +49,7 @@
     "type":"text",
     "text":"最近、[area=機会費用]機会費用[/area]がしんどいわ。",
     "portrait":"player",
-    "next":"end"
+    "next":"end",
+    "unlock":"opportunity_cost"
   }
 ]

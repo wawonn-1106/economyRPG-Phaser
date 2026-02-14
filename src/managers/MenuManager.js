@@ -9,6 +9,7 @@ import GuideContent from '../contents/GuideContent.js';
 import MachineContent from '../contents/MachineContent.js';
 import SaveContent from '../contents/SaveContent.js';
 import StatisticsContent from '../contents/StatisticsContent.js';
+import ShopContent from '../contents/ShopContent.js';
 
 export default class MenuManager{
     constructor(uiScene){
@@ -19,6 +20,7 @@ export default class MenuManager{
         this.currentView=null;
 
         this.contents={
+        //--------------------メニュー------------------------------
             'menu':new MenuContent(uiScene,this),
             'inventory':new InventoryContent(uiScene),
             'profile':new ProfileContent(uiScene,0,0),
@@ -29,7 +31,9 @@ export default class MenuManager{
             'guide':new GuideContent(uiScene),
             'machine':new MachineContent(uiScene),
             'save':new SaveContent(uiScene),
-            'statistics':new StatisticsContent(uiScene)
+            'statistics':new StatisticsContent(uiScene),
+        //----------------------店-----------------------------------
+            'shop':new ShopContent(uiScene,this)
         };
     }
     get activeScene(){
@@ -93,6 +97,9 @@ export default class MenuManager{
                 this.uiScene.scale.width/2,
                 this.uiScene.scale.height/2,
             );
+
+            if (this.currentView.setScrollFactor) this.currentView.setScrollFactor(0);
+            if (this.currentView.setDepth) this.currentView.setDepth(4000);
         }
     }
 }

@@ -43,6 +43,10 @@ export default class DialogManager {
 
         const line=this.currentSequence[this.currentIndex];
 
+        if(line.unlock){
+            this.scene.dictionaryManager.unlock(line.unlock);
+        }
+
         const displayText = (line.text || '')
             .replaceAll('[[NAME]]', this.playerName); //全てのdialogは一回ここを通る
           //.replaceAll([[]],this);

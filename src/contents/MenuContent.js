@@ -1,6 +1,6 @@
 export default class MenuContent{
-    constructor(scene,menuManager){//MenuManagerを経由してBaseSceneとMenuManagerのsceneを受け取る
-        this.scene=scene;
+    constructor(scene,menuManager){//MenuManagerを経由してUISceneとMenuManagerのsceneを受け取る
+        this.scene=scene;//このsceneはUIScene
         this.menuManager=menuManager;
     }
     createView(){

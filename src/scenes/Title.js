@@ -31,6 +31,7 @@ export default class Title extends Phaser.Scene{
                 const data=await response.json();
 
                 this.registry.set('money',data.money||0);
+                this.registry.set('unlockedIds',data.unlockedIds||[]);
                 this.registry.set('inventoryData',data.inventory||[]);
                 this.registry.set('placedItems',data.placedItems||[]);
                 this.registry.set('playerPosition',data.playerPosition||null);
@@ -76,6 +77,7 @@ export default class Title extends Phaser.Scene{
         const defaultNPCData=this.cache.json.get('NPCData');
 
         this.registry.set('money',0);
+        this.registry.set('unlockedIds',[]);
         this.registry.set('inventoryData',defaultPlayerData?.item||[]);
         this.registry.set('placedItems',[]);
         this.registry.set('playerPosition',defaultPlayerData.playerPosition);

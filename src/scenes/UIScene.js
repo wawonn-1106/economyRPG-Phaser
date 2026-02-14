@@ -150,6 +150,21 @@ export default class UIScene extends Phaser.Scene{
             }
         });
     }
+    setVisibleUI(visible){
+        this.decorationBtn?.setVisible(visible);
+        this.menuBtn?.setVisible(visible);
+        this.guideButton?.setVisible(visible);
+
+        this.timeBg?.setVisible(visible);
+        this.dayText?.setVisible(visible);
+        this.clockText?.setVisible(visible);
+
+        const showHotbar=visible&& this.isDecorationMode;
+        this.hotbar?.setVisible(showHotbar);
+        this.selector?.setVisible(showHotbar);
+        this.hotbarIcons.forEach(icon=>icon?.setVisible(showHotbar));
+        this.hotbarTexts.forEach(text=>text?.setVisible(showHotbar));
+    }
 //---------------------ホットバー系------------------------------------------------------------------------------------------------------------------
     createHotbar(){
         //if(!this.isDecorationMode)return;
@@ -413,7 +428,7 @@ export default class UIScene extends Phaser.Scene{
         const x=gameWidth-120;
         const y=80;
 
-        this.timeBg=this.add.image(x,y,'time-bg').setScale(3);
+        this.timeBg=this.add.image(x,y,'time-bg').setScale(3).setDepth(3001);
 
         this.dayText=this.add.text(x,y-20,`Day${this.gameTime.day}`,{
             fontSize:'18px',
@@ -421,7 +436,7 @@ export default class UIScene extends Phaser.Scene{
             stroke:'#000000',
             strokeThickness:2,
             fontStyle:'bold'
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setDepth(3001);
 
         this.clockText=this.add.text(x,y+10,'06:00 AM',{
             fontSize:'22px',
@@ -429,7 +444,7 @@ export default class UIScene extends Phaser.Scene{
             stroke:'#000000',
             strokeThickness:3,
             fontFamily:'sans-serif'
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setDepth(3001);
     }
     advanceTime(){
         this.gameTime.minute+=10;
@@ -442,7 +457,7 @@ export default class UIScene extends Phaser.Scene{
         if(this.gameTime.hour>=24){
             this.gameTime.hour=0;
             this.gameTime.day++;
-            this.dayText.setText(`Day${this.gameTime.day}`);
+            this.dayText.setText(`Day${this.gameTime.day}`).setDepth(3001);
         }
 
         this.updateClock();
