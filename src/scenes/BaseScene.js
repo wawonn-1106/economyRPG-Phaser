@@ -17,17 +17,21 @@ export default class BaseScene extends Phaser.Scene{
         this.readyActionType=null;
         this.actionTarget=null;
         this.isWraping=false;
+        this.currentWeather='Clear';
 
         this.placePreview=null;
         this.canPlace=false;
 
         this.SERVER_URL='http://localhost:3000';
+        //this.WEATHER_SERVER_URL='http://localhost:3000';
     }
 //----------初期化-------------------------------------------------------------------------------------------
     create(data){
         
         this.initData=data;
         this.isWraping=false;
+
+        //await this.fetchWeather();
 
         this.initManagers();
         this.initInput();
@@ -63,15 +67,15 @@ export default class BaseScene extends Phaser.Scene{
             this.physics.world.colliders.destroy();
         });
 
-        /*if(this.currentWeather==='Rain'){
+        this.currentWeather=this.registry.get('weather')||'Clear';
+
+        if(this.currentWeather==='Rain'){
             this.createRain();
         }else if(this.currentWeather==='Snow'){
             this.createSnow();
         }else if(this.currentWeather==='Clouds'){
-                    this.createClouds();
-        }*/
-
-        
+            this.createClouds();
+        }
     }
     initManagers(){
         this.dialogManager=new DialogManager(this);
@@ -103,6 +107,13 @@ export default class BaseScene extends Phaser.Scene{
         this.decorationGrid.setDepth(20000);
     }
     createEntities(playerPos,npcPos){
+        if(this.villagers){
+            this.villagers.destroy(true);
+            this.villagers=null;
+        }
+
+        this.interactables=this.interactables.filter(item =>item.type!=='npc');
+
         console.log("渡されたdata:",playerPos.x,playerPos.y );
         this.player=new Player(this,playerPos.x,playerPos.y,'player'); 
         
@@ -316,54 +327,36 @@ export default class BaseScene extends Phaser.Scene{
         }
     }
 //----------天気-------------------------------------------------------------------------------------------
-    /*async fetchWeather(){//Rain,Snowを取得。
-            const API_KEY=process.env.WEATHER_API_KEY;
-            const lat=34.40;
-            const lon=133.20;
-            const URL=`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
-    
-            try{
-                const response=await fetch(URL);
-                if(!response.ok) throw new Error('天気データの取得に失敗しました');
-    
-                const data=await response.json();
-    
-                this.currentWeather=data.weather[0].main;
-                console.log('現在の尾道の天気：',this.currentWeather);
-    
-            }catch(error){
-                console.error('天気データの取得に失敗しました：',error);
-                this.currentWeather='Clear';//失敗したら晴れ
-            }//明日ぐらいにやる
-        }*/
-        /*createRain(){
-            this.weatherEffect=this.add.particles(0,0,'rain',{//画像のダウンロード必要、snowも
-                x:{min:0,max:1280},
-                y:-10,
-                lifespan:2000,
-                speedY:{min:400,max:600},
-                quality:5,
-                scrollFactor:0
-            });
-        }
-        createSnow(){
-            this.weatherEffect=this.add.particles(0,0,'snow',{
-                x:{min:0,max:1280},
-                y:-10,
-                lifespan:8000,
-                speedX:{min:50,max:100},
-                speedY:{min:-20,max:20},
-                quality:2,
-                scrollFactor:0
-            });
-        }
-        createClouds(){
-            const overlay=this.add.rectangle(0,0,1280,720,0x333344,0.4);//画面全体を曇らせる
-    
-            overlay.setOrigin(0,0);
-            overlay.setScrollFactor(0);
-            overlay.setDepth(2000);
-        }*/
+    createRain(){
+        this.weatherEffect=this.add.particles(0,0,'rain',{//画像のダウンロード必要、snowも
+            x:{min:0,max:1280},
+            y:-10,
+            lifespan:2000,
+            speedY:{min:400,max:600},
+            quantity:5,
+            scrollFactor:0
+        });
+    }
+    createSnow(){
+        this.weatherEffect=this.add.particles(0,0,'snow',{
+            x:{min:0,max:1280},
+            y:-20,
+            lifespan:10000,
+            speedX:{min:-30,max:30},
+            speedY:{min:40,max:90},
+            scale:{start:0.4,end:0.8},
+            quantity:2,
+            scrollFactor:0
+        });
+        this.weatherEffect.setDepth(1000);
+    }
+    createClouds(){
+        const overlay=this.add.rectangle(0,0,1280,720,0x333344,0.4);//画面全体を曇らせる    
+
+        overlay.setOrigin(0,0);
+        overlay.setScrollFactor(0);
+        overlay.setDepth(2000);      
+    }
 //----------データ保存-------------------------------------------------------------------------------------------
     async saveGameData(){
         try{
@@ -414,6 +407,7 @@ export default class BaseScene extends Phaser.Scene{
             });
 
             const result=await response.json();
+
             console.log('セーブ成功',result);
 
         }catch(error){

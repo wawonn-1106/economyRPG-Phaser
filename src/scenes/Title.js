@@ -37,6 +37,8 @@ export default class Title extends Phaser.Scene{
                 this.registry.set('npcPositions',data.npcPositions||[]);
                 this.registry.set('salesHistory',data.salesHistory||[]);
 
+                await this.fetchWeather();
+
                 const playerPos=data.playerPosition;
 
                 if(playerPos&& playerPos.scene){
@@ -46,7 +48,7 @@ export default class Title extends Phaser.Scene{
                         this.scene.start(playerPos.scene);//座標はBaseSceneで
                     });
                 }else{
-                    console.error('セーブデータが不完全です',error);
+                    console.error('セーブデータが不完全です');
                 }
             }catch(error){
                 console.error('ロード失敗',error);
@@ -55,11 +57,11 @@ export default class Title extends Phaser.Scene{
 
         const startBtn=this.add.image(640,550,'start-btn').setInteractive({useHandCursor:true});
 
-        startBtn.on('pointerdown',()=>{
+        startBtn.on('pointerdown',async()=>{
             startBtn.disableInteractive();
             //continueBtn.disableInteractive();
 
-            this.resetGameRegistry();
+            await this.resetGameRegistry();
 
             this.cameras.main.fadeOut(1000,0,0,0);
 
@@ -69,7 +71,7 @@ export default class Title extends Phaser.Scene{
             });
         });
     }
-    resetGameRegistry(){
+    async resetGameRegistry(){
         const defaultPlayerData=this.cache.json.get('playerData');
         const defaultNPCData=this.cache.json.get('NPCData');
 
@@ -80,6 +82,22 @@ export default class Title extends Phaser.Scene{
         this.registry.set('npcPositions',defaultNPCData.initialNPCs||[]);
         this.registry.set('salesHistory',[]);
 
+        await this.fetchWeather();
 
+
+    }
+    async fetchWeather(){//Rain,Snowを取得。
+        try{
+            const response=await fetch(`${this.SERVER_URL}/weather`);
+            const data=await response.json();
+            this.registry.set('weather',data.main);
+    
+            //this.currentWeather=data.main;
+            console.log('現在の尾道の天気：',data.main);
+    
+        }catch(error){
+            console.error('天気データの取得に失敗しました：',error);
+            this.registry.set('weather','Clear');//失敗したら晴れ
+        }
     }
 }

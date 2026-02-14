@@ -49,6 +49,9 @@ const PlayerSchema=new mongoose.Schema({
 const Player=mongoose.model('Player',PlayerSchema);
 
 app.post('/save',async(req,res)=>{
+    console.log('--- Save Request Received ---');
+    console.log('Body Keys:', Object.keys(req.body)); 
+    console.log('Raw Body:', JSON.stringify(req.body, null, 2));
     try{
         console.log('受信したデータ：',req.body);
 
@@ -57,7 +60,7 @@ app.post('/save',async(req,res)=>{
         if(req.body.money!==undefined)updateFields.money=req.body.money;
         if(req.body.inventory!==undefined)updateFields.inventory=req.body.inventory;
         if(req.body.placedItems!==undefined)updateFields.placedItems=req.body.placedItems;
-        if(req.body.playerPosition!==undefined)updateFields.playerPositions=req.body.playerPositions;
+        if(req.body.playerPosition!==undefined)updateFields.playerPosition=req.body.playerPosition;
         if(req.body.npcPositions!==undefined)updateFields.npcPositions=req.body.npcPositions;
 
         const updateData={
@@ -68,7 +71,9 @@ app.post('/save',async(req,res)=>{
             updateData.$push={salesHistory:req.body.newSale};
         }
 
-        const player=await Player.findOneAndUpdate({},updateData,{
+        const player=await Player.findOneAndUpdate(
+            {_id: "698d4a83b16e85a9124a347f"},
+            updateData,{
             upsert:true,
             new:true
         });
@@ -98,5 +103,21 @@ app.get('/load',async(req,res)=>{
         res.status(500).send('読み込み失敗');
     }
 });
-
+//---------------------------天気--------------------------------------------------------------
+app.get('/weather',async(req,res)=>{//Rain,Snowを取得。
+    try{
+        const API_KEY=process.env.WEATHER_API_KEY;
+        const lat=34.40;
+        const lon=133.20;
+        const URL=`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+        
+        const response=await fetch(URL);
+        const data=await response.json();
+    
+        res.json({main:data.weather[0].main});
+    
+    }catch(error){
+        res.status(500).json({main:'Clear'});
+    }
+});
 app.listen(3000,()=>console.log('Server is running'));

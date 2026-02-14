@@ -45,8 +45,8 @@ export default class PreloadScene extends Phaser.Scene{
                 spacing:0
         });*/
 //--------------------------------天気------------------------------------------------------
-        this.load.image('rain','assets/images/player.png');
-        this.load.image('snow','assets/images/player.png');
+        this.load.image('rain','assets/images/rain.png');
+        this.load.image('snow','assets/images/snow.png');
 //--------------------------------json------------------------------------------------------
         this.load.json('chapter1','assets/data/dialog1.json');
         this.load.json('termsData','assets/data/dictionary.json');
