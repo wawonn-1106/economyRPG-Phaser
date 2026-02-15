@@ -6,13 +6,15 @@ import DictionaryManager from '../managers/DictionaryManager.js';
 import MachineManager from '../managers/MachineManager.js';
 import NPC from "../entities/NPC.js";
 import Player from "../entities/Player.js";
+import ShopContent from "../contents/ShopContent.js";
 
 export default class BaseScene extends Phaser.Scene{
     constructor(config){
         super(config);
 
         this.interactables=[];
-        this.inventoryData = [];
+        this.allShelves=[];
+        this.inventoryData=[];
         this.readyIcon=null;
         this.readyActionType=null;
         this.actionTarget=null;
@@ -48,7 +50,7 @@ export default class BaseScene extends Phaser.Scene{
         const npcPos=this.registry.get('npcPositions');
         const placedItems=this.registry.get('placedItems');
 
-        this.inventoryData=inventory;
+        this.inventoryData=inventory||[];
 
         this.createEntities(playerPos,npcPos);
         
@@ -252,11 +254,19 @@ export default class BaseScene extends Phaser.Scene{
             }
 
             if(obj.name==='displayShelf'){
+                const ui=this.scene.get('UIScene');
+                const defaultShelfId=obj.properties?.find(p=>p.name==='shelfId')?.value;
+
+                const newShelf=new ShopContent(ui,this.menuManager,defaultShelfId);
+
+                this.allShelves.push(newShelf);
+
                 this.interactables.push({
                     type:'displayShelf',
                     data:obj,
                     x:obj.x+(obj.width/2),
-                    y:obj.y+(obj.height/2)
+                    y:obj.y+(obj.height/2),
+                    shelfId: defaultShelfId
                 });
             }
 
@@ -400,14 +410,27 @@ export default class BaseScene extends Phaser.Scene{
 
             this.registry.set('npcPositions',updatedNPCPositions);
 
+            //const shelvesData=this.allShelves? this.allShelves.map(s=>s.shelfData):[this.shelfContent.shelfData];
+            let shelvesData=this.registry.get('shelvesData')||[];
+
+            if(this.allShelves&& this.allShelves.length>0){
+                shelvesData=this.allShelves.map(s=>s.shelfData);
+            }
+
             const payload={
                 money:this.registry.get('money')||0,
                 inventory:this.registry.get('inventoryData')||[],
+                shelves:shelvesData,
                 maxInventorySlots:this.registry.get('maxInventorySlots')||10,
                 unlockedIds:this.registry.get('unlockedIds')||[],
                 placedItems:this.interactables
                     .filter(item=>item.isPlaced)
-                    .map(item=>({id:item.type,x:item.x,y:item.y})),
+                    .map(item=>({
+                        id:item.type,
+                        x:item.x,
+                        y:item.y,
+                        shelfId:item.shelfId
+                    })),
                 
                 playerPosition:{
                     x:this.player.x,
@@ -522,10 +545,15 @@ export default class BaseScene extends Phaser.Scene{
                 case 'machine':
                     this.menuManager.toggle('machine');
                     break;
-                case 'displayShelf':
+                case 'displayShelf'://shelfに変える
                     //店に並べる画面
-                    
-                    this.menuManager.toggle('shop');
+                    const currentShelfId=this.actionTarget.shelfId;
+
+                    const targetShelf=this.allShelves.find(s=>s.id===currentShelfId);
+
+                    if(targetShelf){
+                        this.menuManager.toggle('shop',targetShelf);
+                    }
                     break;
             }
         }                
@@ -650,6 +678,19 @@ export default class BaseScene extends Phaser.Scene{
 
         const newItem=this.add.sprite(x,y,selectedItem.id).setDepth(y);
 
+        let shelfId=null;
+
+        if(selectedItem.id.includes('shelf')){
+            shelfId=`shelf_${Date.now()}`;
+
+            const ui=this.scene.get('UIScene');
+            const createNewShelf=new ShopContent(ui,this.menuManager,shelfId);
+
+            if(!this.allShelves)this.allShelves=[];
+
+            this.allShelves.push(createNewShelf);
+        }
+
         this.physics.add.existing(newItem,true);
         this.physics.add.collider(this.player,newItem);
         this.physics.add.collider(this.villagers,newItem);
@@ -659,7 +700,8 @@ export default class BaseScene extends Phaser.Scene{
             instance:newItem,
             x:x,
             y:y,
-            isPlaced:true//回収するときのフラグ
+            isPlaced:true,//回収するときのフラグ
+            shelfId:shelfId
         });
 
         selectedItem.count--;
@@ -740,12 +782,22 @@ export default class BaseScene extends Phaser.Scene{
                 this.physics.add.collider(this.villagers,newItem);
             }
 
+            if(item.shelfId){
+                const ui=this.scene.get('UIScene');
+                const resotreShelf=new ShopContent(ui,this.menuManager,item.shelfId);
+
+                if(!this.allShelves)this.allShelves=[];
+
+                this.allShelves.push(resotreShelf);
+            }
+
             this.interactables.push({
                 type:item.id,
                 instance:newItem,
                 x:item.x,
                 y:item.y,
-                isPlaced:true
+                isPlaced:true,
+                shelfId:item.shelfId
             });
         });
     }

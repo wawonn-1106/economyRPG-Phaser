@@ -39,7 +39,7 @@ export default class MenuManager{
     get activeScene(){
         return this.uiScene.scene.manager.getScenes(true).find(s=>s.scene.key!=='UIScene');
     }
-    toggle(tabId){
+    toggle(tabId,data=null){
         const activeScene=this.activeScene;
         if(activeScene.dialogManager.inputMode||activeScene.dialogManager.isTalking)return;
 
@@ -50,7 +50,7 @@ export default class MenuManager{
         if(this.currentTab===tabId){
             this.closeMenu();
         }else{
-            this.switchTab(tabId);
+            this.switchTab(tabId,data);//どのshelfを開くか。他のcontentでも使える共通。
         }
     }
     openMenu(tabId){
@@ -73,7 +73,7 @@ export default class MenuManager{
         }
 
     }
-    switchTab(tabId){
+    switchTab(tabId,data=null){
         this.currentTab=tabId;
         if(this.currentTab==='returnTitle'){
                 this.closeMenu();
@@ -95,7 +95,7 @@ export default class MenuManager{
 
         const content=this.contents[tabId];
         if(content){
-            this.currentView=content.createView();
+            this.currentView=content.createView(data);
 
             this.currentView.setPosition(
                 this.uiScene.scale.width/2,

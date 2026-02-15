@@ -426,6 +426,12 @@
                  "height":151.515151515152,
                  "id":5,
                  "name":"displayShelf",
+                 "properties":[
+                        {
+                         "name":"shelfId",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

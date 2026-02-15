@@ -34,6 +34,7 @@ export default class Title extends Phaser.Scene{
                 this.registry.set('unlockedIds',data.unlockedIds||[]);
                 this.registry.set('inventoryData',data.inventory||[]);
                 this.registry.set('maxInventorySlots',data.maxInventorySlots||10);
+                this.registry.set('shelvesData',data.shelves||[]);
                 this.registry.set('placedItems',data.placedItems||[]);
                 this.registry.set('playerPosition',data.playerPosition||null);
                 this.registry.set('npcPositions',data.npcPositions||[]);
@@ -84,6 +85,7 @@ export default class Title extends Phaser.Scene{
         this.registry.set('unlockedIds',[]);
         this.registry.set('inventoryData',defaultInventoryData?.items||[]);
         this.registry.set('maxInventorySlots',10);
+        this.registry.set('shelvesData',[]);
         this.registry.set('placedItems',[]);
         this.registry.set('playerPosition',defaultPlayerData.playerPosition);
         this.registry.set('npcPositions',defaultNPCData.initialNPCs||[]);

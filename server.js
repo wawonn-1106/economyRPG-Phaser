@@ -38,6 +38,7 @@ const PlayerSchema=new mongoose.Schema({
     inventory:Array,
     maxInventorySlots:{type:Number,default:10},
     placedItems:Array,
+    shelves:{type:Array,default:[]},
     unlockedIds:{type:[String],default:[]},
     playerPosition:{
         x:Number,
@@ -64,6 +65,7 @@ app.post('/save',async(req,res)=>{
         if(req.body.inventory!==undefined)updateFields.inventory=req.body.inventory;
         if(req.body.maxInventorySlots!==undefined)updateFields.maxInventorySlots=req.body.maxInventorySlots;
         if(req.body.placedItems!==undefined)updateFields.placedItems=req.body.placedItems;
+        if(req.body.shelves!==undefined)updateFields.shelves=req.body.shelves;
         if(req.body.playerPosition!==undefined)updateFields.playerPosition=req.body.playerPosition;
         if(req.body.npcPositions!==undefined)updateFields.npcPositions=req.body.npcPositions;
 
