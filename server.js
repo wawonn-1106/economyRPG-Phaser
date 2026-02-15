@@ -36,6 +36,7 @@ const NPCSchema=new mongoose.Schema({
 const PlayerSchema=new mongoose.Schema({
     money:{type:Number,default:0},
     inventory:Array,
+    maxInventorySlots:{type:Number,default:10},
     placedItems:Array,
     unlockedIds:{type:[String],default:[]},
     playerPosition:{
@@ -61,6 +62,7 @@ app.post('/save',async(req,res)=>{
         if(req.body.money!==undefined)updateFields.money=req.body.money;
         if(req.body.unlockedIds!==undefined)updateFields.unlockedIds=req.body.unlockedIds;
         if(req.body.inventory!==undefined)updateFields.inventory=req.body.inventory;
+        if(req.body.maxInventorySlots!==undefined)updateFields.maxInventorySlots=req.body.maxInventorySlots;
         if(req.body.placedItems!==undefined)updateFields.placedItems=req.body.placedItems;
         if(req.body.playerPosition!==undefined)updateFields.playerPosition=req.body.playerPosition;
         if(req.body.npcPositions!==undefined)updateFields.npcPositions=req.body.npcPositions;
@@ -97,6 +99,7 @@ app.get('/load',async(req,res)=>{
             money:0,
             unlockedIds:[],
             inventory:[],
+            maxInventorySlots:10,
             placedItems:[],
             playerPosition:null,
             npcPositions:[],

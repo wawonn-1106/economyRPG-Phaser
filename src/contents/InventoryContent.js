@@ -11,7 +11,13 @@ export default class InventoryContent{
         container.add(bg);
 
         const items=this.uiScene.registry.get('inventoryData');
-        const maxSlots=this.uiScene.registry.get('maxInventorySlots')||10;//後で追加
+        const maxSlots=this.uiScene.registry.get('maxInventorySlots')||10;
+        /*備忘録　maxInventorySlotsの追加→server.jsでPlayerSchemaとupdateFiledで追加、
+        app.get('/load'、でmaxInventorySlots:9,を追加(初期値)。
+        BaseSceneのsaveGameDataにてpayloadにmaxInventorySlots:this.registry.get('maxInventorySlots')||9,
+        を追加。TitleでresetGameRegistryとcontinueボタンのところthis.registry.set('maxInventorySlots ||9);
+        何を追加するとしても↑の手順は踏む。
+        */
 
         const startX=-410;
         const backPackStartY=-125;

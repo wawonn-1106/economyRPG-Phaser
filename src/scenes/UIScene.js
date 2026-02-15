@@ -253,10 +253,15 @@ export default class UIScene extends Phaser.Scene{
 
                 if(this.heldItem.count<=0) this.heldItem=null;
             }else{
-                const tempItem=JSON.parse(JSON.stringify(clickedItem))||{id:null,count:0};
+                const tempItem=JSON.parse(JSON.stringify(clickedItem||{id:null,count:0}));
                 inventory[targetIndex]=JSON.parse(JSON.stringify(this.heldItem));
 
-                this.heldItem=(tempItem===null)? null:tempItem;
+                //this.heldItem=(tempItem===null)? null:tempItem;
+                if(tempItem.id==null){
+                    this.heldItem=null;
+                }else{
+                    this.heldItem=tempItem;
+                }
             }
         }
         this.registry.set('inventoryData',inventory);

@@ -403,6 +403,7 @@ export default class BaseScene extends Phaser.Scene{
             const payload={
                 money:this.registry.get('money')||0,
                 inventory:this.registry.get('inventoryData')||[],
+                maxInventorySlots:this.registry.get('maxInventorySlots')||10,
                 unlockedIds:this.registry.get('unlockedIds')||[],
                 placedItems:this.interactables
                     .filter(item=>item.isPlaced)
