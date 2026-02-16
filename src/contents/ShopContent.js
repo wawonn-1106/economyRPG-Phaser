@@ -64,7 +64,12 @@ export default class ShopContent{
         return this.container;
     }
     refresh(){
+        //const currentInv = this.uiScene.registry.get('inventoryData');
         console.log("refresh");
+        //console.log("現在のRegistry在庫状況:", JSON.parse(JSON.stringify(currentInv)));
+        const rawData=this.currentInventory;
+        console.log("Registry直取りデータ:",rawData);
+
         this.renderInventory(-220);
         this.renderSettingsPanel(220);
     }
@@ -174,10 +179,8 @@ export default class ShopContent{
         this.settingsLayer.add(text);
     }
     renderQualitySelector(centerX,id){
-        const inventory=this.uiScene.registry.get('inventoryData')||[];
-        //const inventory=rawData.items||[];
-
-        const itemData=inventory.find(item=>item.id===id);
+        const itemData=this.currentInventory.find(item=>item.id===id);
+        
 
         if(!itemData)return;
 
@@ -327,10 +330,13 @@ export default class ShopContent{
     confirmPlace(){
         if(!this.editingItem)return;
 
-        const inventory=this.uiScene.registry.get('inventoryData')||[];
+        let inventory=[...this.uiScene.registry.get('inventoryData')]||[];
         //const inventory=rawData.items||[];
 
-        const itemData=inventory.find(i=>i.id===this.editingItem.id);
+        const itemIndex=inventory.findIndex(i=>i.id===this.editingItem.id);
+
+        let itemData={...inventory[itemIndex]};
+        itemData.qualityDetails=[...itemData.qualityDetails];
 
             //itemData.count--;
 
@@ -338,6 +344,8 @@ export default class ShopContent{
             itemData.qualityDetails[this.editingItem.qualityIndex]--;
 
             itemData.count=itemData.qualityDetails.reduce((a,b)=>a+b,0);
+
+            inventory[itemIndex]=itemData;
 
             //this.shelfData.item={...this.editingItem};
             this.targetShelf.shelfData.item={
@@ -353,7 +361,7 @@ export default class ShopContent{
             this.editingItem=null;
             this.selectedId=null;
 
-            this.uiScene.registry.set('inventoryData',inventory);
+            this.uiScene.registry.set('inventoryData',[...inventory]);
             this.uiScene.registry.set(`shelf_save_${this.targetShelf.id}`,this.targetShelf.shelfData.item);
 
             console.log("陳列完了:",this.targetShelf.shelfData.item);
@@ -366,18 +374,20 @@ export default class ShopContent{
     cancelShelf(){
         if(!this.targetShelf||!this.targetShelf.shelfData.item)return;
 
-        const inventory=this.uiScene.registry.get('inventoryData')||[];
-        //const inventory=rawData.items||[];
-
+        let inventory=[...this.uiScene.registry.get('inventoryData')]||[];
         const returnItem=this.targetShelf.shelfData.item;
+        const itemIndex=inventory.findIndex(i=>i.id===returnItem.id);
 
-        let itemData=inventory.find(i=>i.id===returnItem.id/*&& i.quality===returnItem.quality*/);
-        if(itemData){
+        if(itemIndex!==-1){
+            let itemData={...inventory[itemIndex]};
+            itemData.qualityDetails=[...itemData.qualityDetails];
+
             itemData.qualityDetails[returnItem.qualityIndex]++;
             itemData.count=itemData.qualityDetails.reduce((a,b)=>a+b,0);
 
-            this.uiScene.registry.set('inventoryData',inventory);
+            inventory[itemIndex]=itemData;
 
+            this.uiScene.registry.set('inventoryData',[...inventory]);
         }
 
         this.targetShelf.shelfData.item=null;
@@ -387,5 +397,12 @@ export default class ShopContent{
         this.editingItem=null;
 
         this.refresh();
+    }
+    get currentInventory(){
+        const data=this.uiScene.registry.get('inventoryData')||[];
+
+        console.log('ゲッターのデータ',JSON.parse(JSON.stringify(data)));
+        return data;
+        
     }
 }

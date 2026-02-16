@@ -57,9 +57,9 @@ export default class MenuManager{
         const activeScene=this.activeScene;
         if(activeScene.dialogManager.inputMode||activeScene.dialogManager.isTalking)return;
 
-        if(this.uiScene.isDecorationMode){
+        /*if(this.uiScene.isDecorationMode){
             this.uiScene.toggleDecorationMode();
-        }
+        }*/
 
         this.isOpenMenu=true;
         this.switchTab(tabId,data);

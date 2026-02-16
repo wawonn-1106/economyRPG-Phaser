@@ -39,9 +39,9 @@ export default class BaseScene extends Phaser.Scene{
 
         this.initManagers();
         this.initInput();
-        this.initPlacementPreview();
-        this.initDecorationGrid();
-        this.initAnimations();
+        //this.initPlacementPreview();
+        //this.initDecorationGrid();
+        //this.initAnimations();
         //this.initPlacementPreview();
 
         //this.loadGameData();
@@ -61,9 +61,9 @@ export default class BaseScene extends Phaser.Scene{
             data.spawnPoint=null;
         }
 
-        if(placedItems&& placedItems.length>0){
+        /*if(placedItems&& placedItems.length>0){
             this.restorePlacedItems(placedItems);
-        }
+        }*/
 
         this.setupCamera(this.player);//playerの座標が確定した後に呼ばないと、グインってなる
 
@@ -103,7 +103,7 @@ export default class BaseScene extends Phaser.Scene{
             this.handleAction();//スペース押されたら、アクションを起こせるかどうかの可否と、アクションへの分岐
         })
     }
-    initPlacementPreview(){
+    /*initPlacementPreview(){
         this.placePreview=this.add.sprite(0,0,'')
             .setAlpha(0.5)
             .setVisible(false)
@@ -112,7 +112,7 @@ export default class BaseScene extends Phaser.Scene{
     initDecorationGrid(){
         this.decorationGrid=this.add.graphics();
         this.decorationGrid.setDepth(20000);
-    }
+    }*/
     createEntities(playerPos,npcPos){
         if(this.villagers){
             this.villagers.destroy(true);
@@ -324,9 +324,9 @@ export default class BaseScene extends Phaser.Scene{
         const ui=this.scene.get('UIScene');
         ui.setVisibleUI(false);
 
-        if(ui.isDecorationMode){
+        /*if(ui.isDecorationMode){
             ui.toggleDecorationMode();
-        }
+        }*/
 
         this.isWraping=true;
 
@@ -433,7 +433,7 @@ export default class BaseScene extends Phaser.Scene{
                 shelves:shelvesData,
                 maxInventorySlots:this.registry.get('maxInventorySlots')||10,
                 unlockedIds:this.registry.get('unlockedIds')||[],
-                placedItems:this.interactables
+                placedItems:this.interactables//消すかな
                     .filter(item=>item.isPlaced)
                     .map(item=>({
                         id:item.type,
@@ -505,7 +505,7 @@ export default class BaseScene extends Phaser.Scene{
                 this.player.setPosition(data.playerPosition.x,data.playerPosition.y);
             }
 
-            if(data.placedItems)this.restorePlacedItems(data.placedItems);
+            //if(data.placedItems)this.restorePlacedItems(data.placedItems);
         //});
     }
 //----------アクション系-------------------------------------------------------------------------------------------
@@ -526,10 +526,12 @@ export default class BaseScene extends Phaser.Scene{
             return;
         }
 
-        if(this.placePreview&& this.placePreview.visible&& this.canPlace){
+        /*if(this.placePreview&& this.placePreview.visible&& this.canPlace){
             this.placeItem();
             return;
         }
+
+        if(ui&& ui.isDecorationMode)return;*/
 
         if(this.readyActionType){
             console.log("判定対象のタイプ:", this.readyActionType);
@@ -576,7 +578,7 @@ export default class BaseScene extends Phaser.Scene{
         }                
     }
 //----------デコレーションモード-------------------------------------------------------------------------------------------
-    setDecorationMode(active){
+    /*setDecorationMode(active){
         this.isDecorationMode=active;
         this.decorationGrid.clear();
 
@@ -684,7 +686,7 @@ export default class BaseScene extends Phaser.Scene{
     placeItem(){
         const ui=this.scene.get('UIScene');
 
-        const inventory=this.registry.get('inventoryData');
+        let inventory=[...this.registry.get('inventoryData')];
 
         const selectedItem=inventory[ui.selectedSlotIndex];
         if(!selectedItem)return;
@@ -696,16 +698,16 @@ export default class BaseScene extends Phaser.Scene{
         const newItem=this.add.sprite(x,y,selectedItem.id).setDepth(y);
 
         let shelfId=null;
+        let shelfInstance=null;
 
         if(selectedItem.id.includes('shelf')){
             shelfId=`shelf_${Date.now()}`;
 
-            const ui=this.scene.get('UIScene');
-            const createNewShelf=new ShopContent(ui,this.menuManager,shelfId);
+            shelfInstance=new ShopContent(ui,this.menuManager,shelfId);
 
             if(!this.allShelves)this.allShelves=[];
 
-            this.allShelves.push(createNewShelf);
+            this.allShelves.push(shelfInstance);
         }
 
         this.physics.add.existing(newItem,true);
@@ -713,18 +715,19 @@ export default class BaseScene extends Phaser.Scene{
         this.physics.add.collider(this.villagers,newItem);
 
         this.interactables.push({
-            type:selectedItem.id,
+            type: selectedItem.id.includes('shelf') ? 'displayShelf' : selectedItem.id,
             instance:newItem,
             x:x,
             y:y,
             isPlaced:true,//回収するときのフラグ
-            shelfId:shelfId
+            shelfId:shelfId,
+            shelfInstance:shelfInstance
         });
 
         selectedItem.count--;
 
         if(selectedItem.count<=0){
-            inventory[ui.selectedSlotIndex]=null;
+            inventory[ui.selectedSlotIndex]={id:null,count:0};
 
             //手に持ってるものを消す処理の追加
             if(this.player&& this.player.updateHeldItem){
@@ -734,10 +737,13 @@ export default class BaseScene extends Phaser.Scene{
             this.canPlace=false;
         }
 
-        this.registry.set('inventoryData',inventory);
+        this.registry.set('inventoryData',[...inventory]);
+        console.log("地面設置後のRegistry:",this.registry.get('inventoryData'));
+
+        this.inventoryData=[...inventory];
 
         ui.updateHotbar(inventory);
-    }
+    }*/
 //-----------------Interactablesの更新------------------------------------------------------------------------------------
     updateInteractables(player){
         let minDistance=100;
@@ -799,13 +805,15 @@ export default class BaseScene extends Phaser.Scene{
                 this.physics.add.collider(this.villagers,newItem);
             }
 
+            let shelfInstance=null;
+
             if(item.shelfId){
                 const ui=this.scene.get('UIScene');
-                const resotreShelf=new ShopContent(ui,this.menuManager,item.shelfId);
+                shelfInstance=new ShopContent(ui,this.menuManager,item.shelfId);
 
                 if(!this.allShelves)this.allShelves=[];
 
-                this.allShelves.push(resotreShelf);
+                this.allShelves.push(shelfInstance);
             }
 
             this.interactables.push({
@@ -821,11 +829,11 @@ export default class BaseScene extends Phaser.Scene{
     update(time,delta){
         if (!this.player||!this.player.body)return;
 
-        if(this.isDecorationMode){
+        /*if(this.isDecorationMode){
             this.updatePlacementPreview();
         }else{
             this.placePreview.setVisible(false);
-        }
+        }*/
 
         if(this.player){
             this.updateInteractables(this.player);

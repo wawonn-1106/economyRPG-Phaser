@@ -60,7 +60,7 @@ export default class UIScene extends Phaser.Scene{
 
         this.createClock();
 
-        this.isDecorationMode=false;
+        /*this.isDecorationMode=false;
 
         this.decorationBtn=this.add.image(50,50,'decoration-btn')
             .setInteractive({useHandCursor:true})
@@ -74,9 +74,9 @@ export default class UIScene extends Phaser.Scene{
         });
 
         this.decorationBtn.on('pointerover',()=>this.decorationBtn.setScale(0.9));
-        this.decorationBtn.on('pointerout',()=>this.decorationBtn.setScale(0.8));
+        this.decorationBtn.on('pointerout',()=>this.decorationBtn.setScale(0.8));*/
 
-        this.menuBtn=this.add.image(50,120,'menu-btn')
+        this.menuBtn=this.add.image(50,50,'menu-btn')
             .setInteractive({useHandCursor:true})
             .setScale(0.8)
             .setScrollFactor(0)
@@ -482,7 +482,7 @@ export default class UIScene extends Phaser.Scene{
 
     }
 //---------------------デコレーションモード------------------------------------------------------------------------------------------------------------------
-    toggleDecorationMode(){
+    /*toggleDecorationMode(){
         if(this.menuManager&& this.menuManager.isOpenMenu){
             this.menuManager.closeMenu();
         }
@@ -492,7 +492,7 @@ export default class UIScene extends Phaser.Scene{
         this.hotbar?.setVisible(this.isDecorationMode);/*this.hotbar?。この?はthis.hotbarがなかったら無視
         不測のエラーを防げて便利だが、使いすぎるとエラーの原因がわからなくなるから注意*/
         
-        this.selector?.setVisible(this.isDecorationMode);
+        /*this.selector?.setVisible(this.isDecorationMode);
 
         this.hotbarIcons.forEach(icon=>icon?.setVisible(this.isDecorationMode));
         this.hotbarTexts.forEach(text=>text?.setVisible(this.isDecorationMode));
@@ -501,7 +501,7 @@ export default class UIScene extends Phaser.Scene{
         if(activeScene){
             activeScene.setDecorationMode(this.isDecorationMode);
         }
-    }
+    }*/
     update(time,delta){
         const world=this.scene.get('World');
 
