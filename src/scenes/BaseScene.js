@@ -7,6 +7,7 @@ import MachineManager from '../managers/MachineManager.js';
 import NPC from "../entities/NPC.js";
 import Player from "../entities/Player.js";
 import ShopContent from "../contents/ShopContent.js";
+//import Object from "../entities/Object.js";
 
 export default class BaseScene extends Phaser.Scene{
     constructor(config){
@@ -92,6 +93,7 @@ export default class BaseScene extends Phaser.Scene{
         const ui=this.scene.get('UIScene'); 
         this.dialogManager.setUIScene(ui);
         ui.dictionaryManager = this.dictionaryManager;
+        //this.object=new Object(this);
     }
     initInput(){
         this.cursors=this.input.keyboard.createCursorKeys();
@@ -255,18 +257,26 @@ export default class BaseScene extends Phaser.Scene{
 
             if(obj.name==='displayShelf'){
                 const ui=this.scene.get('UIScene');
-                const defaultShelfId=obj.properties?.find(p=>p.name==='shelfId')?.value;
+                const shelfId=obj.properties?.find(p=>p.name==='shelfId')?.value;
 
-                const newShelf=new ShopContent(ui,this.menuManager,defaultShelfId);
+                let shelfInstance=this.allShelves.find(s=>s.shelfId===shelfId);;
 
-                this.allShelves.push(newShelf);
+                if(!shelfInstance){
+                    shelfInstance=new ShopContent(ui,this.menuManager,shelfId);
+
+                    this.allShelves.push(shelfInstance);
+
+                    const savedItem=this.registry.get(`shelf_save_${shelfId}`);
+                    if(savedItem)shelfInstance.shelfData.item=savedItem;
+                }
 
                 this.interactables.push({
                     type:'displayShelf',
                     data:obj,
                     x:obj.x+(obj.width/2),
                     y:obj.y+(obj.height/2),
-                    shelfId: defaultShelfId
+                    shelfId:shelfId,
+                    shelfInstance:shelfInstance
                 });
             }
 
@@ -500,6 +510,7 @@ export default class BaseScene extends Phaser.Scene{
     }
 //----------アクション系-------------------------------------------------------------------------------------------
     handleAction(){
+        console.log("handleActionが呼ばれました");
         const ui=this.scene.get('UIScene');
         if(ui.menuManager&& ui.menuManager.isOpenMenu)return;
 
@@ -521,6 +532,7 @@ export default class BaseScene extends Phaser.Scene{
         }
 
         if(this.readyActionType){
+            console.log("判定対象のタイプ:", this.readyActionType);
             switch(this.readyActionType){
                 case 'npc':
                     const npc=this.actionTarget.instance;
@@ -547,14 +559,19 @@ export default class BaseScene extends Phaser.Scene{
                     break;
                 case 'displayShelf'://shelfに変える
                     //店に並べる画面
-                    const currentShelfId=this.actionTarget.shelfId;
+                    const targetShelf=this.actionTarget.shelfInstance;
 
-                    const targetShelf=this.allShelves.find(s=>s.id===currentShelfId);
+                    console.log("3. targetShelf の中身:",targetShelf);
 
                     if(targetShelf){
+                        console.log("4. toggle 呼び出し直前。shelfDataの状態:",targetShelf.shelfData);
                         this.menuManager.toggle('shop',targetShelf);
+                        console.log("5. toggle 呼び出し完了");
+                    }else{
+                        console.error("エラー: shelfInstance が見つかりません。");
                     }
                     break;
+
             }
         }                
     }

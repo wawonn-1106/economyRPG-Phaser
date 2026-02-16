@@ -1,11 +1,13 @@
 export default class ShopContent{
-    constructor(uiScene,menuManager){
+    constructor(uiScene,menuManager,shelfId){
         this.uiScene=uiScene;
         this.menuManager=menuManager;
+        this.id=shelfId;
 
-        this.shelfData={id:'shelf_1',item:null};
+        this.shelfData={id:shelfId,item:null};
         this.editingItem=null;
         this.selectedId=null;
+        this.targetShelf=null;
 
         this.cols=5;
         this.slotSize=85;
@@ -18,6 +20,8 @@ export default class ShopContent{
 
     }
     createView(targetShelf){//shelfData
+        console.log("受け取った棚インスタンス:",targetShelf);
+        this.targetShelf=targetShelf;
         /*const emptyData={
             id:'shelf_1',
             item:null
@@ -60,6 +64,7 @@ export default class ShopContent{
         return this.container;
     }
     refresh(){
+        console.log("refresh");
         this.renderInventory(-220);
         this.renderSettingsPanel(220);
     }
@@ -80,7 +85,7 @@ export default class ShopContent{
             const x=startX+(i%this.cols*this.slotSize);
             const y=startY+(Math.floor(i/this.cols)*this.slotSize);
             
-            const currentId=this.editingItem? this.editingItem.id:this.selectedId;
+            const currentId=this.editingItem? this.editingItem.id:this.targetShelf;
             const isSelected=item&& item.id&& currentId===item.id;
 
             const slotBg=this.uiScene.add.rectangle(x,y,this.slotRectSize,this.slotRectSize,
@@ -113,15 +118,16 @@ export default class ShopContent{
         
     }
     handleInventoryClick(newId){
-        const currentId=this.shelfData.item? 
-        this.shelfData.item.id:(this.editingItem? this.editingItem.id: this.selectedId);
+        const currentShelfItem=this.targetShelf&& this.targetShelf.shelfData? this.targetShelf.shelfData.item: null; 
+
+        const currentId=currentShelfItem? currentShelfItem.id: (this.editingItem? this.editingItem.id: this.selectedId);
 
         if(currentId===newId)return;
 
-        if(this.shelfData.item){
+        if(currentShelfItem){
             const inventory=this.uiScene.registry.get('inventoryData')||[];
 
-            const returnItem=this.shelfData.item;
+            const returnItem=currentShelfItem;
             const itemData=inventory.find(i=>i.id===returnItem.id);
 
             if(itemData){
@@ -131,20 +137,24 @@ export default class ShopContent{
                 this.uiScene.registry.set('inventoryData',inventory);
 
             }
-            this.shelfData.item=null;
+            this.targetShelf.shelfData.item=null;
+            this.uiScene.registry.set(`shelf_save_${this.targetShelf.id}`,null);
         }
         this.editingItem=null;
         this.selectedId=newId;
         this.refresh();
     }
     renderSettingsPanel(centerX){
+        console.log("現在のtargetShelf:",this.targetShelf);
         this.settingsLayer.removeAll(true);
 
         const panelBg=this.uiScene.add.rectangle(centerX,0,380,500,0xffffff,0.3)
             .setStrokeStyle(2,0x000000);
         this.settingsLayer.add(panelBg);
 
-        const displayItem=this.shelfData.item||this.editingItem;
+        const displayItem=this.editingItem|| (this.targetShelf&& this.targetShelf.shelfData? this.targetShelf.shelfData.item:null);
+
+        console.log("displayItem:",displayItem);
 
         if(displayItem){
             this.renderEditor(centerX,displayItem);
@@ -293,7 +303,7 @@ export default class ShopContent{
         });
 
         const btnY=190;
-        const isSet=!!this.shelfData.item;
+        const isSet=this.targetShelf&& this.targetShelf.shelfData&& this.targetShelf.shelfData.item;
 
         const btnColor=isSet? 0xcc8e35: 0x2ecc71;
         const btnLabel=isSet? '陳列を戻す':'陳列を確定';
@@ -330,7 +340,7 @@ export default class ShopContent{
             itemData.count=itemData.qualityDetails.reduce((a,b)=>a+b,0);
 
             //this.shelfData.item={...this.editingItem};
-            this.shelfData.item={
+            this.targetShelf.shelfData.item={
                 id:this.editingItem.id,
                 qualityIndex:this.editingItem.qualityIndex,
                 realQuality:this.editingItem.realQuality,
@@ -344,9 +354,9 @@ export default class ShopContent{
             this.selectedId=null;
 
             this.uiScene.registry.set('inventoryData',inventory);
-            this.uiScene.registry.set(`shelf_save_${this.shelfData.id}`,this.shelfData.item);
+            this.uiScene.registry.set(`shelf_save_${this.targetShelf.id}`,this.targetShelf.shelfData.item);
 
-            console.log("陳列完了:", this.shelfData.item);
+            console.log("陳列完了:",this.targetShelf.shelfData.item);
 
             this.refresh();
         }
@@ -354,12 +364,12 @@ export default class ShopContent{
             
     }
     cancelShelf(){
-        if(!this.shelfData.item)return;
+        if(!this.targetShelf||!this.targetShelf.shelfData.item)return;
 
         const inventory=this.uiScene.registry.get('inventoryData')||[];
         //const inventory=rawData.items||[];
 
-        const returnItem=this.shelfData.item;
+        const returnItem=this.targetShelf.shelfData.item;
 
         let itemData=inventory.find(i=>i.id===returnItem.id/*&& i.quality===returnItem.quality*/);
         if(itemData){
@@ -370,8 +380,11 @@ export default class ShopContent{
 
         }
 
-        this.shelfData.item=null;
+        this.targetShelf.shelfData.item=null;
+
+        this.uiScene.registry.set(`shelf_save_${this.targetShelf.id}`,null);
         this.selectedId=null;
+        this.editingItem=null;
 
         this.refresh();
     }

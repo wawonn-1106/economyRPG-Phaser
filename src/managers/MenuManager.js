@@ -44,7 +44,7 @@ export default class MenuManager{
         if(activeScene.dialogManager.inputMode||activeScene.dialogManager.isTalking)return;
 
         if(!this.isOpenMenu){
-            this.openMenu(tabId);
+            this.openMenu(tabId,data);
             return;
         }
         if(this.currentTab===tabId){
@@ -53,7 +53,7 @@ export default class MenuManager{
             this.switchTab(tabId,data);//どのshelfを開くか。他のcontentでも使える共通。
         }
     }
-    openMenu(tabId){
+    openMenu(tabId,data=null){
         const activeScene=this.activeScene;
         if(activeScene.dialogManager.inputMode||activeScene.dialogManager.isTalking)return;
 
@@ -62,7 +62,7 @@ export default class MenuManager{
         }
 
         this.isOpenMenu=true;
-        this.switchTab(tabId);
+        this.switchTab(tabId,data);
     }
     closeMenu(){
         this.isOpenMenu=false;
