@@ -53,12 +53,19 @@ export default class UIScene extends Phaser.Scene{
 
         this.keys=this.input.keyboard.addKeys('M,I,P,A,R,S,D');
 
+        const savedTime=this.registry.get('gameTime');
+        if(savedTime){
+            this.gameTime={...savedTime};
+        }
+
         //this.createHealthBar();
         this.createHotbar();
 
         this.createDialogUI();
 
         this.createClock();
+
+        this.updateClock();
 
         /*this.isDecorationMode=false;
 

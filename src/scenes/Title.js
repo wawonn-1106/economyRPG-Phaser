@@ -39,6 +39,7 @@ export default class Title extends Phaser.Scene{
                 this.registry.set('playerPosition',data.playerPosition||null);
                 this.registry.set('npcPositions',data.npcPositions||[]);
                 this.registry.set('salesHistory',data.salesHistory||[]);
+                this.registry.set('gameTime',data.gameTime||null);
 
                 await this.fetchWeather();
 
@@ -90,6 +91,8 @@ export default class Title extends Phaser.Scene{
         this.registry.set('playerPosition',defaultPlayerData.playerPosition);
         this.registry.set('npcPositions',defaultNPCData.initialNPCs||[]);
         this.registry.set('salesHistory',[]);
+        this.registry.set('gameTime',null);
+
 
         await this.fetchWeather();
 

@@ -1,159 +1,153 @@
-export default class InventoryContent{
+export default class InventoryContent {
     constructor(uiScene){
         this.uiScene=uiScene;
-
         this.worldScene=this.uiScene.scene.get('World');
+
+        this.selectedItem=null;
+        this.cols=5;            
+        this.totalGridSlots=25; 
+        this.slotSize=100;      
+        this.spacing=10;        
+
+    
+        this.container=null;
+        this.gridLayer=null;    
+        this.detailLayer=null;
     }
+
     createView(){
-        const container=this.uiScene.add.container(0,0);
+        this.container=this.uiScene.add.container(0,0);
 
-        const bg=this.uiScene.add.image(0,0,'menu-bg').setDisplaySize(1000,600);//menu-bg→inventory-bg
-        container.add(bg);
+        
+        const bg=this.uiScene.add.image(0,0,'menu-bg').setDisplaySize(1000,600);
+        this.container.add(bg);
 
-        const items=this.uiScene.registry.get('inventoryData');
-        const maxSlots=this.uiScene.registry.get('maxInventorySlots')||10;
-        /*備忘録　maxInventorySlotsの追加→server.jsでPlayerSchemaとupdateFiledで追加、
-        app.get('/load'、でmaxInventorySlots:9,を追加(初期値)。
-        BaseSceneのsaveGameDataにてpayloadにmaxInventorySlots:this.registry.get('maxInventorySlots')||9,
-        を追加。TitleでresetGameRegistryとcontinueボタンのところthis.registry.set('maxInventorySlots ||9);
-        何を追加するとしても↑の手順は踏む。
-        */
+        this.gridLayer=this.uiScene.add.container(0,0);
+        this.detailLayer=this.uiScene.add.container(0,0);
+        this.container.add([this.gridLayer,this.detailLayer]);
 
-        const startX=-410;
-        const backPackStartY=-125;
-        const hotbarStartY=175;
-        const slotSize=102;
+        const closeBtn=this.uiScene.add.text(510,-290,'×',{
+            fontSize:'60px',
+            color:'#000'
+        }).setOrigin(0.5).setInteractive({useHandCursor:true});
 
-        for(let index=0;index<maxSlots;index++){
-            const item=items[index];
-            const isHotbar=index<9;
+        closeBtn.on('pointerdown',()=>{
+            this.uiScene.menuManager.closeMenu();
+        });
+        this.container.add(closeBtn);
 
-            let x,y;
-            
-            if(isHotbar){
-                x=startX+(index*slotSize);
-                y=hotbarStartY;
-            }else{
-                const bpIndex=index-9;
-                const col=bpIndex%9;
-                const row=Math.floor(bpIndex/9);
+        this.refresh();
 
-                x=startX+(col*slotSize);
-                y=backPackStartY+(row*slotSize);
-            }
-            const slotBg=this.uiScene.add.rectangle(x,y,90,90,0x000000,0.3);
-            container.add(slotBg);//temp
-
-            const itemContainer = this.uiScene.add.container(x, y);
-            container.add(itemContainer);
-
-
-            const hitArea=this.uiScene.add.rectangle(x,y,90,90,0x000000,0)
-                .setInteractive({useHandCursor:true,draggable:true});
-
-            container.add(hitArea);
-
-            if(item&& item.count>0){
-                const icon=this.uiScene.add.image(0,0,item.id).setDisplaySize(70,70);
-                const countText=this.uiScene.add.text(35,35,item.count,{
-                    fontSize:'18px',
-                    stroke:'#000',
-                    strokeThickness:3
-                }).setOrigin(1,1);
-
-                itemContainer.add([icon,countText]);
-            }
-
-            let isDragging=false;
-
-            hitArea.on('pointerdown',(pointer)=>{
-                isDragging=false;
-
-                this.clickTimer=this.uiScene.time.delayedCall(200,()=>{
-                    if(!isDragging&& item&& item.id){
-                        this.showItemDescription(item,pointer.x,pointer.y);
-                    }
-                });
-            });
-
-            hitArea.on('dragstart',()=>{
-                isDragging=true;
-                //if(!item|| item.count<=0)return;
-
-                if(this.clickTimer)this.clickTimer.remove();
-                if(this.descPanel) this.descPanel.destroy();
-
-                this.uiScene.handleInteraction(index);
-            });
-
-        }
-
-        return container;
+        return this.container;
     }
-    showItemDescription(item,x,y){
-        //if (!item ||item.count<=0|| this.uiScene.draggedItem) return;
 
-        console.log(item);
+    refresh(){
+        this.renderInventoryGrid(-250);
+        this.renderDetailPanel(250);
+    }
 
-        if(this.descPanel)this.descPanel.destroy();
+    renderInventoryGrid(centerX){
+        this.gridLayer.removeAll(true);
 
-        let panelX=x+175;
-        let panelY=y;
+        const inventory=this.uiScene.registry.get('inventoryData')||[];
+        const maxSlots=this.uiScene.registry.get('maxInventorySlots')||10;
 
-        if(panelX+175>this.uiScene.scale.width){
-            panelX=x-175;
+        const startX=centerX-((this.cols-1)*(this.slotSize+this.spacing))/2;
+        const startY=-((Math.floor(this.totalGridSlots/this.cols)-1)*(this.slotSize+this.spacing))/2;
+
+        for(let i=0;i<this.totalGridSlots;i++){
+            const col=i%this.cols;
+            const row=Math.floor(i/this.cols);
+            const x=startX+col*(this.slotSize+this.spacing);
+            const y=startY+row*(this.slotSize+this.spacing);
+
+            const isLocked=i>=maxSlots;
+            const item=inventory[i];
+            
+            
+            const isSelected=this.selectedItem&& item&& this.selectedItem===item;
+
+            
+            const slotBg=this.uiScene.add.rectangle(x,y,this.slotSize,this.slotSize, 
+                isLocked? 0x000000: (isSelected? 0xffff00: 0x000000), 
+                isLocked? 0.5: (isSelected? 0.4: 0.15))
+                .setStrokeStyle(isSelected? 3: 1,0x000000,0.5);
+            
+            this.gridLayer.add(slotBg);
+
+            if(isLocked){
+                
+                const lockIcon=this.uiScene.add.text(x,y,'LOCKED',{ fontSize:'14px',color:'#ff4444'}).setOrigin(0.5);
+                this.gridLayer.add(lockIcon);
+            }else{
+                slotBg.setInteractive({useHandCursor:true});
+
+                if(item&& item.id&& item.count>0){
+                    const img=this.uiScene.add.image(x,y,item.id).setDisplaySize(70,70);
+                    const count=this.uiScene.add.text(x+40,y+40,item.count,{
+                        fontSize:'18px',
+                        stroke:'#000',
+                        strokeThickness:3
+                    }).setOrigin(1,1);
+                    this.gridLayer.add([img,count]);
+
+                
+                    slotBg.on('pointerdown',()=>{
+                        this.selectedItem=item;
+                        this.refresh();
+                    });
+                }
+            }
         }
-        if(panelY+225>this.uiScene.scale.height){
-            panelY=this.uiScene.scale.height-225;
+    }
+
+    renderDetailPanel(centerX){
+        this.detailLayer.removeAll(true);
+
+        const panelBg=this.uiScene.add.rectangle(centerX,0,420,540,0xffffff,0.2)
+            .setStrokeStyle(2,0x000000,0.3);
+        this.detailLayer.add(panelBg);
+
+        if(!this.selectedItem){
+            const msg=this.uiScene.add.text(centerX,0,'アイテムを選択してください',{
+                fontSize:'20px',
+                color:'#666'
+            }).setOrigin(0.5);
+            this.detailLayer.add(msg);
+            return;
         }
 
-        this.descPanel=this.uiScene.add.container(panelX,panelY);
+        const item=this.selectedItem;
 
-        const panelBg=this.uiScene.add.image(0,0,'menu-bg')//descPanel-bg
-            .setDisplaySize(350,450)
-            .setInteractive();
-
-        const titleText=this.uiScene.add.text(0,-180,item.name,{
-            fontSize:'28px',
-            color:'#000000',
-            stroke:'#000',
-            strokeThickness:4
+        const title=this.uiScene.add.text(centerX,-220,item.name|| item.id,{
+            fontSize:'32px',
+            color:'#000',
+            fontWeight:'bold'
         }).setOrigin(0.5);
 
-        const descText=this.uiScene.add.text(-140,-130,item.description,{
-            fontSize:'18px',
-            color:'#ffffff',
-            lineSpacing:5,
-            wordWrap:{width:280}
-        });
+        const icon=this.uiScene.add.image(centerX,-100,item.id).setDisplaySize(140,140);
 
-        let qualityInfo=`【品質内訳】`;
-
-        if(item.qualityDetails){
-            qualityInfo+=`★１:${item.qualityDetails[0]}個 ★２:${item.qualityDetails[1]}個 ★３:${item.qualityDetails[2]}個`;
-        }
-
-        const qualityText=this.uiScene.add.text(-140,50,qualityInfo,{
-            fontSize:'18px',
-            color:'#000000',
+        const desc=this.uiScene.add.text(centerX-180,20,item.description|| "説明はありません。",{
+            fontSize:'20px',
+            color:'#333',
+            wordWrap:{width:360},
             lineSpacing:8
         });
 
-        const closeBtn=this.uiScene.add.image(0,180,'close-btn')//何て名前だっけ、後で統一
-            .setDisplaySize(120,50)
-            .setInteractive({useHandCursor:true});
-        
-        const closeText=this.uiScene.add.text(0,180,'閉じる',{
-            fontSize:'16px',
-            color:'#000000',
-        }).setOrigin(0.5);
+        let qualityInfo=`【所持品質の内訳\n`;
+        if(item.qualityDetails){
+            qualityInfo+=`★1:${item.qualityDetails[0]}個 ★2:${item.qualityDetails[1]}個 ★3:${item.qualityDetails[2]}個`;
+        }else{
+            qualityInfo+=`品質情報なし`;
+        }
 
-        closeBtn.on('pointerdown',()=>{
-            this.descPanel.destroy();
-            this.descPanel=null;
+        const qualityText=this.uiScene.add.text(centerX-180,180,qualityInfo,{
+            fontSize:'18px',
+            color:'#000',
+            backgroundColor:'#ffffff66',
+            padding:{x:5,y:5}
         });
 
-        this.descPanel.add([panelBg,titleText,descText,qualityText,closeBtn,closeText]);
-        this.descPanel.setDepth(20000);
+        this.detailLayer.add([title,icon,desc,qualityText]);
     }
 }

@@ -46,7 +46,8 @@ const PlayerSchema=new mongoose.Schema({
         scene:String
     },
     npcPositions:[NPCSchema],
-    salesHistory:[SalesHistoryScheme]
+    salesHistory:[SalesHistoryScheme],
+    gameTime:{type:Object,default:null}
 });
 
 const Player=mongoose.model('Player',PlayerSchema);
@@ -68,6 +69,7 @@ app.post('/save',async(req,res)=>{
         if(req.body.shelves!==undefined)updateFields.shelves=req.body.shelves;
         if(req.body.playerPosition!==undefined)updateFields.playerPosition=req.body.playerPosition;
         if(req.body.npcPositions!==undefined)updateFields.npcPositions=req.body.npcPositions;
+        if(req.body.gameTime!==undefined)updateFields.gameTime=req.body.gameTime;
 
         const updateData={
             $set:updateFields
@@ -106,6 +108,7 @@ app.get('/load',async(req,res)=>{
             playerPosition:null,
             npcPositions:[],
             salesHistory:[],
+            gameTime:null//ぬおー
         });
     }catch(error){
         res.status(500).send('読み込み失敗');

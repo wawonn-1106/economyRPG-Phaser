@@ -140,6 +140,8 @@ export default class BaseScene extends Phaser.Scene{
             this.interactables.push({type:'npc',instance:newVillager});
 
             this.physics.add.collider(this.player,newVillager);
+
+            this.setupCollisions(newVillager);
         });
     }
 //----------アニメーション-------------------------------------------------------------------------------------------
@@ -420,6 +422,8 @@ export default class BaseScene extends Phaser.Scene{
 
             this.registry.set('npcPositions',updatedNPCPositions);
 
+            const currentGameTime=this.registry.get('gameTime');
+
             //const shelvesData=this.allShelves? this.allShelves.map(s=>s.shelfData):[this.shelfContent.shelfData];
             let shelvesData=this.registry.get('shelvesData')||[];
 
@@ -448,7 +452,8 @@ export default class BaseScene extends Phaser.Scene{
                     scene:this.scene.key
                 },
 
-                npcPositions:updatedNPCPositions
+                npcPositions:updatedNPCPositions,
+                gameTime:currentGameTime
             };
 
             console.log("送信データ:",payload);

@@ -5,38 +5,22 @@ export default class ShopContent{
         this.id=shelfId;
 
         this.shelfData={id:shelfId,item:null};
+
         this.editingItem=null;
         this.selectedId=null;
         this.targetShelf=null;
 
         this.cols=5;
-        this.slotSize=85;
-        this.slotRectSize=75;
+        this.totalGrid=25;
+        this.slotSize=90;
+        this.spacing=8;
 
         this.container=null;
         this.inventoryLayer=null;
         this.settingsLayer=null;
-
-
     }
-    createView(targetShelf){//shelfData
-        console.log("受け取った棚インスタンス:",targetShelf);
+    createView(targetShelf){
         this.targetShelf=targetShelf;
-        /*const emptyData={
-            id:'shelf_1',
-            item:null
-        };
-        
-        const occupiedData={
-            id:'shelf_2',
-            item:{
-                id:'break',
-                price:150,
-                quality:3,
-            }
-        };
-        
-        const shelfData=emptyData;*/
 
         this.container=this.uiScene.add.container(0,0);
 
@@ -45,18 +29,18 @@ export default class ShopContent{
 
         this.inventoryLayer=this.uiScene.add.container(0,0);
         this.settingsLayer=this.uiScene.add.container(0,0);
+
         this.container.add([this.inventoryLayer,this.settingsLayer]);
 
-        const closeBtn=this.uiScene.add.text(460,-260,'×',{
+        const closeBtn=this.uiScene.add.text(510,-290,'×',{
             fontSize:'60px',
             color:'#000'
         }).setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(5001);
 
         closeBtn.on('pointerdown',()=>{
-            console.log('閉じます');
-            //this.menuManager.toggle('shop');
             this.uiScene.menuManager.closeMenu();
         });
+
         this.container.add(closeBtn);
 
         this.refresh();
@@ -64,63 +48,67 @@ export default class ShopContent{
         return this.container;
     }
     refresh(){
-        //const currentInv = this.uiScene.registry.get('inventoryData');
-        console.log("refresh");
-        //console.log("現在のRegistry在庫状況:", JSON.parse(JSON.stringify(currentInv)));
-        const rawData=this.currentInventory;
-        console.log("Registry直取りデータ:",rawData);
-
-        this.renderInventory(-220);
-        this.renderSettingsPanel(220);
+        this.renderInventory(-260);
+        this.renderSettingsPanel(240);
     }
     renderInventory(centerX){
         this.inventoryLayer.removeAll(true);
 
         const inventory=this.uiScene.registry.get('inventoryData')||[];
+        const maxSlots=this.uiScene.registry.get('maxInventorySlots')||10;
 
-        const maxSlots=this.uiScene.registry.get('maxInventorySlots')||10;;
+        const startX=centerX-((this.cols-1)*(this.slotSize+this.spacing))/2;
+        const startY=-((Math.floor(this.totalGrid/this.cols)-1)*(this.slotSize+this.spacing))/2;
 
-        const totalRows=Math.ceil(maxSlots/this.cols);
-        const startY=-((totalRows-1)*this.slotSize)/2;
-        const startX=centerX-((this.cols-1)*this.slotSize)/2;
+        for(let i=0;i<this.totalGrid;i++){
+            const col=i%this.cols;
+            const row=Math.floor(i/this.cols);
 
-        for(let i=0;i<maxSlots;i++){
+            const x=startX+col*(this.slotSize+this.spacing);
+            const y=startY+row*(this.slotSize+this.spacing);
+
+            const isLocked=i>=maxSlots;
             const item=inventory[i];
 
-            const x=startX+(i%this.cols*this.slotSize);
-            const y=startY+(Math.floor(i/this.cols)*this.slotSize);
-            
-            const currentId=this.editingItem? this.editingItem.id:this.targetShelf;
+            const currentId=this.editingItem? this.editingItem.id:(this.selectedId? this.selectedId:null);
             const isSelected=item&& item.id&& currentId===item.id;
 
-            const slotBg=this.uiScene.add.rectangle(x,y,this.slotRectSize,this.slotRectSize,
-                isSelected? 0xffff00: 0x000000,isSelected? 0.3:0.08)
-                .setStrokeStyle(isSelected?3:1,0x000000,0.2)
-                .setInteractive({useHandCursor:true});
+            const slotBg=this.uiScene.add.rectangle(x,y,this.slotSize,this.slotSize,
+                isLocked? 0x000000:(isSelected? 0xffff00:0x000000),
+                isLocked? 0.5:(isSelected?0.3: 0.08))
+                .setStrokeStyle(isSelected? 3:1,0x000000,0.2);
             
             this.inventoryLayer.add(slotBg);
 
-            
-            if(item&& item.id&& item.count>0){
-                const img=this.uiScene.add.image(x,y,item.id).setDisplaySize(55,55);
+            if(isLocked){
+                const lockText=this.uiScene.add.text(x,y,'LOCKED',{
+                    fontSize:'12px',
+                    color:'#ff4444',
+                }).setOrigin(0.5);
 
-                const count=this.uiScene.add.text(x+30,y+30,item.count,{
-                    fontSize:'14px',
-                    color:'#000',
-                    stroke:'#fff',
-                    strokeThickness:2
-                }).setOrigin(1,1);
+                this.inventoryLayer.add(lockText);
+            }else{
 
-                slotBg.on('pointerdown',()=>{
-                    this.handleInventoryClick(item.id);
-                });
+                if(item&& item.id&& item.count>0){
+                    const img=this.uiScene.add.image(x,y,item.id).setDisplaySize(60,60);
 
-                this.inventoryLayer.add([img,count]);
+                    const count=this.uiScene.add.text(x+35,y+35,item.count,{
+                        fontSize:'16px',
+                        color:'#000',
+                        stroke:'#fff',
+                        strokeThickness:2
+                    }).setOrigin(1,1);
+
+                    slotBg.setInteractive({useHandCursor:true});
+                    slotBg.on('pointerdown',()=>{
+                        this.handleInventoryClick(item.id);
+                    });
+
+                    this.inventoryLayer.add([img,count]);
+                }
             }
 
-            
         }
-        
     }
     handleInventoryClick(newId){
         const currentShelfItem=this.targetShelf&& this.targetShelf.shelfData? this.targetShelf.shelfData.item: null; 
