@@ -9,12 +9,15 @@ export default class Shop extends BaseScene{
     }
     create(data){
         const map=this.createMap('shop','Serene_Village_48x48','tileset');
+
+        if(!this.scene.isActive('UIScene')){
+            this.scene.launch('UIScene');//Sceneは基本一個づつ表示だが、ShopではShopシーンを消さずにUISceneを立ち上げるように命令。他のSceneでもね。
+        }
         
         console.log("Shopシーン開始！");
         super.create(data);//親クラス(BaseScene)のcreate()を実行。そこにはinventoryDataをjsonから取得するのがある
-
-        this.scene.launch('UIScene');//Sceneは基本一個づつ表示だが、ShopではShopシーンを消さずにUISceneを立ち上げるように命令。他のSceneでもね。
-
+        
+        
         
   
         //this.player = new Player(this, 0, 0,'player');
@@ -37,7 +40,7 @@ export default class Shop extends BaseScene{
             delay:10000,
             callback:this.spawnCustomer,
             callbackScope:this,
-            loop:trusted
+            loop:true
         });
 
     }
@@ -45,7 +48,8 @@ export default class Shop extends BaseScene{
         return this.villagers.getChildren().filter(v=>v.isGuest).map(v=>v.npcName);
     }
     spawnInitialCustomer(){
-        const customerData=this.registry.get('customerData');
+        const customerData=this.cache.json.get('customerData');//いったん直で
+        //mongoにも送るようにすること。registryを使うこと
         const presentNames=this.getPresentCustomerNames();
 
         const avaliableCustomers=customerData.customerList.filter(c=>!presentNames.includes(c.name));
@@ -68,12 +72,34 @@ export default class Shop extends BaseScene{
         }
     }
     spawnCustomer(){
-        const customerData=this.registry.get('customerData');
-        /////////////////////----------------------ここから
+        const maxCust=this.registry.get('maxCustomers')||6;
+        const currentGuests=this.villagers.getChildren().filter(v=>v.isGuest);
 
-        const guest=new NPC(this,400,850,'player');
+        if(currentGuests.length>=maxCust)return;
 
-        this.villagers.add(guest);
+        const customerData=this.cache.json.get('customerData');//いったん直で
+        const presentNames=this.getPresentCustomerNames();
+
+        const avaliableCustomers=customerData.customerList.filter(c=>!presentNames.includes(c.name));
+
+        const emptyShelves=this.allShelves.filter(s=>!s.sprite.isOccupied);
+
+        if(avaliableCustomers.length>0 &&emptyShelves.length>0){
+            const customer=Phaser.Utils.Array.GetRandom(avaliableCustomers);
+
+            const targetShelf=Phaser.Utils.Array.GetRandom(emptyShelves);
+
+            targetShelf.sprite.isOccupied=true;
+
+            const config={...customer,isGuest:true,state:'enter'};
+            const guest=new NPC(this,520,1200,customer.npcId,config);
+            guest.currentTarget=targetShelf;
+
+            this.villagers.add(guest);
+            this.setupCollisions(guest);
+        }
+
+        
     }
     update(time,delta){
         super.update(time, delta);

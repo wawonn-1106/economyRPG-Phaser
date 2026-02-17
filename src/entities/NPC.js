@@ -51,7 +51,7 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
             const target=Phaser.Utils.Array.GetRandom(avaliableShelves);
 
             this.currentTarget=target;
-            target.isOccupied=true;
+            target.sprite.isOccupied=true;
 
             this.targetX=target.sprite.x;
             this.targetY=target.sprite.y+48;
@@ -78,6 +78,10 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         }
     }
     decideNextAction(){
+        if(this.currentTarget){
+            this.currentTarget.sprite.isOccupied=false;
+        }
+
         if(Math.random()<0.7){
             if(this.currentTarget)this.currentTarget.isOccupied=false;
 
@@ -87,8 +91,8 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         }
     }
     handleExit(){
-        const exitX=400;
-        const exitY=850;
+        const exitX=520;
+        const exitY=1200;
 
         const distance=Phaser.Math.Distance.Between(this.x,this.y,exitX,exitY);
 

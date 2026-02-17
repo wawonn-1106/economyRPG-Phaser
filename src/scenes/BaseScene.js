@@ -348,6 +348,12 @@ export default class BaseScene extends Phaser.Scene{
             //this.isWraping=false;
             ui.setVisibleUI(true);
 
+            if (this.scene.isActive('UIScene')) {
+                this.scene.stop('UIScene');
+            }/*Sceneでlaunch('UIScene')で起動したものをstop('UIScene')
+            しないと、前起動したものが残り、タイトルに戻ってまたスタートする時に、UISceneが起動してあるのに
+            起動してしまってエラーになる*/
+
             this.scene.start(nextScene,{spawnPoint:spawnPoint});
            // this.scene.start(nextScene,spawnPoint);
         });

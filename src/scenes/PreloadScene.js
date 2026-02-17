@@ -13,6 +13,7 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.image('axe','assets/images/axe.png');
         this.load.image('pickaxe','assets/images/pickaxe.png');
         this.load.image('fishing-rod','assets/images/fishing-rod.png');
+        this.load.image('shelf','assets/images/shelf.png');
 //--------------------------------tilemap------------------------------------------------------
         this.load.tilemapTiledJSON('map','assets/tilemaps/economyRPG.json');
         this.load.tilemapTiledJSON('house','assets/tilemaps/House.json');
@@ -54,6 +55,7 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.json('playerData','assets/data/playerData.json');
         this.load.json('inventoryData','assets/data/inventory.json');
         this.load.json('NPCData','assets/data/NPC.json');
+        this.load.json('customerData','assets/data/Customer.json');
 
         //this.load.json('saveData',`${this.SERVER_URL}/load`);
 //--------------------------------タイトル------------------------------------------------------       
