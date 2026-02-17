@@ -40,6 +40,7 @@ export default class Title extends Phaser.Scene{
                 this.registry.set('npcPositions',data.npcPositions||[]);
                 this.registry.set('salesHistory',data.salesHistory||[]);
                 this.registry.set('gameTime',data.gameTime||null);
+                this.registry.set('maxCustomers',data.maxCustomers||6);
 
                 await this.fetchWeather();
 
@@ -92,6 +93,7 @@ export default class Title extends Phaser.Scene{
         this.registry.set('npcPositions',defaultNPCData.initialNPCs||[]);
         this.registry.set('salesHistory',[]);
         this.registry.set('gameTime',null);
+        this.registry.set('maxCustomers',6);
 
 
         await this.fetchWeather();

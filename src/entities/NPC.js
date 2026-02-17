@@ -2,6 +2,10 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
     constructor(scene,x,y,texture,config){
         super(scene,x,y,texture);
 
+        this.state=config.state;
+        this.currentTarget=null;
+        this.speed=100;
+
         //this.npcId=texture;
 
         scene.physics.world.enable(this);
@@ -39,6 +43,61 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         }
 
         
+    }
+    findNextShelf(){
+        const avaliableShelves=this.scene.allShelves.filter(s=>!s.isOccupied);
+
+        if(avaliableShelves.length>0){
+            const target=Phaser.Utils.Array.GetRandom(avaliableShelves);
+
+            this.currentTarget=target;
+            target.isOccupied=true;
+
+            this.targetX=target.sprite.x;
+            this.targetY=target.sprite.y+48;
+
+            this.state='moving';
+        }else{
+            this.state='leaving';
+
+        }
+    }
+    handleMoving(){
+        const distance=Phaser.Math.Distance.Between(this.x,this.y,this.targetX,this.targetY);
+
+        if(distance<5){
+            this.setVelocity(0);
+
+            this.state='browsing';
+
+            this.moveTimer=Phaser.Math.Between(2000,5000);
+        }else{
+            this.scene.physics.moveTo(this,this.targetX,this.targetY,this.speed);
+
+            this.currentDir.set(this.body.velocity.x,this.body.velocity.y);
+        }
+    }
+    decideNextAction(){
+        if(Math.random()<0.7){
+            if(this.currentTarget)this.currentTarget.isOccupied=false;
+
+            this.findNextShelf();
+        }else{
+            this.state='leaving';
+        }
+    }
+    handleExit(){
+        const exitX=400;
+        const exitY=850;
+
+        const distance=Phaser.Math.Distance.Between(this.x,this.y,exitX,exitY);
+
+        if(distance<10){
+            if(this.currentTarget)this.currentTarget.isOccupied=false;
+            this.destroy();
+        }else{
+            this.scene.physics.moveTo(this,exitX,exitY,this.speed);
+        }
     }
     updateShopLogic(time,delta){
         switch(this.state){

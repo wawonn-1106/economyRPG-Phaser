@@ -268,6 +268,15 @@ export default class BaseScene extends Phaser.Scene{
 
                     this.allShelves.push(shelfInstance);
 
+                    const shelfSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),'shelf')
+                    .setDepth(5);
+
+                    shelfInstance.sprite=shelfSprite;
+                    shelfSprite.isOccupied=false;
+
+                    this.physics.add.existing(shelfSprite,true);
+                    this.physics.add.collider(this.player,shelfSprite);
+
                     const savedItem=this.registry.get(`shelf_save_${shelfId}`);
                     if(savedItem)shelfInstance.shelfData.item=savedItem;
                 }
@@ -436,6 +445,7 @@ export default class BaseScene extends Phaser.Scene{
                 inventory:this.registry.get('inventoryData')||[],
                 shelves:shelvesData,
                 maxInventorySlots:this.registry.get('maxInventorySlots')||10,
+                maxCustomers:this.registry.get('maxCustomers')||6,
                 unlockedIds:this.registry.get('unlockedIds')||[],
                 placedItems:this.interactables//消すかな
                     .filter(item=>item.isPlaced)

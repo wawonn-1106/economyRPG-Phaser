@@ -35,15 +35,6 @@
             "startId":"greed",
             "name":"オーディン",
             "type":"villager"
-        },
-        {
-            "x":800,
-            "y":800,
-            "scene":"Shop",
-            "npcId":"player",
-            "startId":"start",
-            "name":"ペルセポネ",
-            "type":"villager"
         }
     ]
 }

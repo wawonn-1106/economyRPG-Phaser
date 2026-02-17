@@ -1,4 +1,4 @@
-//import NPC from '../entities/NPC.js';
+import NPC from '../entities/NPC.js';
 import BaseScene from './BaseScene.js';
 //import Player from '../entities/Player.js';
 
@@ -25,13 +25,55 @@ export default class Shop extends BaseScene{
 
         this.setupSceneTransitions(map, this.player);
 
-        //this.setupCollisions(this.player);
-        //this.setupCollisions(this.villagers);
+        const maxCust=this.registry.get('maxCustomers')||6;
 
-        //this.physics.add.collider(this.player,this.villagers);
-        //this.physics.add.collider(this.villagers,this.villagers);
-        
-        //this.setupCamera(this.player);
+        const initialCount=Phaser.Math.Between(1,Math.floor(maxCust/2));
+
+        for(let i=0;i<initialCount;i++){
+            this.spawnInitialCustomer();
+        }
+
+        this.time.addEvent({
+            delay:10000,
+            callback:this.spawnCustomer,
+            callbackScope:this,
+            loop:trusted
+        });
+
+    }
+    getPresentCustomerNames(){
+        return this.villagers.getChildren().filter(v=>v.isGuest).map(v=>v.npcName);
+    }
+    spawnInitialCustomer(){
+        const customerData=this.registry.get('customerData');
+        const presentNames=this.getPresentCustomerNames();
+
+        const avaliableCustomers=customerData.customerList.filter(c=>!presentNames.includes(c.name));
+
+        const emptyShelves=this.allShelves.filter(s=>!s.sprite.isOccupied);
+
+        if(avaliableCustomers.length>0 &&emptyShelves.length>0){
+            const customer=Phaser.Utils.Array.GetRandom(avaliableCustomers);
+
+            const targetShelf=Phaser.Utils.Array.GetRandom(emptyShelves);
+
+            targetShelf.sprite.isOccupied=true;
+
+            const config={...customer,isGuest:true,state:'browsing'};
+            const guest=new NPC(this,targetShelf.sprite.x,targetShelf.sprite.y+48,customer.npcId,config);
+            guest.currentTarget=targetShelf;
+
+            this.villagers.add(guest);
+            this.setupCollisions(guest);
+        }
+    }
+    spawnCustomer(){
+        const customerData=this.registry.get('customerData');
+        /////////////////////----------------------ここから
+
+        const guest=new NPC(this,400,850,'player');
+
+        this.villagers.add(guest);
     }
     update(time,delta){
         super.update(time, delta);
