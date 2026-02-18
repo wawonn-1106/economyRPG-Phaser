@@ -111,10 +111,10 @@
             ]
         },
         {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
+            "id":"axe",
+            "name":"斧",
+            "resultItem":"axe",
+            "category":"tool",
             "description":"",
             "ingredients":[
                 {"itemId":"wheat","count":3}

@@ -252,6 +252,13 @@ export default class BaseScene extends Phaser.Scene{
             }
 
             if(obj.name==='machine'){
+
+                const shelfSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),'shelf')
+                    .setDepth(5);//shelfで代用
+                
+                this.physics.add.existing(shelfSprite,true);
+                this.physics.add.collider(this.player,shelfSprite);
+
                 this.interactables.push({
                     type:'machine',
                     data:obj,
@@ -277,11 +284,36 @@ export default class BaseScene extends Phaser.Scene{
                     shelfInstance.sprite=shelfSprite;
                     shelfSprite.isOccupied=false;
 
+                    shelfInstance.targetShelf=shelfInstance;
+                    shelfInstance.worldSprite=shelfSprite;//worldSpriteは適当
+
+                    shelfInstance.updateDisplay=()=>{
+                        if(shelfInstance.itemSprite){
+                            shelfInstance.itemSprite.destroy();
+                            shelfInstance.itemSprite=null;
+                        }
+
+                        const item=shelfInstance.shelfData.item;
+
+                        if(item&& item.id){
+                            shelfInstance.itemSprite=this.add.sprite(
+                                shelfSprite.x,
+                                shelfSprite.y-20,
+                                item.id
+                            ).setDepth(shelfSprite.depth+1).setScale(0.7);
+                        }
+                    };
+
                     this.physics.add.existing(shelfSprite,true);
                     this.physics.add.collider(this.player,shelfSprite);
 
                     const savedItem=this.registry.get(`shelf_save_${shelfId}`);
-                    if(savedItem)shelfInstance.shelfData.item=savedItem;
+
+                    if(savedItem){
+                        shelfInstance.shelfData.item=savedItem;
+
+                        shelfInstance.updateDisplay();
+                    }
                 }
 
                 this.interactables.push({

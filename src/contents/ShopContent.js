@@ -355,6 +355,10 @@ export default class ShopContent{
             console.log("陳列完了:",this.targetShelf.shelfData.item);
 
             this.refresh();
+
+            if(this.targetShelf&& this.targetShelf.updateDisplay){
+                this.targetShelf.updateDisplay();
+            }
         }
 
             
@@ -379,6 +383,10 @@ export default class ShopContent{
         }
 
         this.targetShelf.shelfData.item=null;
+
+        if(this.targetShelf&& this.targetShelf.updateDisplay){
+            this.targetShelf.updateDisplay();
+        }
 
         this.uiScene.registry.set(`shelf_save_${this.targetShelf.id}`,null);
         this.selectedId=null;

@@ -54,12 +54,14 @@ export default class Shop extends BaseScene{
 
         const avaliableCustomers=customerData.customerList.filter(c=>!presentNames.includes(c.name));
 
-        const emptyShelves=this.allShelves.filter(s=>!s.sprite.isOccupied);
+        const avaliableShelves=this.allShelves.filter(
+            s=>!s.sprite.isOccupied&& s.shelfData.item&& s.shelfData.item.id
+        );
 
-        if(avaliableCustomers.length>0 &&emptyShelves.length>0){
+        if(avaliableCustomers.length>0 &&avaliableShelves.length>0){
             const customer=Phaser.Utils.Array.GetRandom(avaliableCustomers);
 
-            const targetShelf=Phaser.Utils.Array.GetRandom(emptyShelves);
+            const targetShelf=Phaser.Utils.Array.GetRandom(avaliableShelves);
 
             targetShelf.sprite.isOccupied=true;
 
@@ -82,12 +84,15 @@ export default class Shop extends BaseScene{
 
         const avaliableCustomers=customerData.customerList.filter(c=>!presentNames.includes(c.name));
 
-        const emptyShelves=this.allShelves.filter(s=>!s.sprite.isOccupied);
+        //const emptyShelves=this.allShelves.filter(s=>!s.sprite.isOccupied);
+        const avaliableShelves=this.allShelves.filter(
+            s=>!s.sprite.isOccupied&& s.shelfData.item&& s.shelfData.item.id
+        );
 
-        if(avaliableCustomers.length>0 &&emptyShelves.length>0){
+        if(avaliableCustomers.length>0 &&avaliableShelves.length>0){
             const customer=Phaser.Utils.Array.GetRandom(avaliableCustomers);
 
-            const targetShelf=Phaser.Utils.Array.GetRandom(emptyShelves);
+            const targetShelf=Phaser.Utils.Array.GetRandom(avaliableShelves);
 
             targetShelf.sprite.isOccupied=true;
 

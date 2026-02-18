@@ -46,6 +46,9 @@ export default class UIScene extends Phaser.Scene{
         this.menuManager=new MenuManager(this,worldScene);
         this.machineContent = new MachineContent(this);
 
+        const money=this.registry.get('money')||0;
+        this.moneyText=`${money}G`;
+
         if(worldScene){
             worldScene.dialogManager?.setUIScene(this);
         }//嫌な予感する
@@ -62,7 +65,7 @@ export default class UIScene extends Phaser.Scene{
 
         this.createDialogUI();
 
-        this.createClock();
+        this.createClock(this.scale.width-80,50);
 
         this.updateClock();
 
@@ -112,6 +115,14 @@ export default class UIScene extends Phaser.Scene{
            //if(this.dialogManager && !this.dialogManager.isTalking){
                 this.menuManager?.toggle('guide');
             //}
+        });
+
+        this.moneyText=this.add.text(this.scale.width-200,50,this.moneyText,{
+            fontSize:'24px',
+            color:'#000',
+            stroke:'#fff',
+            strokeThickness:2,
+            fontStyle:'bold'
         });
 
         this.cursorIcon=this.add.image(0,0,'').setVisible(false).setDepth(10000);
@@ -438,28 +449,34 @@ export default class UIScene extends Phaser.Scene{
         this.dialogChoices=[];
     }
 //---------------------日付、時計------------------------------------------------------------------------------------------------------------------
-    createClock(){
-        const gameWidth=this.scale.width;
+    createClock(x,y){
+        this.clockContainer=this.add.container(x,y);
+
+        /*const gameWidth=this.scale.width;
         const x=gameWidth-120;
-        const y=80;
+        const y=80;*/
 
-        this.timeBg=this.add.image(x,y,'time-bg').setScale(3).setDepth(3001);
+        this.timeBg=this.add.image(0,0,'time-bg').setScale(3);
 
-        this.dayText=this.add.text(x,y-20,`Day${this.gameTime.day}`,{
+        this.dayText=this.add.text(0,-20,`Day${this.gameTime.day}`,{
             fontSize:'18px',
             color:'#ffffff',
             stroke:'#000000',
             strokeThickness:2,
             fontStyle:'bold'
-        }).setOrigin(0.5).setDepth(3001);
+        }).setOrigin(0.5);
 
-        this.clockText=this.add.text(x,y+10,'06:00 AM',{
+        this.clockText=this.add.text(0,10,'06:00 AM',{
             fontSize:'22px',
             color:'#ffffff',
             stroke:'#000000',
             strokeThickness:3,
             fontFamily:'sans-serif'
-        }).setOrigin(0.5).setDepth(3001);
+        }).setOrigin(0.5);
+
+        this.clockContainer.add([this.timeBg,this.dayText,this.clockText]);
+
+        this.clockContainer.setDepth(3001);
     }
     advanceTime(){
         this.gameTime.minute+=10;

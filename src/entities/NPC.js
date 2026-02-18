@@ -45,7 +45,10 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         
     }
     findNextShelf(){
-        const avaliableShelves=this.scene.allShelves.filter(s=>!s.isOccupied);
+        const avaliableShelves=this.scene.allShelves.filter(
+            s=>!s.isOccupied&& s.shelfData.item&& s.shelfData.item.id
+        );
+
 
         if(avaliableShelves.length>0){
             const target=Phaser.Utils.Array.GetRandom(avaliableShelves);
