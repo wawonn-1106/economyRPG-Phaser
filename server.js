@@ -15,10 +15,10 @@ mongoose.connect(process.env.MONGODB_URI)
 const SalesHistoryScheme=new mongoose.Schema({
     timestamp:{type:Date,default:Date.now},
     itemId:String,
-    quality:Number,
-    setQuality:Number,
+    realQuality:Number,
+    displayQuality:Number,
     sellPrice:Number,
-    fairPrice:Number,
+    marketPrice:Number,
     profit:Number,
     npcId:String
 });
@@ -78,7 +78,20 @@ app.post('/save',async(req,res)=>{
         };
 
         if(req.body.newSale){
-            updateData.$push={salesHistory:req.body.newSale};
+            //updateData.$push={salesHistory:req.body.newSale};
+            const sale=req.body.newSale;
+
+            const formattedSale={
+                itemId:sale.itemId,
+                realQuality:sale.realQuality,
+                displayQuality:sale.displayQuality,
+                sellPrice:sale.sellPrice,
+                marketPrice:sale.marketPrice,
+                profit:sale.sellPrice-(sale.cost||0),
+                npcId:sale.npcId
+            };
+
+            updateData.$push={salesHistory:formattedSale}
         }
 
         const player=await Player.findOneAndUpdate(

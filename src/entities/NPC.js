@@ -1,5 +1,5 @@
 export default class NPC extends Phaser.Physics.Arcade.Sprite{
-    constructor(scene,x,y,texture,config){
+    constructor(scene,x,y,texture,config){//Baseのscenee
         super(scene,x,y,texture);
 
         this.state=config.state;
@@ -81,12 +81,14 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         }
     }
     decideNextAction(){
-        if(this.currentTarget){
+        this.relaseTarget();
+
+        /*if(this.currentTarget){
             this.currentTarget.sprite.isOccupied=false;
-        }
+        }*/
 
         if(Math.random()<0.7){
-            if(this.currentTarget)this.currentTarget.isOccupied=false;
+            //if(this.currentTarget)this.currentTarget.isOccupied=false;
 
             this.findNextShelf();
         }else{
@@ -100,13 +102,71 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         const distance=Phaser.Math.Distance.Between(this.x,this.y,exitX,exitY);
 
         if(distance<10){
-            if(this.currentTarget)this.currentTarget.isOccupied=false;
+            //if(this.currentTarget)this.currentTarget.isOccupied=false;
+            this.relaseTarget();
             this.destroy();
         }else{
             this.scene.physics.moveTo(this,exitX,exitY,this.speed);
         }
     }
+    isPurchase(){
+        if(!this.currentTarget||!this.currentTarget.shelfData.item){
+            this.decideNextAction();
+            return;        
+        }
+
+        if(Math.random()<0.7){
+            console.log('商品が購入されました');
+
+            this.executePurchase(this.currentTarget);
+        }else{
+            console.log('買うのをやめました');
+
+            this.decideNextAction();
+        }
+    }
+    executePurchase(shelf){
+        const item=shelf.shelfData.item;
+        if(!item)return;
+
+        const currentMoney=this.scene.registry.get('money')||0;
+        this.scene.registry.set('money',currentMoney+item.price);
+
+        this.scene.recordSale({
+            itemId:item.id,
+            sellPrice:item.price,
+            marketPrice:item.marketPrice,
+            npcId:this.npcName,
+            realQuality:item.realQuality,
+            displayQuality:item.displayQuality,
+            cost:item.cost||0
+        });
+
+        shelf.shelfData.item=null;
+        //shelf.sprite.isOccupied=false;
+
+        shelf.updateDisplay();
+    }
+    relaseTarget(){
+        if(this.currentTarget){
+            this.currentTarget.isOccupied=false;
+            this.currentTarget=null;
+        }
+    }
     updateShopLogic(time,delta){
+
+        if((this.state==='moving'||this.state==='browsing')&& this.currentTarget){
+
+            if(!this.currentTarget.shelfData.item){
+                this.relaseTarget();
+
+                this.decideNextAction();
+
+                this.state='leaving';//途中で商品戻したら帰る
+                return;
+            }
+        }
+
         switch(this.state){
             case 'enter':
                 this.findNextShelf();
@@ -116,7 +176,7 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
                 break;
             case 'browsing':
                 this.moveTimer-=delta;
-                if(this.moveTimer<=0)this.decideNextAction();
+                if(this.moveTimer<=0)this.isPurchase();
                 break;
             case 'leaving':
                 this.handleExit();

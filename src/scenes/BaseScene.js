@@ -525,16 +525,16 @@ export default class BaseScene extends Phaser.Scene{
             this.isSaving=false;
         }
     }
-    /*async recordSale(saleInfo){
+    async recordSale(saleInfo){
         try{
             const payload={
                 money:this.registry.get('money'),
                 newSale:{
-                    itemId:saleInfo.id,
-                    quality:saleInfo.quality,
-                    setQuality:saleInfo.setQuality,
-                    sellPrice:saleInfo.price,
-                    fairPrice:saleInfo.marketPrice,
+                    itemId:saleInfo.itemId,
+                    realQuality:saleInfo.realQuality,
+                    displayQuality:saleInfo.displayQuality,
+                    sellPrice:saleInfo.sellPrice,
+                    marketPrice:saleInfo.marketPrice,
                     profit:saleInfo.price-(saleInfo.cost||0),
                     npcId:saleInfo.npcId
                 }
@@ -547,11 +547,11 @@ export default class BaseScene extends Phaser.Scene{
             });
             const result=await response.json();
 
-            console.log('販売履歴を記録しました');
+            console.log('販売履歴を記録しました',result);
         }catch(error){
             console.error('販売履歴の記録に失敗',error);
         }
-    }*/
+    }
     applySaveData(data){
         this.registry.set('money',data.money||0);
         this.registry.set('inventoryData',data.inventory||[]);
