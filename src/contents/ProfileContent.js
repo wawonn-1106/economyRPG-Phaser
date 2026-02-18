@@ -47,6 +47,21 @@ export default class ProfileContent{
 
         const lines=[];
 
+        const closeBtn=this.uiScene.add.text(480,-280,'×',{
+            fontSize:'60px',
+            color:'#000'
+        }).setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(5000);
+
+        const backBtn=this.uiScene.add.text(440,-285,'←',{//なんかデフォルトが低い
+            fontSize:'55px',
+            color:'#000'
+        }).setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(5000);
+
+        closeBtn.on('pointerdown',()=>this.uiScene.menuManager.closeMenu());
+        backBtn.on('pointerdown',()=>this.uiScene.menuManager.toggle('menu'));
+
+        //frontSide.add([closeBtn,backBtn]);裏面のみ
+
         for(let i=0;i<4;i++){
             const lineY=-100+(i*80);
             const line=this.uiScene.add.line(0,0,infoX,lineY,infoX+500,lineY,0xaaaaaa).setOrigin(0);
@@ -100,6 +115,9 @@ export default class ProfileContent{
                 }
             });    
         }
+
+        backSide.add([closeBtn,backBtn]);
+
 
         frontBg.on('pointerdown',flipCard);
         backBg.on('pointerdown',flipCard);

@@ -44,7 +44,14 @@ export default class MenuContent{
                 fill:'#000000'
             }).setOrigin(0.5);
 
-            container.add([icon,label]);
+            const closeBtn=this.scene.add.text(480,-280,'×',{
+                fontSize:'60px',
+                color:'#000'
+            }).setOrigin(0.5).setInteractive({useHandCursor:true});
+
+            closeBtn.on('pointerdown',()=>this.menuManager.toggle('menu'));
+
+            container.add([icon,label,closeBtn]);
         });
 
         return container;

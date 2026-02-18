@@ -45,11 +45,10 @@ export default class UIScene extends Phaser.Scene{
         //this.dictionaryManager=new DictionaryManager();//DCでgetTermsするため
         this.menuManager=new MenuManager(this,worldScene);
         this.machineContent = new MachineContent(this);
-        worldScene.menuManager=this.menuManager;
 
         if(worldScene){
             worldScene.dialogManager?.setUIScene(this);
-        }
+        }//嫌な予感する
 
         this.keys=this.input.keyboard.addKeys('M,I,P,A,R,S,D');
 

@@ -13,7 +13,7 @@ export default class ShopContent{
         this.cols=5;
         this.totalGrid=25;
         this.slotSize=90;
-        this.spacing=8;
+        this.spacing=10;
 
         this.container=null;
         this.inventoryLayer=null;
@@ -32,13 +32,13 @@ export default class ShopContent{
 
         this.container.add([this.inventoryLayer,this.settingsLayer]);
 
-        const closeBtn=this.uiScene.add.text(510,-290,'×',{
+        const closeBtn=this.uiScene.add.text(480,-280,'×',{
             fontSize:'60px',
             color:'#000'
         }).setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(5001);
 
         closeBtn.on('pointerdown',()=>{
-            this.uiScene.menuManager.closeMenu();
+            this.uiScene.menuManager.toggle('shop');
         });
 
         this.container.add(closeBtn);
@@ -48,8 +48,8 @@ export default class ShopContent{
         return this.container;
     }
     refresh(){
-        this.renderInventory(-260);
-        this.renderSettingsPanel(240);
+        this.renderInventory(-220);
+        this.renderSettingsPanel(250);
     }
     renderInventory(centerX){
         this.inventoryLayer.removeAll(true);
@@ -75,14 +75,14 @@ export default class ShopContent{
 
             const slotBg=this.uiScene.add.rectangle(x,y,this.slotSize,this.slotSize,
                 isLocked? 0x000000:(isSelected? 0xffff00:0x000000),
-                isLocked? 0.5:(isSelected?0.3: 0.08))
-                .setStrokeStyle(isSelected? 3:1,0x000000,0.2);
+                isLocked? 0.5:(isSelected?0.4: 0.15))
+                .setStrokeStyle(isSelected? 3:1,0x000000,0.5);
             
             this.inventoryLayer.add(slotBg);
 
             if(isLocked){
                 const lockText=this.uiScene.add.text(x,y,'LOCKED',{
-                    fontSize:'12px',
+                    fontSize:'14px',
                     color:'#ff4444',
                 }).setOrigin(0.5);
 
@@ -90,14 +90,14 @@ export default class ShopContent{
             }else{
 
                 if(item&& item.id&& item.count>0){
-                    const img=this.uiScene.add.image(x,y,item.id).setDisplaySize(60,60);
+                    const img=this.uiScene.add.image(x,y,item.id).setDisplaySize(70,70);
 
-                    const count=this.uiScene.add.text(x+35,y+35,item.count,{
-                        fontSize:'16px',
-                        color:'#000',
-                        stroke:'#fff',
+                    const count=this.uiScene.add.text(x+40,y+40,item.count,{
+                        fontSize:'18px',
+                        color:'#fff',
+                        stroke:'#000',
                         strokeThickness:2
-                    }).setOrigin(1,1);
+                    }).setOrigin(1,1).setDepth(300);
 
                     slotBg.setInteractive({useHandCursor:true});
                     slotBg.on('pointerdown',()=>{

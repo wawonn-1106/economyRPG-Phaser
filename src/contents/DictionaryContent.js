@@ -106,6 +106,21 @@ export default class DictionaryContent{
             wordWrap:{width:400}
         });
 
+        const closeBtn=this.uiScene.add.text(480,-280,'×',{
+            fontSize:'60px',
+            color:'#000'
+        }).setOrigin(0.5).setInteractive({useHandCursor:true});
+
+        const backBtn=this.uiScene.add.text(440,-285,'←',{//なんかデフォルトが低い
+            fontSize:'55px',
+            color:'#000'
+        }).setOrigin(0.5).setInteractive({useHandCursor:true});
+
+        closeBtn.on('pointerdown',()=>this.uiScene.menuManager.closeMenu());
+        backBtn.on('pointerdown',()=>this.uiScene.menuManager.toggle('menu'));
+
+        container.add([closeBtn,backBtn]);
+
         detailContainer.add([wordTitle,categoryLabel,descriptionText,exampleText]);//wordTitleもいるなら
 
         terms.forEach((term,index)=>{//相対座標にするから毎回index使う、他の場所でも

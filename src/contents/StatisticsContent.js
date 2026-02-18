@@ -77,6 +77,21 @@ export default class RankingContent{
         
         this.drawChart();
 
+        const closeBtn=this.uiScene.add.text(480,-280,'×',{
+            fontSize:'60px',
+            color:'#000'
+        }).setOrigin(0.5).setInteractive({useHandCursor:true});
+
+        const backBtn=this.uiScene.add.text(440,-285,'←',{//なんかデフォルトが低い
+            fontSize:'55px',
+            color:'#000'
+        }).setOrigin(0.5).setInteractive({useHandCursor:true});
+
+        closeBtn.on('pointerdown',()=>this.uiScene.menuManager.closeMenu());
+        backBtn.on('pointerdown',()=>this.uiScene.menuManager.toggle('menu'));
+
+        this.mainContainer.add([closeBtn,backBtn]);
+
         return this.mainContainer;;
     }
     drawChart(){

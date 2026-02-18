@@ -29,6 +29,10 @@ export default class BaseScene extends Phaser.Scene{
         this.isSaving=false;
         //this.WEATHER_SERVER_URL='http://localhost:3000';
     }
+    
+    get menuManager() {
+        return this.scene.get('UIScene').menuManager;
+    }
 //----------初期化-------------------------------------------------------------------------------------------
     create(data){
         
@@ -87,10 +91,9 @@ export default class BaseScene extends Phaser.Scene{
         this.machineManager=new MachineManager(this);
         this.dictionaryManager=new DictionaryManager(this);
         this.inventoryManager=new InventoryManager(this);   
-        this.menuManager=new MenuManager(this);
-        //this.shopManager=new ShopManager(this);
-        //this.uiScene=new UIScene(this);勘違いしてた。Sceneはインスタンスじゃなくてscene.get('')で取得する
+        
         const ui=this.scene.get('UIScene'); 
+        
         this.dialogManager.setUIScene(ui);
         ui.dictionaryManager = this.dictionaryManager;
         //this.object=new Object(this);

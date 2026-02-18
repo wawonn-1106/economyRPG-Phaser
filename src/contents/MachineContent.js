@@ -47,7 +47,7 @@ export default class MachineContent{
         //const manager=this.worldScene.machineManager;//ここら辺はまた今度やる
 
         const closeBtn=this.uiScene.add.text(350,-220,'×',{
-            fontSize:'500px',
+            fontSize:'24px',
             color:'#000000',
             fontStyle:'bold'
         }).setInteractive({useHandCursor:true}).setDepth(6000);//500,6000は一時的な値。
