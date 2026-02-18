@@ -2,13 +2,17 @@ export default class MachineManager{
     constructor(scene){
         this.scene=scene;
 
-        this.recipes=this.scene.cache.json.get('recipesData').recipes;
     }
-    canCraft(recipe,inventoryData){
+    canCraft(){
         //const recipe=this.recipes.find(r=>r.id===recipeId);
+        this.unlockedRecipes=this.scene.registry.get('unlockedRecipes')||[];
+        this.inventoryData=this.scene.registry.get('inventoryData')||[];
+        this.allRecipes=this.scene.cache.json.get('recipesData').recipes;
+
+
         let missingCount=0;
 
-        recipe.ingredients.forEach(ingredient=>{
+        this.allRecipes.ingredients.forEach(ingredient=>{
             const heldItem=inventoryData.find(item=>item.id===ingredient.itemId);
 
             if(!heldItem|| heldItem.count<ingredient.count){
@@ -16,10 +20,10 @@ export default class MachineManager{
             }
         });
 
-        return missingCount;//レシピの材料の種類から足りない個数を渡す。
+        return {missingCount:unlocked.includes(recipe.id)};//レシピの材料の種類から足りない個数を渡す。
         
     }
-    calculateQuality(rank){//加工の成功率を計算、粗悪品、普通品、高品質の三段階
+    /*calculateQuality(rank){//加工の成功率を計算、粗悪品、普通品、高品質の三段階
         //const baseRate=parseFloat(process.env.SUCCESS_BASE_RATE);
         const baseRate=parseFloat(12);
 
@@ -41,7 +45,7 @@ export default class MachineManager{
                 bonus=parseFloat(process.env.BONUS_RANK_1);
                 break;
         }*///process.env使えなかったからいったんこれで↓。出力はできたからok。
-        switch(rank){
+        /*switch(rank){
             case '5':
                 bonus=parseFloat(12);
                 break;
@@ -69,10 +73,22 @@ export default class MachineManager{
         }else{
             return {id:'bad',name:'粗悪品'};
         }
-    }
+    }*/
     tryCraft(recipe,rank){//recpeで何を作ったか特定かな？
         const quality=this.calculateQuality(rank);
 
         return quality;
+    }
+    async unlock(recipeName){
+        let unlocked=this.scene.registry.get('unlockedRecipes')||[];
+
+        if(!unlockedRecipes.includes(recipeName)){
+            unlockedRecipes.push(recipeName);
+
+            this.scene.registry.set('unlockedRecipes',unlocked);
+            console.log('新レシピ解放！:'+recipeName);
+
+            await this.scene.saveGameData();
+        }
     }
 }

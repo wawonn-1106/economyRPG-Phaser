@@ -488,6 +488,8 @@ export default class BaseScene extends Phaser.Scene{
                 maxInventorySlots:this.registry.get('maxInventorySlots')||10,
                 maxCustomers:this.registry.get('maxCustomers')||6,
                 unlockedIds:this.registry.get('unlockedIds')||[],
+                unlockedRecipes:this.registry.get('unlockedRecipes')||[],
+
                 placedItems:this.interactables//消すかな
                     .filter(item=>item.isPlaced)
                     .map(item=>({

@@ -32,6 +32,7 @@ export default class Title extends Phaser.Scene{
 
                 this.registry.set('money',data.money||0);
                 this.registry.set('unlockedIds',data.unlockedIds||[]);
+                this.registry.set('unlockedRecipes',data.unlockedRecipes||[]);
                 this.registry.set('inventoryData',data.inventory||[]);
                 this.registry.set('maxInventorySlots',data.maxInventorySlots||10);
                 this.registry.set('shelvesData',data.shelves||[]);

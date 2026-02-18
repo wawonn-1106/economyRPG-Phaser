@@ -14,6 +14,9 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.image('pickaxe','assets/images/pickaxe.png');
         this.load.image('fishing-rod','assets/images/fishing-rod.png');
         this.load.image('shelf','assets/images/shelf.png');
+        this.load.image('rock','assets/images/rock.png');
+        this.load.image('wood','assets/images/wood.png');
+        this.load.image('bread','assets/images/bread.png');
 //--------------------------------tilemap------------------------------------------------------
         this.load.tilemapTiledJSON('map','assets/tilemaps/economyRPG.json');
         this.load.tilemapTiledJSON('house','assets/tilemaps/House.json');

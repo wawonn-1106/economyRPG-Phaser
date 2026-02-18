@@ -4,6 +4,9 @@
         {"id":"seed","name":"種","count":13,"isPlaceable":true,"qualityDetails":[3,5,5],"description":"甘いりんご"},
         {"id":"axe","name":"斧","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"甘いりんご"},
         {"id":"pickaxe","name":"ツルハシ","count":1,"isPlaceable":false,"qualityDetails":[0,1,0],"description":"甘いりんご"},
-        {"id":"fishing-rod","name":"釣り竿","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"甘いりんご"}
+        {"id":"fishing-rod","name":"釣り竿","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"甘いりんご"},
+        {"id":"bread","name":"パン","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"甘いりんご"},
+        {"id":"rock","name":"石","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"獄門疆みたいな石"},
+        {"id":"wood","name":"木材","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"甘いりんご"}
     ]
 }
