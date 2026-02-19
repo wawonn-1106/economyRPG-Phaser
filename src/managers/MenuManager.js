@@ -10,6 +10,7 @@ import MachineContent from '../contents/MachineContent.js';
 import SaveContent from '../contents/SaveContent.js';
 import StatisticsContent from '../contents/StatisticsContent.js';
 import ShopContent from '../contents/ShopContent.js';
+import DeskContent from '../contents/DeskContent.js';
 
 export default class MenuManager{
     constructor(uiScene){
@@ -33,7 +34,9 @@ export default class MenuManager{
             'save':new SaveContent(uiScene),
             'statistics':new StatisticsContent(uiScene),
         //----------------------店-----------------------------------
-            'shop':new ShopContent(uiScene,this)
+            'shop':new ShopContent(uiScene,this),
+        //----------------------家-----------------------------------
+            'desk':new DeskContent(uiScene)
         };
     }
     get activeScene(){

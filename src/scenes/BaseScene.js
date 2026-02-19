@@ -253,14 +253,30 @@ export default class BaseScene extends Phaser.Scene{
 
             if(obj.name==='machine'){
 
-                const shelfSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),'shelf')
+                const machineSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),'shelf')
                     .setDepth(5);//shelfで代用
                 
-                this.physics.add.existing(shelfSprite,true);
-                this.physics.add.collider(this.player,shelfSprite);
+                this.physics.add.existing(machineSprite,true);
+                this.physics.add.collider(this.player,machineSprite);
 
                 this.interactables.push({
                     type:'machine',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
+
+            if(obj.name==='desk'){//勉強とNPCに仕事に行かせる机(事務デスク)
+
+                const deskSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),'shelf')
+                    .setDepth(5);//shelfで代用
+                
+                this.physics.add.existing(deskSprite,true);
+                this.physics.add.collider(this.player,deskSprite);
+
+                this.interactables.push({
+                    type:'desk',
                     data:obj,
                     x:obj.x+(obj.width/2),
                     y:obj.y+(obj.height/2)
@@ -617,6 +633,10 @@ export default class BaseScene extends Phaser.Scene{
                 case 'machine':
                     this.menuManager.toggle('machine');
                     break;
+                case 'desk':
+                    this.menuManager.toggle('desk');
+                    break;
+
                 case 'displayShelf'://shelfに変える
                     //店に並べる画面
                     const targetShelf=this.actionTarget.shelfInstance;
