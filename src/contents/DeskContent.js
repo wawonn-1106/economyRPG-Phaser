@@ -1,3 +1,5 @@
+import WorkContent from './WorkContent.js';
+
 export default class DeskContent{
     constructor(uiScene,menuManager){
         this.uiScene=uiScene;
@@ -111,13 +113,16 @@ export default class DeskContent{
         this.contentLayer.add(backBtn);
     }
     renderWorkView(){
-        const workTitle=this.uiScene.add.text(0,-180,'事務作業します',{
+        const workView=new WorkContent(this.uiScene);
+        const workContainer=workView.createView();
+
+        /*const workTitle=this.uiScene.add.text(0,-180,'事務作業します',{
             fontSize:'40px',
             color:'#000',
             fontStyle:'bold'
-        }).setOrigin(0.5);
+        }).setOrigin(0.5);*/
 
-        this.contentLayer.add(workTitle);
+        this.contentLayer.add(workContainer);
 
         const backBtn=this.uiScene.add.text(480,-280,'←',{
             fontSize:'60px',
