@@ -3,7 +3,7 @@ import MachineManager from "../managers/MachineManager.js";
 export default class MachineContent{
     constructor(uiScene){
         this.uiScene=uiScene;
-        this.worldScene=this.uiScene.scene.get('World');
+        //this.worldScene=this.uiScene.scene.get('World');
         this.machineManager=new MachineManager(this.uiScene);
 
         this.selectedRecipe=null;
@@ -101,14 +101,19 @@ export default class MachineContent{
 
     renderRecipeList(centerX){
         this.listLayer.removeAll(true);
-        const invData=this.worldScene.inventoryData;
+        const invData=this.uiScene.registry.get('inventoryData')||[];
         const filtered=this.machineManager.recipes.filter(r=>r.category===this.currentCategory);
 
         const startY=-220;
 
         filtered.forEach((recipe,index)=>{
-            const missingCount=this.machineManager.canCraft(recipe,invData);
-            if(missingCount>=2)return;
+            const {missingCount,isUnlocked}=this.machineManager.canCraft(recipe,invData);
+
+            const shouldShow=missingCount<2||isUnlocked;
+            //const displayName=isUnknown? '？？？':recipe.name;//逆？
+            const displayName=shouldShow? recipe.name:'？？？';
+
+            const canViewDetail=missingCount<=1||isUnlocked;
 
             const y=startY+(index*this.rowHeight);
             const row=this.uiScene.add.container(0,0);
@@ -118,24 +123,45 @@ export default class MachineContent{
             const bg=this.uiScene.add.rectangle(centerX,y+30,this.listWidth-20,60,
                 isSelected?0xffff00:0x000000,
                 isSelected?0.3:0.1
-            ).setInteractive({useHandCursor:true});
+            ).setInteractive({useHandCursor:shouldShow});
+            row.add(bg);
 
-            const icon=this.uiScene.add.image(centerX-160,y+30,recipe.id).setDisplaySize(50,50);
 
-            const nameText=this.uiScene.add.text(centerX-120,y+15,recipe.name,{
-                fontSize:'22px',
-                color:'#000',
-                fontWeight:isSelected?'bold':'normal'
-            });
+            if(shouldShow){
+                const icon=this.uiScene.add.image(centerX-160,y+30,recipe.id).setDisplaySize(50,50);
+
+                const nameText=this.uiScene.add.text(centerX-120,y+15,displayName,{
+                    fontSize:'22px',
+                    color:'#000',
+                    fontWeight:isSelected?'bold':'normal'
+                });
+
+                row.add([icon,nameText]);
+
+                row.setAlpha(missingCount>0? 0.5:1);
+
+            }else{
+                const unknownText=this.uiScene.add.text(centerX-30,y+32,displayName,{
+                    fontSize:'30px',
+                    color:'#000',
+                }).setOrigin(0.5);
+
+                row.add(unknownText);
+            }
+
+
+            
 
             if(missingCount===1)row.setAlpha(0.5);
 
             bg.on('pointerdown',()=>{
-                this.selectedRecipe=recipe;
-                this.refresh();
+
+                if(canViewDetail){
+                    this.selectedRecipe=recipe;
+                    this.refresh();
+                }
             });
 
-            row.add([bg,icon,nameText]);
             this.listLayer.add(row);
         });
     }
@@ -166,9 +192,9 @@ export default class MachineContent{
 
         recipe.ingredients.forEach((ing,i)=>{
             const ingY=20+(i*35);
-            const ingText=this.uiScene.add.text(centerX-170,ingY,`・${ing.name} x ${ing.amount}`,{
+            const ingText=this.uiScene.add.text(centerX-170,ingY,`・${ing.itemId} x ${ing.count}`,{
                 fontSize:'20px',
-                color:'#333'
+                color:'#000'
             });
             this.detailLayer.add(ingText);
         });
@@ -185,10 +211,16 @@ export default class MachineContent{
         craftBtn.add([btnBg,btnText]);
         btnBg.on('pointerdown',()=>{
 
-            const playerData=this.uiScene.cache.json.get('playerData');
+            //const playerData=this.uiScene.cache.json.get('playerData');
+            const invData=this.uiScene.registry.get('inventoryData')||[];
+            const {missingCount}=this.machineManager.canCraft(recipe,invData);
 
-            this.machineManager.tryCraft(recipe,playerData.statsList.processing);
-            this.refresh();
+            if(missingCount===0){
+                this.machineManager.tryCraft(recipe);
+                this.refresh();
+            }else{
+                console.log('素材が足りません');
+            }
         });
 
         this.detailLayer.add([title,icon,craftBtn]);

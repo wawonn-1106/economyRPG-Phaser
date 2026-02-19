@@ -46,8 +46,8 @@ export default class UIScene extends Phaser.Scene{
         this.menuManager=new MenuManager(this,worldScene);
         this.machineContent = new MachineContent(this);
 
-        const money=this.registry.get('money')||0;
-        this.moneyText=`${money}G`;
+        //const money=this.registry.get('money')||0;
+        //this.moneyText=`${money}G`;
 
         if(worldScene){
             worldScene.dialogManager?.setUIScene(this);
@@ -123,7 +123,18 @@ export default class UIScene extends Phaser.Scene{
             stroke:'#fff',
             strokeThickness:2,
             fontStyle:'bold'
+        }).setDepth(3001);
+
+        const updateMoneyDisplay=(money)=>{
+            const currentMoney=this.registry.get('money')||0;
+            this.moneyText.setText(`${currentMoney}G`);
+        }
+
+        this.registry.events.on('changedata-money',(parent,value)=>{
+            updateMoneyDisplay(value);
         });
+
+        updateMoneyDisplay();
 
         this.cursorIcon=this.add.image(0,0,'').setVisible(false).setDepth(10000);
         this.cursorCountText=this.add.text(0,0,'',{
@@ -538,6 +549,8 @@ export default class UIScene extends Phaser.Scene{
                 this.advanceTime();
             }
         }
+
+        
 
         if(this.heldItem){
             const pointer=this.input.activePointer;

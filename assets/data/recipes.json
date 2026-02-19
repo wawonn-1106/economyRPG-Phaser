@@ -12,112 +12,13 @@
             "unlocked":false
         },
         {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
+            "id":"chair",
+            "name":"椅子",
+            "resultItem":"chair",
+            "category":"furniture",
             "description":"",
             "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
+                {"itemId":"wood","count":3}
             ],
             "unlocked":false
         },
@@ -134,68 +35,14 @@
             "unlocked":false
         },
         {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
+            "id":"soup",
+            "name":"スープ",
+            "resultItem":"soup",
             "category":"food",
             "description":"",
             "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
-            ],
-            "unlocked":false
-        },
-        {
-            "id":"bread",
-            "name":"パン",
-            "resultItem":"bread",
-            "category":"food",
-            "description":"",
-            "ingredients":[
-                {"itemId":"wheat","count":3}
+                {"itemId":"salt","count":1},
+                {"itemId":"water","count":1}
             ],
             "unlocked":false
         }

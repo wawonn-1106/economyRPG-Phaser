@@ -2,17 +2,22 @@ export default class MachineManager{
     constructor(scene){
         this.scene=scene;
 
+        const recipesData=this.scene.cache.json.get('recipesData');
+        this.recipes=recipesData? recipesData.recipes:[];
+
     }
-    canCraft(){
+    canCraft(recipe,inventoryData){
         //const recipe=this.recipes.find(r=>r.id===recipeId);
-        this.unlockedRecipes=this.scene.registry.get('unlockedRecipes')||[];
-        this.inventoryData=this.scene.registry.get('inventoryData')||[];
-        this.allRecipes=this.scene.cache.json.get('recipesData').recipes;
+        this.unlocked=this.scene.registry.get('unlockedRecipes')||[];
+        //this.inventoryData=this.scene.registry.get('inventoryData')||[];
+        //this.allRecipes=this.scene.cache.json.get('recipesData').recipes;
+        const isUnlocked=this.unlocked.includes(recipe.id);
 
+        //if(!isUnlocked)return-1;
 
-        let missingCount=0;
+        let missingCount=0; 
 
-        this.allRecipes.ingredients.forEach(ingredient=>{
+        recipe.ingredients.forEach(ingredient=>{
             const heldItem=inventoryData.find(item=>item.id===ingredient.itemId);
 
             if(!heldItem|| heldItem.count<ingredient.count){
@@ -20,70 +25,44 @@ export default class MachineManager{
             }
         });
 
-        return {missingCount:unlocked.includes(recipe.id)};//レシピの材料の種類から足りない個数を渡す。
+        return {missingCount,isUnlocked};//レシピの材料の種類から足りない個数を渡す。
         
     }
-    /*calculateQuality(rank){//加工の成功率を計算、粗悪品、普通品、高品質の三段階
-        //const baseRate=parseFloat(process.env.SUCCESS_BASE_RATE);
-        const baseRate=parseFloat(12);
+    tryCraft(recipe){//recpeで何を作ったか特定かな？
+        //const quality=this.calculateQuality(rank);
+        let invData=this.scene.registry.get('inventoryData')||[];
 
-        let bonus=0;
-        /*switch(rank){
-            case '5':
-                bonus=parseFloat(process.env.BONUS_RANK_5);
-                break;
-            case '4':
-                bonus=parseFloat(process.env.BONUS_RANK_4);
-                break;
-            case '3':
-                bonus=parseFloat(process.env.BONUS_RANK_3);
-                break;
-            case '2':
-                bonus=parseFloat(process.env.BONUS_RANK_2);
-                break;
-            case '1':
-                bonus=parseFloat(process.env.BONUS_RANK_1);
-                break;
-        }*///process.env使えなかったからいったんこれで↓。出力はできたからok。
-        /*switch(rank){
-            case '5':
-                bonus=parseFloat(12);
-                break;
-            case '4':
-                bonus=parseFloat(12);
-                break;
-            case '3':
-                bonus=parseFloat(12);
-                break;
-            case '2':
-                bonus=parseFloat(12);
-                break;
-            case '1':
-                bonus=parseFloat(12);
-                break;
-        }
+        recipe.ingredients.forEach(ingredient=>{
+            const item=invData.find(i=>i.id===ingredient.itemId);
 
-        const qualityCheck=Math.max(0,Math.min(1,baseRate+bonus));//最小０、最大１に調整;
-        const dice=Math.random();
+            if(item){
+                item.count-=ingredient.count;
+            }
+        });
 
-        if(dice<qualityCheck){//↑でサイコロふって、それより大きいかどうかで分ける
-            return {id:'hight',name:'高品質'};
-        }else if(dice<qualityCheck+(1-qualityCheck)/2){
-            return {id:'normal',name:'普通'};
+        invData=invData.filter(item=>item.count>0);
+
+        const craftItem=invData.find(i=>i.id===recipe.id);
+
+        if(craftItem){
+            craftItem.count++;
         }else{
-            return {id:'bad',name:'粗悪品'};
+            invData.push({id:recipe.id,count:1});
         }
-    }*/
-    tryCraft(recipe,rank){//recpeで何を作ったか特定かな？
-        const quality=this.calculateQuality(rank);
 
-        return quality;
+        this.scene.registry.set('inventoryData',invData);
+
+        console.log(`${recipe.name}を作成しました`);
+
+        this.unlock(recipe.id);
+
+        return true;
     }
     async unlock(recipeName){
         let unlocked=this.scene.registry.get('unlockedRecipes')||[];
 
-        if(!unlockedRecipes.includes(recipeName)){
-            unlockedRecipes.push(recipeName);
+        if(!unlocked.includes(recipeName)){
+            unlocked.push(recipeName);
 
             this.scene.registry.set('unlockedRecipes',unlocked);
             console.log('新レシピ解放！:'+recipeName);

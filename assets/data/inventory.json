@@ -7,6 +7,7 @@
         {"id":"fishing-rod","name":"釣り竿","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"甘いりんご"},
         {"id":"bread","name":"パン","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"甘いりんご"},
         {"id":"rock","name":"石","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"獄門疆みたいな石"},
-        {"id":"wood","name":"木材","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"甘いりんご"}
+        {"id":"wood","name":"木材","count":1,"isPlaceable":false,"qualityDetails":[1,0,0],"description":"甘いりんご"},
+        {"id":"wheat","name":"小麦","count":20,"isPlaceable":false,"qualityDetails":[10,2,8],"description":"甘いりんご"}
     ]
 }
