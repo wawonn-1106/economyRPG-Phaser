@@ -242,24 +242,27 @@ export default class WorkContent{
     renderHireCarousel(centerX){
         const total=this.hireCandidates.length;
 
-        const displayCandidates=[
-            (this.hireIndex-1+total)%total,this.hireIndex,(this.hireIndex+1)%total
-        ];
+        const maskShape=this.uiScene.make.graphics();
+        maskShape.fillStyle(0xffffff);
 
-        displayCandidates.forEach((candidateIndex,i)=>{
+        maskShape.fillRect(
+            this.uiScene.cameras.main.centerX+centerX-350, 
+            this.uiScene.cameras.main.centerY-250, 
+            700,500
+        );
+        this.listLayer.setMask(maskShape.createGeometryMask());
+
+        const offsets=[-2,-1,0,1,2];
+        offsets.forEach((offset)=>{
+            const candidateIndex=(this.hireIndex+offset+total*10)%total;
             const person=this.hireCandidates[candidateIndex];
-
-            const diff=i-1;
-
-            const x=centerX+(diff*260);
-            const isCenter=(diff===0);
-
+        
+            const x=centerX+(offset*260);
             const group=this.uiScene.add.container(x,-60);
+        
+            const img=this.uiScene.add.image(0,0,person.id).setDisplaySize(200, 280);
 
-            const img=this.uiScene.add.image(0,0,person.id).setDisplaySize(200,280);
-            if(isCenter)img.setStrokeStyle&& img.setStrokeStyle(4,0x2ecc71);
-
-            const name=this.uiScene.add.text(0,160,person.name,{
+            const name=this.uiScene.add.text(0,160, person.name,{
                 fontSize:'32px',
                 color:'#000',
                 fontStyle:'bold'
@@ -267,69 +270,136 @@ export default class WorkContent{
 
             group.add([img,name]);
 
-            group.setScale(isCenter? 1: 0.6).setAlpha(isCenter? 1: 0.4).setDepth(isCenter? 1:0.5);
+        
+            group.setDepth(offset===0? 10: 5);
+        
+        
+            const dist=Math.abs(offset);
+
+            group.setScale(dist===0? 1: (dist===1? 0.6: 0.3));
+            group.setAlpha(dist===0 ?1 : (dist===1? 0.4: 0));
+        
             this.listLayer.add(group);
         });
 
-        const leftArrow=this.uiScene.add.text(centerX-380,-60,'<',{
+        const arrowStyle={
             fontSize:'80px',
-            color:'#333'
-        }).setOrigin(0.5).setInteractive({useHandCursor:true});
+            color:'#333',
+            fontStyle:'bold'
+        };
+    
+        this.fixedLayer.removeAll(true);
 
-        const rightArrow=this.uiScene.add.text(centerX+380,-60,'>',{
-            fontSize:'80px',
-            color:'#333'
-        }).setOrigin(0.5).setInteractive({useHandCursor:true});
+        const leftArrow=this.uiScene.add.text(centerX-380,-60,'<',arrowStyle)
+            .setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(100);
 
-        leftArrow.on('pointerdown',()=>{
-            this.hireIndex=(this.hireIndex-1+total)%total;
+        const rightArrow=this.uiScene.add.text(centerX+380,-60,'>',arrowStyle)
+            .setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(100);
 
-            this.refresh();
+
+        const slideTo=(direction)=>{
+            if(this.isTweening)return;
+            this.isTweening=true;
+
+            this.uiScene.tweens.add({
+                targets:this.listLayer.list.filter(item=>item.type==='Container'),
+                x:direction==='right'? '-=260': '+=260',
+                duration:400,
+                ease:'Cubic.easeInOut',
+                onUpdate:(tween,target)=>{
+                    const dist=Math.abs(target.x-centerX);
+                
+                
+                    let scale,alpha;
+                    if(dist<=260){
+                        const p=dist/260;
+                        scale=Phaser.Math.Linear(1,0.6,p);
+                        alpha=Phaser.Math.Linear(1,0.4,p);
+
+                        target.setDepth(10);
+                    }else{
+                        const p=Math.min((dist-260)/260,1);
+                        scale=Phaser.Math.Linear(0.6,0.3,p);
+                        alpha=Phaser.Math.Linear(0.4,0,p);
+                        target.setDepth(5);
+                    }
+                
+                    target.setScale(scale);
+                    target.setAlpha(alpha);
+                },
+                onComplete:()=>{
+                    this.isTweening=false;
+                    if(direction==='right'){
+                        this.hireIndex=(this.hireIndex+1)%total;
+                    }else{
+                        this.hireIndex=(this.hireIndex-1+total)%total;
+                    }
+
+                    this.refresh();
+                }
+            });
+        };
+
+        leftArrow.on('pointerdown',() =>{
+            slideTo('left')
         });
 
         rightArrow.on('pointerdown',()=>{
-            this.hireIndex=(this.hireIndex+1)%total;
-
-            this.refresh();
+            slideTo('right')
         });
 
+        this.fixedLayer.add([leftArrow,rightArrow]);
+
         const current=this.hireCandidates[this.hireIndex];
-        const infoText=this.uiScene.add.text(centerX,140,`${current.description}\n要求賃金：${current.wage}`,{
+
+        const infoText=this.uiScene.add.text(centerX, 150, 
+            `${current.description}\n要求賃金：${current.wage}G`,{
             fontSize:'20px',
             color:'#333',
-            align:'center'
+            align:'center',
+            lineSpacing: 8
         }).setOrigin(0.5);
 
-        const hireBtn=this.uiScene.add.rectangle(centerX,240,220,60,0x2ecc71)
+        const hireBtn=this.uiScene.add.rectangle(centerX,250,220,60,0x2ecc71)
             .setInteractive({useHandCursor:true});
 
-        const hireTxt=this.uiScene.add.text(centerX,240,'この人を雇う',{
+        const hireTxt=this.uiScene.add.text(centerX,250,'この人を雇う',{
             fontSize:'24px',
             color:'#fff',
             fontStyle:'bold'
         }).setOrigin(0.5);
 
         hireBtn.on('pointerdown',()=>{
-            const newNPC={...current,id:`npc_${Date.now()}`,status:'idle',target:''};
+    
+            this.uiScene.tweens.add({
+                targets:[hireBtn,hireTxt],
+                scale:0.9,
+                duration:80,
+                yoyo:true,
+                onComplete:()=>{
+                    const newNPC={ ...current,id:`npc_${Date.now()}`,status:'idle',target: ''};
+                    this.NPCs.push(newNPC);
 
-            this.NPCs.push(newNPC);
-            this.selectedNPC=newNPC;
+                    this.selectedNPC=newNPC;
+                    this.isSelectingNewNPC=false;
 
-            this.refresh();
+                    this.refresh();
+                }
+            });
         });
 
-        const cancel=this.uiScene.add.text(centerX,280,'キャンセル',{
+        const cancel=this.uiScene.add.text(centerX,300,'キャンセル',{
             fontSize:'18px',
-            color:'e74c3c'
+            color:'#e74c3c'
         }).setOrigin(0.5).setInteractive({useHandCursor:true});
 
         cancel.on('pointerdown',()=>{
             this.isSelectingNewNPC=false;
+
             this.refresh();
         });
 
-        this.listLayer.add([leftArrow,rightArrow]);
         this.detailLayer.add([infoText,hireBtn,hireTxt,cancel]);
-    }
+}
 
 }

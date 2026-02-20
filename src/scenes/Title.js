@@ -1,3 +1,5 @@
+import API from '../utils/API.js'; 
+
 export default class Title extends Phaser.Scene{
     constructor(){
         super({key:'Title'});
@@ -27,8 +29,8 @@ export default class Title extends Phaser.Scene{
             continueBtn.disableInteractive();
 
             try{
-                const response=await fetch(`${this.SERVER_URL}/load`);
-                const data=await response.json();
+                //const response=await fetch(`${this.SERVER_URL}/load`);
+                const data=await API.loadGameData();
 
                 this.registry.set('money',data.money||0);
                 this.registry.set('unlockedIds',data.unlockedIds||[]);
@@ -103,8 +105,8 @@ export default class Title extends Phaser.Scene{
     }
     async fetchWeather(){//Rain,Snowを取得。
         try{
-            const response=await fetch(`${this.SERVER_URL}/weather`);
-            const data=await response.json();
+            //const response=await fetch(`${this.SERVER_URL}/weather`);
+            const data=await API.fetchWeather();
             this.registry.set('weather',data.main);
     
             //this.currentWeather=data.main;

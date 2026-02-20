@@ -8,6 +8,7 @@ import NPC from "../entities/NPC.js";
 import Player from "../entities/Player.js";
 import ShopContent from "../contents/ShopContent.js";
 //import Object from "../entities/Object.js";
+import API from '../utils/API.js'; 
 
 export default class BaseScene extends Phaser.Scene{
     constructor(config){
@@ -555,13 +556,13 @@ export default class BaseScene extends Phaser.Scene{
 
             console.log("送信データ:",payload);
         
-            const response=await fetch(`${this.SERVER_URL}/save`,{
+            /*const response=await fetch(`${this.SERVER_URL}/save`,{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify(payload)
-            });
+            });*/
 
-            const result=await response.json();
+            const result=await API.saveGameData(payload);
 
             console.log('セーブ成功',result);
 
@@ -586,12 +587,12 @@ export default class BaseScene extends Phaser.Scene{
                 }
             };
 
-            const response=await fetch(`${this.SERVER_URL}/save`,{
+            /*const response=await fetch(`${this.SERVER_URL}/save`,{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify(payload)
-            });
-            const result=await response.json();
+            });*/
+            const result=await API.recordSale(payload);
 
             console.log('販売履歴を記録しました',result);
         }catch(error){

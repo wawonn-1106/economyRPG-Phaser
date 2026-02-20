@@ -346,6 +346,11 @@
                  "name":"door",
                  "properties":[
                         {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"down"
+                        }, 
+                        {
                          "name":"spawnHolder",
                          "type":"string",
                          "value":"world_house"
@@ -372,6 +377,11 @@
                  "id":2,
                  "name":"door",
                  "properties":[
+                        {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"down"
+                        }, 
                         {
                          "name":"spawnHolder",
                          "type":"string",
