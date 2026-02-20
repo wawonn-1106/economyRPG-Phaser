@@ -2,6 +2,7 @@ import MenuManager from "../managers/MenuManager.js";
 import DictionaryContent from "../contents/DictionaryContent.js";
 import MachineContent from "../contents/MachineContent.js";
 //import DictionaryManager from "../managers/DictionaryManager.js";
+//import TradeContent from "../contents/TradeContent.js";
 
 export default class UIScene extends Phaser.Scene{
     constructor(){
@@ -38,13 +39,14 @@ export default class UIScene extends Phaser.Scene{
         this.dayText=null;
         this.clockText=null;
     }
-    create(){
+    create(data){
         const worldScene=this.scene.get('World');
 
         this.dictionaryContent = new DictionaryContent(this);//createQuickViewのため
         //this.dictionaryManager=new DictionaryManager();//DCでgetTermsするため
         this.menuManager=new MenuManager(this,worldScene);
         this.machineContent = new MachineContent(this);
+        //this.tradeContent = new TradeContent(this, this.tradeScene);
 
         //const money=this.registry.get('money')||0;
         //this.moneyText=`${money}G`;

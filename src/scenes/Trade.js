@@ -5,17 +5,30 @@ import BaseScene from './BaseScene.js';
 export default class Trade extends BaseScene{
     constructor(){
         super({key:'Trade'});
+
+        this.activeTraders=[];
+
     }
     create(data){
         const map=this.createMap('trade','Serene_Village_48x48','tileset');//いったんhouseで代用
 
         super.create(data); 
 
+        this.spawnInitialTrader();
+
+
+        /*const uiScene=this.scene.get('UIScene');
+        if(uiScene){
+            uiScene.tradeScene=this;
+            if(uiScene.tradeContent){
+                uiScene.tradeContent.tradeScene=this;
+            }
+        }*/
+
         this.scene.launch('UIScene');
 
         this.setupSceneTransitions(map, this.player);
 
-        this.spawnInitialTrader();
     }
     spawnInitialTrader(){
             const rawData=this.cache.json.get('traderData');//いったん直で
@@ -35,6 +48,8 @@ export default class Trade extends BaseScene{
 
             const traderCount=5;
 
+            this.activeTraders=[];
+
             for(let i=0;i<traderCount;i++){
                 if(!randomSpawnPoints[i]||!randomTraders[i])break;
 
@@ -49,23 +64,24 @@ export default class Trade extends BaseScene{
                 this.setupCollisions(guest);
 
                 this.interactables.push({type:'npc',instance:guest});
+
+                this.activeTraders.push(guest);
             }
-
-            
-
-    
-            //const targetShelf=Phaser.Utils.Array.GetRandom(avaliableShelves);
-    
-            //targetShelf.sprite.isOccupied=true;
-    
-            //const config={...customer,isGuest:true,state:'browsing'};
-            //const guest=new NPC(this,targetShelf.sprite.x,targetShelf.sprite.y+48,customer.npcId,config);
-            //guest.currentTarget=targetShelf;
-
-            
     }
     update(time,delta){
         super.update(time, delta);
 
         this.player.update();
-    }}
+
+        const uiScene=this.scene.get('UIScene');
+
+        if(uiScene&& uiScene.menuManager&& uiScene.menuManager.isOpenMenu){
+            if(uiScene.menuManager.currentTab==='trade'){
+                const content=uiScene.menuManager.contents['trade'];
+                if(content){
+                    content.update(); 
+                }
+            }
+        }
+    }
+}
