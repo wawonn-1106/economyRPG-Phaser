@@ -11,6 +11,7 @@ import SaveContent from '../contents/SaveContent.js';
 import StatisticsContent from '../contents/StatisticsContent.js';
 import ShopContent from '../contents/ShopContent.js';
 import DeskContent from '../contents/DeskContent.js';
+import TradeContent from '../contents/TradeContent.js';
 
 export default class MenuManager{
     constructor(uiScene){
@@ -36,7 +37,9 @@ export default class MenuManager{
         //----------------------店-----------------------------------
             'shop':new ShopContent(uiScene,this),
         //----------------------家-----------------------------------
-            'desk':new DeskContent(uiScene)
+            'desk':new DeskContent(uiScene),
+        //----------------------交易-----------------------------------
+            'trade':new TradeContent(uiScene)
         };
     }
     get activeScene(){

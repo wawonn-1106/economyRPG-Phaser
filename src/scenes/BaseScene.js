@@ -283,6 +283,22 @@ export default class BaseScene extends Phaser.Scene{
                 });
             }
 
+            if(obj.name==='trade'){
+
+                const tradeSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),'shelf')
+                    .setDepth(5);//shelfで代用
+                
+                this.physics.add.existing(tradeSprite,true);
+                this.physics.add.collider(this.player,tradeSprite);
+
+                this.interactables.push({
+                    type:'trade',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
+
             if(obj.name==='displayShelf'){
                 const ui=this.scene.get('UIScene');
                 const shelfId=obj.properties?.find(p=>p.name==='shelfId')?.value;
@@ -420,8 +436,20 @@ export default class BaseScene extends Phaser.Scene{
         })
 
         if(spawnHolder){
-            const x=spawnHolder.x+(spawnHolder.width/2);
-            const y=spawnHolder.y+(spawnHolder.height/2);
+            let x=spawnHolder.x+(spawnHolder.width/2);
+            let y=spawnHolder.y+(spawnHolder.height/2);
+
+            const offset=100;
+
+            const direction=spawnHolder.properties?.find(p=>p.name==='direction')?.value;
+
+            if(direction==='up')y-=offset;
+            else if(direction==='down')y+=offset;
+            else if(direction==='right')x+=offset;
+            else if(direction==='left')x-=offset;
+            else{
+                y-=offset;
+            }
 
             this.player.setPosition(x,y);
         }
@@ -635,6 +663,9 @@ export default class BaseScene extends Phaser.Scene{
                     break;
                 case 'desk':
                     this.menuManager.toggle('desk');
+                    break;
+                case 'trade':
+                    this.menuManager.toggle('trade');
                     break;
 
                 case 'displayShelf'://shelfに変える

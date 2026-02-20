@@ -411,16 +411,31 @@
                  "name":"wrap",
                  "properties":[
                         {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"right"
+                        }, 
+                        {
+                         "name":"spawnHolder",
+                         "type":"string",
+                         "value":"world_trade"
+                        }, 
+                        {
+                         "name":"spawnPoint",
+                         "type":"string",
+                         "value":"front_trade"
+                        }, 
+                        {
                          "name":"target",
                          "type":"string",
-                         "value":"Forest"
+                         "value":"Trade"
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":48.4848484848485,
-                 "x":309.090909090909,
-                 "y":651.515151515152
+                 "x":336.363636363636,
+                 "y":648.484848484849
                 }, 
                 {
                  "height":24.2424242424242,

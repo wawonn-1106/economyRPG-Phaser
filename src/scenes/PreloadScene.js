@@ -21,6 +21,7 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.tilemapTiledJSON('map','assets/tilemaps/economyRPG.json');
         this.load.tilemapTiledJSON('house','assets/tilemaps/House.json');
         this.load.tilemapTiledJSON('shop','assets/tilemaps/Shop.json');
+        this.load.tilemapTiledJSON('trade','assets/tilemaps/Trade.json');
 //--------------------------------tileset-----------------------------------------------------
         this.load.image('tileset','assets/tilesets/Serene_Village_48x48.png');
 //--------------------------------animation----------------------------------------------------
@@ -59,6 +60,7 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.json('inventoryData','assets/data/inventory.json');
         this.load.json('NPCData','assets/data/NPC.json');
         this.load.json('customerData','assets/data/Customer.json');
+        this.load.json('traderData','assets/data/Trader.json');
 
         //this.load.json('saveData',`${this.SERVER_URL}/load`);
 //--------------------------------タイトル------------------------------------------------------       

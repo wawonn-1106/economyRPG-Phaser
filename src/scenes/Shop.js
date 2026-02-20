@@ -71,6 +71,8 @@ export default class Shop extends BaseScene{
 
             this.villagers.add(guest);
             this.setupCollisions(guest);
+
+            this.interactables.push({type:'npc',instance:guest});
         }
     }
     spawnCustomer(){
