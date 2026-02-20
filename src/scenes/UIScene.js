@@ -186,6 +186,7 @@ export default class UIScene extends Phaser.Scene{
         this.decorationBtn?.setVisible(visible);
         this.menuBtn?.setVisible(visible);
         this.guideButton?.setVisible(visible);
+        this.moneyText?.setVisible(visible);
 
         this.timeBg?.setVisible(visible);
         this.dayText?.setVisible(visible);
@@ -500,9 +501,11 @@ export default class UIScene extends Phaser.Scene{
         }
 
         if(this.gameTime.hour>=24){
-            this.gameTime.hour=0;
+            /*this.gameTime.hour=0;
             this.gameTime.day++;
-            this.dayText.setText(`Day${this.gameTime.day}`).setDepth(3001);
+            this.dayText.setText(`Day${this.gameTime.day}`).setDepth(3001);*/
+            this.goToNextDay();
+            return;
         }
 
         this.updateClock();
@@ -516,6 +519,28 @@ export default class UIScene extends Phaser.Scene{
 
         this.clockText.setText(`${hour}:${minute}:${ampm}`);
 
+    }
+    goToNextDay(){
+        this.gameTime.elapsed=0;
+
+        this.cameras.main.fadeOut(1000,0,0,0);
+
+        this.cameras.main.once('camerafadeoutcomplete',()=>{
+            this.gameTime.day++;
+            this.gameTime.hour=6;
+            this.gameTime.minute=0;
+
+            this.updateClock();
+            this.dayText.setText(`Day${this.gameTime.day}`);
+
+            const tradeScene=this.scene.manager.getScene('Trade');
+            if(this.scene.isActive('Trade')&& tradeScene.spawnInitialTrader){
+                tradeScene.spawnInitialTrader();
+            }
+
+            this.registry.set('gameTime',this.gameTime);
+            this.cameras.main.fadeIn(1000,0,0,0);
+        });
     }
 //---------------------デコレーションモード------------------------------------------------------------------------------------------------------------------
     /*toggleDecorationMode(){

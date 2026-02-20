@@ -31,42 +31,56 @@ export default class Trade extends BaseScene{
 
     }
     spawnInitialTrader(){
-            const rawData=this.cache.json.get('traderData');//いったん直で
+        if(this.activeTraders){
 
-            const traderData=rawData.traderList;
+            this.activeTraders.forEach(trader=>{
+                if(trader.destroy)trader.destroy();
+            });
+        }
+
+        this.activeTraders=[];
+
+        const uiScene=this.scene.get('UIScene');
+        const gameDay=uiScene.gameTime.day||1;
+
+        const rawData=this.cache.json.get('traderData');//いったん直で
+
+        const traderData=rawData.traderList;
             
-            const objectLayer=this.map.getObjectLayer('Object');
-            const spawnPoints=objectLayer.objects.filter(obj=>obj.name==='trader_spawn');
+        const objectLayer=this.map.getObjectLayer('Object');
+        const spawnPoints=objectLayer.objects.filter(obj=>obj.name==='trader_spawn');
 
-            if(spawnPoints.length===0){
-                console.log('スポーン地点が0です');
-                return;
-            }
+        if(spawnPoints.length===0){
+            console.log('スポーン地点が0です');
+            return;
+        }
 
-            const randomTraders=Phaser.Utils.Array.Shuffle([...traderData]);
-            const randomSpawnPoints=Phaser.Utils.Array.Shuffle([...spawnPoints]);
+        const r=new Phaser.Math.RandomDataGenerator([gameDay.toString()]);
 
-            const traderCount=5;
+        const randomTraders=r.shuffle([...traderData]);
+        const randomSpawnPoints=r.shuffle([...spawnPoints]);
 
-            this.activeTraders=[];
+        const traderCount=5;
 
-            for(let i=0;i<traderCount;i++){
-                if(!randomSpawnPoints[i]||!randomTraders[i])break;
+            
 
-                const spawnPoint=randomSpawnPoints[i];
-                const trader=randomTraders[i];
+        for(let i=0;i<traderCount;i++){
+            if(!randomSpawnPoints[i]||!randomTraders[i])break;
 
-                const guest=new NPC(
-                    this,spawnPoint.x,spawnPoint.y,trader.npcId,{...trader,isGuest:true}
-                );
+            const spawnPoint=randomSpawnPoints[i];
+            const trader=randomTraders[i];
 
-                this.villagers.add(guest);
-                this.setupCollisions(guest);
+            const guest=new NPC(
+                this,spawnPoint.x,spawnPoint.y,trader.npcId,{...trader,isGuest:true}
+            );
 
-                this.interactables.push({type:'npc',instance:guest});
+            this.villagers.add(guest);
+            this.setupCollisions(guest);
 
-                this.activeTraders.push(guest);
-            }
+            this.interactables.push({type:'npc',instance:guest});
+
+            this.activeTraders.push(guest);
+        }
     }
     update(time,delta){
         super.update(time, delta);
