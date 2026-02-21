@@ -44,6 +44,7 @@ export default class BaseScene extends Phaser.Scene{
 
         this.initManagers();
         this.initInput();
+        this.initDailyTraders();
         //this.initPlacementPreview();
         //this.initDecorationGrid();
         //this.initAnimations();
@@ -107,16 +108,25 @@ export default class BaseScene extends Phaser.Scene{
             this.handleAction();//スペース押されたら、アクションを起こせるかどうかの可否と、アクションへの分岐
         })
     }
-    /*initPlacementPreview(){
-        this.placePreview=this.add.sprite(0,0,'')
-            .setAlpha(0.5)
-            .setVisible(false)
-            .setDepth(1000);
+    initDailyTraders(){
+        const gameTime=this.registry.get('gameTime')||1;
+
+        let dailyData=this.registry.get('dailyTraders');
+
+        if(!dailyData||dailyData.data!==gameTime.day){
+            const rawData=this.cache.json.get('traderData');
+            const traderList=rawData.traderList;
+
+            const selected=traderList.sort(()=>0.5-Math.random()).slice(0,5);
+
+            dailyData={
+                date:gameTime.day,
+                traders:selected
+            };
+            this.registry.set('dailyTraders',dailyData);
+        }
+        //this.currentTraders=dailyData.traders;
     }
-    initDecorationGrid(){
-        this.decorationGrid=this.add.graphics();
-        this.decorationGrid.setDepth(20000);
-    }*/
     createEntities(playerPos,npcPos){
         if(this.villagers){
             this.villagers.destroy(true);
@@ -278,22 +288,6 @@ export default class BaseScene extends Phaser.Scene{
 
                 this.interactables.push({
                     type:'desk',
-                    data:obj,
-                    x:obj.x+(obj.width/2),
-                    y:obj.y+(obj.height/2)
-                });
-            }
-
-            if(obj.name==='trade'){
-
-                const tradeSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),'shelf')
-                    .setDepth(5);//shelfで代用
-                
-                this.physics.add.existing(tradeSprite,true);
-                this.physics.add.collider(this.player,tradeSprite);
-
-                this.interactables.push({
-                    type:'trade',
                     data:obj,
                     x:obj.x+(obj.width/2),
                     y:obj.y+(obj.height/2)
@@ -665,10 +659,6 @@ export default class BaseScene extends Phaser.Scene{
                 case 'desk':
                     this.menuManager.toggle('desk');
                     break;
-                case 'trade':
-                    this.menuManager.toggle('trade');
-                    break;
-
                 case 'displayShelf'://shelfに変える
                     //店に並べる画面
                     const targetShelf=this.actionTarget.shelfInstance;
@@ -687,173 +677,6 @@ export default class BaseScene extends Phaser.Scene{
             }
         }                
     }
-//----------デコレーションモード-------------------------------------------------------------------------------------------
-    /*setDecorationMode(active){
-        this.isDecorationMode=active;
-        this.decorationGrid.clear();
-
-        console.log('setDecorationModeです');
-
-        if(this.isDecorationMode){
-            this.decorationGrid.lineStyle(1,0xffffff,0.2);
-
-            const gridSize=48;
-
-            const width=this.map.widthInPixels;
-            const height=this.map.heightInPixels;
-
-            console.log(`絵画開始、${width}${height}`);
-            
-            this.decorationGrid.beginPath();
-
-            for(let x=0;x<=width;x+=gridSize){
-                this.decorationGrid.moveTo(x,0);
-
-                this.decorationGrid.lineTo(x,height);
-            }
-
-            for(let y=0;y<=height;y+=gridSize){
-                this.decorationGrid.moveTo(0,y);
-
-                this.decorationGrid.lineTo(width,y);
-            }
-        
-        this.decorationGrid.closePath();
-        this.decorationGrid.strokePath();
-
-        console.log('五目');
-    }
-   }
-    updatePlacementPreview(){
-        if(!this.isDecorationMode)return;
-
-        const ui=this.scene.get('UIScene');
-        if(!this.inventoryData)return;
-
-        const inventory=this.registry.get('inventoryData');
-        if(!inventory)return;
-
-        const selectedItem=inventory[ui.selectedSlotIndex];
-
-        if(selectedItem&& selectedItem.isPlaceable){//placeableは後で付ける
-            this.placePreview.setVisible(true);
-            this.placePreview.setTexture(selectedItem.id);
-
-            const offset=48;
-            const gridSize=48;
-            let targetX=this.player.x+(this.player.flipX ?-gridSize:gridSize);
-            //let targetX=this.player.x;
-            let targetY=this.player.y;
-
-            if(this.player.flipX){
-                targetX-=offset;
-            }else{
-                targetX+=offset;
-            }
-
-            
-            const gridX=Math.floor(targetX/gridSize)*gridSize+(gridSize/2);
-            const gridY=Math.floor(targetY/gridSize)*gridSize+(gridSize/2);
-
-            this.placePreview.setPosition(gridX,gridY);
-
-            if(this.canPlaceAt(gridX,gridY)){
-                this.placePreview.clearTint();
-                this.canPlace=true;
-            }else{
-                this.placePreview.setTint(0xff0000)//赤
-                this.canPlace=false;
-            }
-        }else{
-            this.placePreview.setVisible(false);
-            this.canPlace=false;
-        }
-    }
-    canPlaceAt(x,y){
-        const isOverlapping=this.interactables.some(item=>{
-            return item.x===x && item.y===y;
-        });
-
-        if(isOverlapping)return false;
-
-        //const tile=this.onGroundLayer.getTileAtWorld(x,y);
-        const checkLayers=[this.onGroundLayer,this.houseLayer];
-
-        for(const layer of checkLayers){//for(const A of B){}
-            //if (layer && typeof layer.getTileAtWorld=== 'function'){
-                //↑getTileAtWorldは関数であると定義、getTileAtWorldはJSの機能じゃないから必要
-                if(layer){
-                    const tile=layer.getTileAtWorldXY(x,y);
-
-                    if(tile&& tile.collides){
-                    return false;
-                }
-                }  
-            //}
-        }
-        return true;
-    }
-    placeItem(){
-        const ui=this.scene.get('UIScene');
-
-        let inventory=[...this.registry.get('inventoryData')];
-
-        const selectedItem=inventory[ui.selectedSlotIndex];
-        if(!selectedItem)return;
-        //const selectedItem=this.inventoryData[ui.selectedSlotIndex];
-
-        const x=this.placePreview.x;
-        const y=this.placePreview.y;
-
-        const newItem=this.add.sprite(x,y,selectedItem.id).setDepth(y);
-
-        let shelfId=null;
-        let shelfInstance=null;
-
-        if(selectedItem.id.includes('shelf')){
-            shelfId=`shelf_${Date.now()}`;
-
-            shelfInstance=new ShopContent(ui,this.menuManager,shelfId);
-
-            if(!this.allShelves)this.allShelves=[];
-
-            this.allShelves.push(shelfInstance);
-        }
-
-        this.physics.add.existing(newItem,true);
-        this.physics.add.collider(this.player,newItem);
-        this.physics.add.collider(this.villagers,newItem);
-
-        this.interactables.push({
-            type: selectedItem.id.includes('shelf') ? 'displayShelf' : selectedItem.id,
-            instance:newItem,
-            x:x,
-            y:y,
-            isPlaced:true,//回収するときのフラグ
-            shelfId:shelfId,
-            shelfInstance:shelfInstance
-        });
-
-        selectedItem.count--;
-
-        if(selectedItem.count<=0){
-            inventory[ui.selectedSlotIndex]={id:null,count:0};
-
-            //手に持ってるものを消す処理の追加
-            if(this.player&& this.player.updateHeldItem){
-                this.player.updateHeldItem(null);
-            }
-            this.placePreview.setVisible(false);
-            this.canPlace=false;
-        }
-
-        this.registry.set('inventoryData',[...inventory]);
-        console.log("地面設置後のRegistry:",this.registry.get('inventoryData'));
-
-        this.inventoryData=[...inventory];
-
-        ui.updateHotbar(inventory);
-    }*/
 //-----------------Interactablesの更新------------------------------------------------------------------------------------
     updateInteractables(player){
         let minDistance=100;

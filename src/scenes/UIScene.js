@@ -533,36 +533,15 @@ export default class UIScene extends Phaser.Scene{
             this.updateClock();
             this.dayText.setText(`Day${this.gameTime.day}`);
 
-            const tradeScene=this.scene.manager.getScene('Trade');
+            /*const tradeScene=this.scene.manager.getScene('Trade');
             if(this.scene.isActive('Trade')&& tradeScene.spawnInitialTrader){
                 tradeScene.spawnInitialTrader();
-            }
+            }*/
 
             this.registry.set('gameTime',this.gameTime);
             this.cameras.main.fadeIn(1000,0,0,0);
         });
     }
-//---------------------デコレーションモード------------------------------------------------------------------------------------------------------------------
-    /*toggleDecorationMode(){
-        if(this.menuManager&& this.menuManager.isOpenMenu){
-            this.menuManager.closeMenu();
-        }
-        
-        this.isDecorationMode=!this.isDecorationMode;
-
-        this.hotbar?.setVisible(this.isDecorationMode);/*this.hotbar?。この?はthis.hotbarがなかったら無視
-        不測のエラーを防げて便利だが、使いすぎるとエラーの原因がわからなくなるから注意*/
-        
-        /*this.selector?.setVisible(this.isDecorationMode);
-
-        this.hotbarIcons.forEach(icon=>icon?.setVisible(this.isDecorationMode));
-        this.hotbarTexts.forEach(text=>text?.setVisible(this.isDecorationMode));
-
-        const activeScene=this.scene.manager.getScenes(true).find(s=>s.scene.key!=='UIScene');
-        if(activeScene){
-            activeScene.setDecorationMode(this.isDecorationMode);
-        }
-    }*/
     update(time,delta){
         const world=this.scene.get('World');
 

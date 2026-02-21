@@ -1,3 +1,4 @@
+import TradeContent from './TradeContent.js';
 import WorkContent from './WorkContent.js';
 
 export default class DeskContent{
@@ -29,8 +30,8 @@ export default class DeskContent{
             case 'select':
                 this.renderSelectView();
                 break;
-            case 'study':
-                this.renderStudyView();
+            case 'trade':
+                this.uiScene.menuManager.toggle('trade');
                 break;
             case 'work':
                 this.renderWorkView();
@@ -47,7 +48,7 @@ export default class DeskContent{
         this.contentLayer.add(title);
 
         const options=[
-            {id:'study',name:'勉強をする',icon:'study',x:-220},
+            {id:'trade',name:'交易をする',icon:'trade',x:-220},
             {id:'work',name:'事務作業をする',icon:'work',x:200}
         ];
 
@@ -90,14 +91,19 @@ export default class DeskContent{
             });
         });
     }
-    renderStudyView(){
-        const studyTitle=this.uiScene.add.text(0,-180,'勉強します',{
+    renderTradeView(){
+        /*const tradeTitle=this.uiScene.add.text(0,-180,'交易します',{
             fontSize:'40px',
             color:'#000',
             fontStyle:'bold'
         }).setOrigin(0.5);
 
-        this.contentLayer.add(studyTitle);
+        this.contentLayer.add(tradeTitle);*/
+
+        const tradeView=new TradeContent(this.uiScene);
+        const tradeContainer=tradeView.createView();
+
+        this.contentLayer.add(tradeContainer);
 
         const backBtn=this.uiScene.add.text(480,-280,'←',{
             fontSize:'60px',
@@ -113,8 +119,8 @@ export default class DeskContent{
         this.contentLayer.add(backBtn);
     }
     renderWorkView(){
-        const workView=new WorkContent(this.uiScene);
-        const workContainer=workView.createView();
+        //const workView=new WorkContent(this.uiScene);
+        //const workContainer=workView.createView();
 
         /*const workTitle=this.uiScene.add.text(0,-180,'事務作業します',{
             fontSize:'40px',

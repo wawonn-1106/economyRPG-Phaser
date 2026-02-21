@@ -40,12 +40,20 @@ export default class Trade extends BaseScene{
 
         this.activeTraders=[];
 
-        const uiScene=this.scene.get('UIScene');
+        /*const uiScene=this.scene.get('UIScene');
         const gameDay=uiScene.gameTime.day||1;
 
         const rawData=this.cache.json.get('traderData');//いったん直で
 
-        const traderData=rawData.traderList;
+        const traderData=rawData.traderList;*/
+        const dailyData=this.registry.get('dailyTraders');
+
+        if(!dailyData||!dailyData.traders){
+            console.error('商人のデータがありません');
+            return;
+        }
+
+        const traderList=dailyData.traders;
             
         const objectLayer=this.map.getObjectLayer('Object');
         const spawnPoints=objectLayer.objects.filter(obj=>obj.name==='trader_spawn');
@@ -55,24 +63,25 @@ export default class Trade extends BaseScene{
             return;
         }
 
-        const r=new Phaser.Math.RandomDataGenerator([gameDay.toString()]);
+        //const r=new Phaser.Math.RandomDataGenerator([gameDay.toString()]);
 
-        const randomTraders=r.shuffle([...traderData]);
-        const randomSpawnPoints=r.shuffle([...spawnPoints]);
+        /*const randomTraders=r.shuffle([...traderData]);
+        const randomSpawnPoints=r.shuffle([...spawnPoints]);*/
+        const shuffledSpawns=[...spawnPoints].sort(()=>0.5-Math.random());
 
-        const traderCount=5;
+        //const traderCount=5;
+        
+        //const registryData=[];
 
-            
-
-        for(let i=0;i<traderCount;i++){
-            if(!randomSpawnPoints[i]||!randomTraders[i])break;
-
-            const spawnPoint=randomSpawnPoints[i];
-            const trader=randomTraders[i];
+        traderList.forEach((trader,i)=>{
+            const spawnPoint=shuffledSpawns[i];
+            if(!spawnPoint) return;
 
             const guest=new NPC(
                 this,spawnPoint.x,spawnPoint.y,trader.npcId,{...trader,isGuest:true}
             );
+            guest.traderInfo=trader;
+
 
             this.villagers.add(guest);
             this.setupCollisions(guest);
@@ -80,22 +89,13 @@ export default class Trade extends BaseScene{
             this.interactables.push({type:'npc',instance:guest});
 
             this.activeTraders.push(guest);
-        }
+        });
+        const gameTime=this.registry.get('gameTime')||1;
+        this.registry.set('dailyTraders',{date:gameTime.day,traders:traderList});
     }
     update(time,delta){
         super.update(time, delta);
 
         this.player.update();
-
-        const uiScene=this.scene.get('UIScene');
-
-        if(uiScene&& uiScene.menuManager&& uiScene.menuManager.isOpenMenu){
-            if(uiScene.menuManager.currentTab==='trade'){
-                const content=uiScene.menuManager.contents['trade'];
-                if(content){
-                    content.update(); 
-                }
-            }
-        }
     }
 }

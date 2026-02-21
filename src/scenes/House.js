@@ -21,18 +21,22 @@ export default class House extends BaseScene{
         //this.setPlayerSpawnPoint(data);
 
         this.setupSceneTransitions(map, this.player);
-
-        //this.setupCollisions(this.player);
-        //this.setupCollisions(this.villagers);
-
-        //this.physics.add.collider(this.player,this.villagers);
-        //this.physics.add.collider(this.villagers,this.villagers);
-
-        //this.setupCamera(this.player);
     }
     update(time,delta){
         super.update(time, delta);
 
         this.player.update();
+
+        const uiScene=this.scene.get('UIScene');
+
+        if(uiScene&& uiScene.menuManager&& uiScene.menuManager.isOpenMenu){
+        
+            const currentTab=uiScene.menuManager.currentTab;
+            const content=uiScene.menuManager.contents[currentTab];
+
+            if(content&& content.update){
+                content.update(time, delta); 
+            }
+        }
     }
 }
