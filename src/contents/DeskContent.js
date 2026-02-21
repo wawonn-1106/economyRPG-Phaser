@@ -1,43 +1,28 @@
-import TradeContent from './TradeContent.js';
-import WorkContent from './WorkContent.js';
-
 export default class DeskContent{
     constructor(uiScene,menuManager){
         this.uiScene=uiScene;
         this.menuManager=menuManager;
 
-        this.currentView='select';
         this.container=null;
         this.contentLayer=null;
     }
-    createView(){
 
+
+    createView(){
         this.container=this.uiScene.add.container(0,0);
 
         const bg=this.uiScene.add.image(0,0,'menu-bg').setDisplaySize(1000,600);
         this.container.add(bg);
-        
-        this.refresh();
-        return this.container;
-    }
-    refresh(){
-        if(this.contentLayer)this.contentLayer.destroy();
 
         this.contentLayer=this.uiScene.add.container(0,0);
         this.container.add(this.contentLayer);
 
-        switch(this.currentView){
-            case 'select':
-                this.renderSelectView();
-                break;
-            case 'trade':
-                this.uiScene.menuManager.toggle('trade');
-                break;
-            case 'work':
-                this.renderWorkView();
-                break;
-        }
+        this.renderSelectView();
+
+        return this.container;
     }
+
+
     renderSelectView(){
         const title=this.uiScene.add.text(0,-180,'何をしますか？',{
             fontSize:'40px',
@@ -73,7 +58,7 @@ export default class DeskContent{
             const buttonText=this.uiScene.add.text(0,80,option.name,{
                 fontSize:'28px',
                 color:'#fff',
-                fontSty:'bold'
+                fontStyle:'bold'
             }).setOrigin(0.5);
 
             const buttonIcon=this.uiScene.add.image(0,30,option.icon)
@@ -81,73 +66,14 @@ export default class DeskContent{
                 .setDisplaySize(200,200);
 
             buttonGroup.add([buttonBg,buttonText,buttonIcon]);
-
             this.contentLayer.add(buttonGroup);
 
             buttonBg.on('pointerdown',()=>{
-                this.currentView=option.id;
+                
+                this.uiScene.menuManager.toggle('desk');
 
-                this.refresh();
+                this.uiScene.menuManager.toggle(option.id);
             });
         });
     }
-    renderTradeView(){
-        /*const tradeTitle=this.uiScene.add.text(0,-180,'交易します',{
-            fontSize:'40px',
-            color:'#000',
-            fontStyle:'bold'
-        }).setOrigin(0.5);
-
-        this.contentLayer.add(tradeTitle);*/
-
-        const tradeView=new TradeContent(this.uiScene);
-        const tradeContainer=tradeView.createView();
-
-        this.contentLayer.add(tradeContainer);
-
-        const backBtn=this.uiScene.add.text(480,-280,'←',{
-            fontSize:'60px',
-            color:'#000'
-        }).setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(5001);
-
-        backBtn.on('pointerdown',()=>{
-            this.currentView='select';
-            this.refresh();
-
-        });
-
-        this.contentLayer.add(backBtn);
-    }
-    renderWorkView(){
-        //const workView=new WorkContent(this.uiScene);
-        //const workContainer=workView.createView();
-
-        /*const workTitle=this.uiScene.add.text(0,-180,'事務作業します',{
-            fontSize:'40px',
-            color:'#000',
-            fontStyle:'bold'
-        }).setOrigin(0.5);*/
-
-        this.contentLayer.add(workContainer);
-
-        const backBtn=this.uiScene.add.text(480,-280,'←',{
-            fontSize:'60px',
-            color:'#000'
-        }).setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(5001);
-
-        backBtn.on('pointerdown',()=>{
-            this.currentView='select';
-            this.refresh();
-
-        });
-
-        this.contentLayer.add(backBtn);
-    }
-    /*get currentInventory(){
-        const data=this.uiScene.registry.get('inventoryData')||[];
-
-        console.log('ゲッターのデータ',JSON.parse(JSON.stringify(data)));
-        return data;
-        
-    }*/
 }

@@ -71,21 +71,7 @@ export default class UIScene extends Phaser.Scene{
 
         this.updateClock();
 
-        /*this.isDecorationMode=false;
-
-        this.decorationBtn=this.add.image(50,50,'decoration-btn')
-            .setInteractive({useHandCursor:true})
-            .setScale(0.8)
-            .setScrollFactor(0)
-            .setDepth(3000);
-        
-        this.decorationBtn.on('pointerdown',()=>{
-            this.toggleDecorationMode();
-            console.log('切り替わります');
-        });
-
-        this.decorationBtn.on('pointerover',()=>this.decorationBtn.setScale(0.9));
-        this.decorationBtn.on('pointerout',()=>this.decorationBtn.setScale(0.8));*/
+        this.registry.set('gameTime',this.gameTime);
 
         this.menuBtn=this.add.image(50,50,'menu-btn')
             .setInteractive({useHandCursor:true})

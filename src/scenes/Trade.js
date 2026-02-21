@@ -90,8 +90,8 @@ export default class Trade extends BaseScene{
 
             this.activeTraders.push(guest);
         });
-        const gameTime=this.registry.get('gameTime')||1;
-        this.registry.set('dailyTraders',{date:gameTime.day,traders:traderList});
+        //const gameTime=this.registry.get('gameTime')||1; UISceneでセットしてるはず
+        this.registry.set('dailyTraders',{traders:traderList});
     }
     update(time,delta){
         super.update(time, delta);

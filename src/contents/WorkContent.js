@@ -43,13 +43,13 @@ export default class WorkContent{
         this.container.add([this.listLayer,this.fixedLayer,this.detailLayer]);
         //this.fixedLayer.setDepth(100);
 
-        const closeBtn=this.uiScene.add.text(480,-280,'×',{
+        const closeBtn=this.uiScene.add.text(480,-280,'←',{
             fontSize:'60px',
             color:'#000'
         }).setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(5001);
 
         closeBtn.on('pointerdown',()=>{
-            this.uiScene.menuManager.toggle('desk');
+            this.uiScene.menuManager.switchTab('desk');
         });
 
         this.container.add(closeBtn);

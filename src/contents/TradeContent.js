@@ -42,37 +42,45 @@ export default class TradeContent {
         mapBorder.strokeRect(-this.mapW/2,-this.mapH/2,this.mapW,this.mapH);
         this.mapArea.add(mapBorder);
 
-        const closeBtn=this.uiScene.add.text(480,-280,'×',{
+        this.npcMarkers=[];
+        this.isUIOpen=false;
+
+        const closeBtn=this.uiScene.add.text(480,-280,'←',{
             fontSize:'60px',
             color:'#000'
         }).setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(5001);
 
         closeBtn.on('pointerdown',()=>{
+            this.uiScene.input.off('wheel');
             this.uiScene.menuManager.toggle('desk');
         });
 
         this.container.add(closeBtn);
 
-        const maskShape=this.uiScene.make.graphics();
-        maskShape.fillStyle(0xffffff);
-        const camera=this.uiScene.cameras.main;
-        maskShape.fillRect(camera.centerX-430,camera.centerY-220,this.listWidth,360);
-        this.listMask=maskShape.createGeometryMask();
-
         const dailyData=this.uiScene.registry.get('dailyTraders');
+        const gameTime=this.uiScene.registry.get('gameTime');
+
+        console.log("1. dailyData:", dailyData);
         const traders=dailyData? dailyData.traders:[];
+
+        const daySeed=gameTime.day;
+
+        console.log('ゲームの時間'+gameTime.day);
 
         const padding=50;
         const rangeX=this.mapW-padding*2;
         const rangeY=this.mapH-padding*2;
 
-        traders.forEach(data=>{
+        traders.forEach((data,index)=>{
             const marker=this.uiScene.add.container(0,0);
             
-            const randX=(Math.random()*rangeX)-(rangeX/2);
-            const randY=(Math.random()*rangeY)-(rangeY/2);
+            const randX=Math.abs(Math.sin(daySeed*12.9+index*7.8))%1;
+            const randY=Math.abs(Math.sin(daySeed*index*45.1+12.3))%1;
 
-            marker.setPosition(randX,randY);
+            const startX=(randX*rangeX)-(rangeX/2);
+            const startY=(randY*rangeY)-(rangeY/2);
+
+            marker.setPosition(startX,startY);
 
             const circleBg=this.uiScene.add.circle(0,0,35,0xffffff).setStrokeStyle(3,0x000000).setInteractive({useHandCursor:true});
             const face=this.uiScene.add.image(0,0,data.npcId).setDisplaySize(50,50);
@@ -111,6 +119,9 @@ export default class TradeContent {
     showTradeUI(){
         this.isUIOpen=true;
         this.mapArea.setVisible(false);
+
+        this.npcMarkers.forEach(item=>item.marker.getAt(0).disableInteractive());
+
         this.listLayer.setVisible(true);
         this.fixedLayer.setVisible(true);
         this.detailLayer.setVisible(true);
@@ -127,11 +138,22 @@ export default class TradeContent {
         this.fixedLayer.removeAll(true);
         this.detailLayer.removeAll(true);
 
-        this.listLayer.setMask(this.listMask);
+        if(this.maskGraphics)this.maskGraphics.destroy();
+
+        this.maskGraphics=this.uiScene.make.graphics();
+        this.maskGraphics.fillStyle(0xffffff);
+        const camera=this.uiScene.cameras.main;
+
+        this.maskGraphics.fillRect(camera.centerX-430,camera.centerY-220,this.listWidth,360);
+
+        const newMask=this.maskGraphics.createGeometryMask();
+        this.listLayer.setMask(newMask);
 
         this.renderItemList(-210);
         this.renderFixedFooter(-210);
         this.renderDetailPanel(250);
+
+        //this.listLayer.setMask(this.listMask);
     }
 
 
@@ -188,6 +210,9 @@ export default class TradeContent {
         button.on('pointerdown',()=>{
             this.isUIOpen=false;
             this.mapArea.setVisible(true);
+
+            this.npcMarkers.forEach(item =>item.marker.getAt(0).setInteractive({useHandCursor:true}));
+
             this.listLayer.setVisible(false);
             this.fixedLayer.setVisible(false);
             this.detailLayer.setVisible(false);
@@ -202,7 +227,7 @@ export default class TradeContent {
             .setStrokeStyle(2,0x000000);
         this.detailLayer.add(panelBg);
 
-        const info=this.selectedNPC || {};
+        const info=this.selectedNPC|| {};
 
         const header=this.uiScene.add.text(centerX,-220,`${info.villageId}との取引`,{
             fontSize:'24px',
@@ -278,17 +303,15 @@ export default class TradeContent {
                 const dir=[[1,0],[-1,0],[0,1],[0,-1]];
                 const selected=dir[Phaser.Math.Between(0,3)];
 
-                item.vx=selected[0]*0.1; // 地図上の移動速度に調整
+                item.vx=selected[0]*0.1;
                 item.vy=selected[1]*0.1;
                 item.moveTimer=Phaser.Math.Between(500,1500);
             }
         }
 
-        // 座標更新
         item.marker.x+=item.vx*delta;
         item.marker.y+=item.vy*delta;
 
-        // 範囲外に出ないように制限
         const limitX=this.mapW/2-this.padding;
         const limitY=this.mapH/2-this.padding;
 
