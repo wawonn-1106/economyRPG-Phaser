@@ -1,4 +1,4 @@
-import ShopContent from '../contents/ShopContent.js';
+/*import ShopContent from '../contents/ShopContent.js';
 
 export default class Object{
     constructor(scene){
@@ -40,4 +40,4 @@ export default class Object{
         }
         return interactable;
     }
-}
+}*/

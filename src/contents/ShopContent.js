@@ -11,7 +11,7 @@ export default class ShopContent{
         this.targetShelf=null;
 
         this.cols=5;
-        this.totalGrid=25;
+        this.totalGrid=20;
         this.slotSize=90;
         this.spacing=10;
 

@@ -1,4 +1,4 @@
-export default class DeskContent{
+export default class TradeBoxContent{
     constructor(uiScene){
         this.uiScene=uiScene;
         //this.menuManager=menuManager;
@@ -24,7 +24,7 @@ export default class DeskContent{
 
 
     renderSelectView(){
-        const title=this.uiScene.add.text(0,-180,'何をしますか？',{
+        const title=this.uiScene.add.text(0,-180,'交易ボックス',{
             fontSize:'40px',
             color:'#000',
             fontStyle:'bold'
@@ -33,8 +33,8 @@ export default class DeskContent{
         this.contentLayer.add(title);
 
         const options=[
-            {id:'trade',name:'交易をする',icon:'trade',x:-220},
-            {id:'work',name:'事務作業をする',icon:'work',x:200}
+            {id:'setItems',name:'商品をセットする',icon:'setItems',x:-220},
+            {id:'removeItems',name:'商品を取り出す',icon:'removeItems',x:200}
         ];
 
         const closeBtn=this.uiScene.add.text(480,-280,'×',{
@@ -43,7 +43,7 @@ export default class DeskContent{
         }).setOrigin(0.5).setInteractive({useHandCursor:true}).setDepth(5001);
 
         closeBtn.on('pointerdown',()=>{
-            this.uiScene.menuManager.toggle('desk');
+            this.uiScene.menuManager.toggle('tradeBox');
         });
 
         this.contentLayer.add(closeBtn);
@@ -70,7 +70,7 @@ export default class DeskContent{
 
             buttonBg.on('pointerdown',()=>{
                 
-                this.uiScene.menuManager.toggle('desk');
+                this.uiScene.menuManager.toggle('tradeBox');
 
                 this.uiScene.menuManager.toggle(option.id);
             });

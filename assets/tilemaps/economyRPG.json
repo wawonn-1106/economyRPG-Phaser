@@ -448,26 +448,15 @@
                  "y":648.484848484849
                 }, 
                 {
-                 "height":24.2424242424242,
-                 "id":6,
-                 "name":"rock",
-                 "properties":[
-                        {
-                         "name":"durability",
-                         "type":"string",
-                         "value":"3"
-                        }, 
-                        {
-                         "name":"type",
-                         "type":"string",
-                         "value":"stone"
-                        }],
+                 "height":60.6060606060607,
+                 "id":8,
+                 "name":"tradeBox",
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":27.2727272727273,
-                 "x":536.363636363636,
-                 "y":618.181818181818
+                 "width":66.6666666666666,
+                 "x":342.424242424242,
+                 "y":806.060606060606
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -587,7 +576,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":8,
+ "nextobjectid":9,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

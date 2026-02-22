@@ -294,6 +294,22 @@ export default class BaseScene extends Phaser.Scene{
                 });
             }
 
+            if(obj.name==='tradeBox'){//交易で売る商品のセット及び買った商品が送られる場所、注文はリモート
+
+                const tradeSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),'shelf')
+                    .setDepth(5);//shelfで代用
+                
+                this.physics.add.existing(tradeSprite,true);
+                this.physics.add.collider(this.player,tradeSprite);
+
+                this.interactables.push({
+                    type:'tradeBox',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
+
             if(obj.name==='displayShelf'){
                 const ui=this.scene.get('UIScene');
                 const shelfId=obj.properties?.find(p=>p.name==='shelfId')?.value;
@@ -352,43 +368,6 @@ export default class BaseScene extends Phaser.Scene{
                     shelfInstance:shelfInstance
                 });
             }
-
-            /*if(obj.name==='fishingSpot'){
-
-                const fishIcon=this.add.image(obj.x+(obj.width/2),obj.y+(obj.height/2),'fishIcon')
-                    .setDepth(5)
-                    .setVisible(true);
-
-                this.interactables.push({
-                    type:'fishingSpot',
-                    data:obj,
-                    x:obj.x+(obj.width/2),
-                    y:obj.y+(obj.height/2),
-                    isAvailable:true,
-                    markerIcon:fishIcon
-                });
-            }
-
-            if(obj.name==='rock'){
-                const durability=obj.properties?.find(p=>p.name==='durability')?.value;
-                const subType=obj.type || 'stone';
-
-                const rockSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),subType)
-                    .setDepth(5);
-
-                this.physics.add.existing(rockSprite,true);
-                this.physics.add.collider(this.player,rockSprite);//NPCにもつける
-
-                this.interactables.push({
-                    type:'rock',
-                    subType:subType,
-                    data:obj,
-                    x:obj.x+(obj.width/2),
-                    y:obj.y+(obj.height/2),
-                    hp:durability,
-                    instance:rockSprite
-                });
-            }*/
         });
     }
     performTransition(nextScene,spawnPoint){
@@ -658,6 +637,9 @@ export default class BaseScene extends Phaser.Scene{
                     break;
                 case 'desk':
                     this.menuManager.toggle('desk');
+                    break;
+                case 'tradeBox':
+                    this.menuManager.toggle('tradeBox');
                     break;
                 case 'displayShelf'://shelfに変える
                     //店に並べる画面

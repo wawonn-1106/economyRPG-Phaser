@@ -86,7 +86,7 @@ export default class Title extends Phaser.Scene{
 
         //console.log("JSONロード結果:", defaultInventoryData);
 
-        this.registry.set('money',0);
+        this.registry.set('money',1000);//1000円いれとく
         this.registry.set('unlockedIds',[]);
         this.registry.set('inventoryData',defaultInventoryData?.items||[]);
         this.registry.set('maxInventorySlots',10);

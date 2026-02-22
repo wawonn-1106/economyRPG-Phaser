@@ -5,42 +5,66 @@
             "startId":"start",
             "name":"ペルセポネ",
             "type":"villager",
-            "villageId":"よさこい村"
+            "villageId":"よさこい村",
+            "items":[
+                {"id":"fish","name":"魚","price":80,"count":10},
+                {"id":" pork","name":"豚肉","price":80,"count":10}
+            ]
         },
         {
             "npcId":"player",
             "startId":"start",
             "name":"ケインズ",
             "type":"villager",
-            "villageId":"ケマモト村"
+            "villageId":"ケマモト村",
+            "items":[
+                {"id":"fish","name":"魚","price":80,"count":10},
+                {"id":" pork","name":"豚肉","price":80,"count":10}
+            ]
         },
         {
             "npcId":"player",
             "startId":"start",
             "name":"ガガイ",
             "type":"villager",
-            "villageId":"ビネガー村"
+            "villageId":"ビネガー村",
+            "items":[
+                {"id":"fish","name":"魚","price":80,"count":10},
+                {"id":" pork","name":"豚肉","price":80,"count":10}
+            ]
         },
         {
             "npcId":"player",
             "startId":"start",
             "name":"ブラウディ",
             "type":"villager",
-            "villageId":"ヤーコン村"
+            "villageId":"ヤーコン村",
+            "items":[
+                {"id":"fish","name":"魚","price":80,"count":10},
+                {"id":" pork","name":"豚肉","price":80,"count":10}
+            ]
         },
         {
             "npcId":"player",
             "startId":"start",
             "name":"オレガノ",
             "type":"villager",
-            "villageId":"オリーブ村"
+            "villageId":"オリーブ村",
+            "items":[
+                {"id":"fish","name":"魚","price":80,"count":10},
+                {"id":" pork","name":"豚肉","price":80,"count":10}
+            ]
         },
         {
             "npcId":"player",
             "startId":"start",
             "name":"ジェイソン",
             "type":"villager",
-            "villageId":"トマト村"
+            "villageId":"トマト村",
+            "items":[
+                {"id":"fish","name":"魚","price":80,"count":10},
+                {"id":" pork","name":"豚肉","price":80,"count":10}
+            ]
         }
     ]
 }

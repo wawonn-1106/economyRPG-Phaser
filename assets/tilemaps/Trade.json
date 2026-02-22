@@ -182,17 +182,6 @@
                  "y":2036
                 }, 
                 {
-                 "height":116,
-                 "id":2,
-                 "name":"trade",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":160,
-                 "x":1032,
-                 "y":1680
-                }, 
-                {
                  "height":0,
                  "id":3,
                  "name":"trader_spawn",

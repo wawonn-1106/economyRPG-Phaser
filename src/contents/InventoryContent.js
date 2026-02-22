@@ -5,7 +5,7 @@ export default class InventoryContent{
         this.selectedItem=null;
 
         this.cols=5;
-        this.totalGridSlots=25;
+        this.totalGridSlots=20;
         this.slotSize=90;
         this.spacing=10;
 
