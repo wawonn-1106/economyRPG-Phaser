@@ -457,6 +457,17 @@
                  "width":66.6666666666666,
                  "x":342.424242424242,
                  "y":806.060606060606
+                }, 
+                {
+                 "height":72.7272727272727,
+                 "id":9,
+                 "name":"donation",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":75.7575757575758,
+                 "x":1451.51515151515,
+                 "y":787.878787878788
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -576,7 +587,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":9,
+ "nextobjectid":10,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

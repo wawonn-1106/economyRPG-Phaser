@@ -72,6 +72,7 @@ app.post('/save',async(req,res)=>{
         if(req.body.npcPositions!==undefined)updateFields.npcPositions=req.body.npcPositions;
         if(req.body.gameTime!==undefined)updateFields.gameTime=req.body.gameTime;
         if(req.body.maxCustomers!==undefined)updateFields.maxCustomers=req.body.maxCustomers;
+        if(req.body.bridgeDonation!==undefined)updateFields.bridgeDonation=req.body.bridgeDonation;
 
         const updateData={
             $set:updateFields

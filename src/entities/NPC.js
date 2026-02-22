@@ -4,7 +4,7 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
 
         this.state=config.state;
         this.currentTarget=null;
-        this.speed=100;
+        this.speed=50;
 
         //this.npcId=texture;
 
@@ -14,7 +14,7 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
         this.npcName=config.name;
         this.startId=config.startId;
 
-        this.setScale(0.1).refreshBody();
+        this.setScale(0.04).refreshBody();
         this.setCollideWorldBounds(true);
         
         //↓この2つはセット、押されても動かない
@@ -191,7 +191,7 @@ export default class NPC extends Phaser.Physics.Arcade.Sprite{
                 this.setVelocity(0);
                 this.moveTimer=Phaser.Math.Between(1000,3000);//1000以上3000以下の整数をランダムに選ぶ
             }else{
-                const dir=[[100,0],[-100,0],[0,100],[0,-100]];
+                const dir=[[50,0],[-50,0],[0,50],[0,-50]];
                 const selected=dir[Phaser.Math.Between(0,3)];//方向を決める
 
                 this.setVelocity(selected[0],selected[1]);//選んだ方向の要素をセット

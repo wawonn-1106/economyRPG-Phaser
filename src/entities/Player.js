@@ -8,12 +8,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         scene.physics.world.enable(this);//当たり判定の準備、this.bodyが使えるようになる
         scene.add.existing(this);//sceneにthis(this.player)を追加する。このsceneはWorld,House,Shopとか
 
-        this.setScale(0.1).refreshBody();
+        this.setScale(0.04).refreshBody();
         this.setCollideWorldBounds(true);
         this.setPushable(false);
 
-        this.speed=200;
-        this.jump_speed=-330;
+        this.speed=80;
+        //this.jump_speed=-330;
 
         this.heldItem=scene.add.image(x,y,null).setVisible(false);
         this.heldItem.setScale(0.5);

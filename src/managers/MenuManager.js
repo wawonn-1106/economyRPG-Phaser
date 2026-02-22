@@ -16,6 +16,7 @@ import WorkContent from '../contents/WorkContent.js';
 import TradeBoxContent from '../contents/TradeBoxContent.js';
 import SetItemsContent from '../contents/SetItemsContent.js';
 import RemoveItemsContent from '../contents/RemoveItemsContent.js';
+import DonationContent from '../contents/DonationContent.js';
 
 export default class MenuManager{
     constructor(uiScene){
@@ -47,7 +48,9 @@ export default class MenuManager{
             'trade':new TradeContent(uiScene),
             'tradeBox':new TradeBoxContent(uiScene),//色変わらないのが謎
             'setItems':new SetItemsContent(uiScene),
-            'removeItems':new RemoveItemsContent(uiScene)
+            'removeItems':new RemoveItemsContent(uiScene),
+        //----------------------その他-----------------------------------
+            'donation':new DonationContent(uiScene)
         };
     }
     get activeScene(){

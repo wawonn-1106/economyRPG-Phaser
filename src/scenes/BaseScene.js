@@ -192,14 +192,29 @@ export default class BaseScene extends Phaser.Scene{
         });
     }
 //----------マップ(当たり判定、カメラ含む)-------------------------------------------------------------------------------------------
-    createMap(mapKey,tilesetName,tilesetKey){
+    createMap(mapKey){
         this.map=this.make.tilemap({key:mapKey});
-        this.tileset=this.map.addTilesetImage(tilesetName,tilesetKey);
+        //this.tileset=this.map.addTilesetImage(tilesetName,tilesetKey);
 
-        this.groundLayer=this.map.createLayer('Ground',this.tileset,0,0);
-        this.onGroundLayer=this.map.createLayer('OnGround',this.tileset,0,0);
-        this.houseLayer=this.map.createLayer('House',this.tileset,0,0);
-        this.decorationLayer=this.map.createLayer('Decoration',this.tileset,0,0);
+        const ts1=this.map.addTilesetImage('barn','barn');
+        const ts2=this.map.addTilesetImage('blacksmith_forge','blacksmith_forge');
+        const ts3=this.map.addTilesetImage('houses','houses');
+        const ts4=this.map.addTilesetImage('market','market');
+        const ts5=this.map.addTilesetImage('tavern','tavern');
+        const ts6=this.map.addTilesetImage('tiles_and_exterior_items','tiles_and_exterior_items');
+        const ts7=this.map.addTilesetImage('cliff_high','cliff_high');//
+        const ts8=this.map.addTilesetImage('Color_trees','Color_trees');
+        const ts9=this.map.addTilesetImage('newTree_tiles','newTree_tiles');//
+        const ts10=this.map.addTilesetImage('tileset','tileset');//
+        const ts11=this.map.addTilesetImage('trees_stuff','trees_stuff');//
+        const ts12=this.map.addTilesetImage('waterfall_watertiles','waterfall_watertiles');
+
+        const allTiles=[ts1,ts2,ts3,ts4,ts5,ts6,ts7,ts8,ts9,ts10,ts11,ts12];
+
+        this.groundLayer=this.map.createLayer('Ground',allTiles,0,0);
+        this.onGroundLayer=this.map.createLayer('OnGround',allTiles,0,0);
+        this.houseLayer=this.map.createLayer('House',allTiles,0,0);
+        this.decorationLayer=this.map.createLayer('Decoration',allTiles,0,0);
 
         [this.groundLayer,this.onGroundLayer,this.houseLayer].forEach(layer=>{
             if(layer) layer.setCollisionByProperty({collides:true});
@@ -228,10 +243,12 @@ export default class BaseScene extends Phaser.Scene{
         if(!target)return;
 
         this.cameras.main.scrollX=target.x-this.cameras.main.width/2;
-        this.cameras.main.scrollY=target.y-this.cameras.main.heigth/2;
+        this.cameras.main.scrollY=target.y-this.cameras.main.height/2;
 
         this.cameras.main.startFollow(target,true,0.1,0.1);
         this.cameras.main.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
+
+        this.cameras.main.setZoom(2.5);
     }
 //----------マップ移動-------------------------------------------------------------------------------------------
     setupSceneTransitions(map,player){
@@ -304,6 +321,22 @@ export default class BaseScene extends Phaser.Scene{
 
                 this.interactables.push({
                     type:'tradeBox',
+                    data:obj,
+                    x:obj.x+(obj.width/2),
+                    y:obj.y+(obj.height/2)
+                });
+            }
+
+            if(obj.name==='donation'){
+
+                const donationSprite=this.add.sprite(obj.x+(obj.width/2),obj.y+(obj.height/2),'shelf')
+                    .setDepth(5);//shelfで代用
+                
+                this.physics.add.existing(donationSprite,true);
+                this.physics.add.collider(this.player,donationSprite);
+
+                this.interactables.push({
+                    type:'donation',
                     data:obj,
                     x:obj.x+(obj.width/2),
                     y:obj.y+(obj.height/2)
@@ -640,6 +673,9 @@ export default class BaseScene extends Phaser.Scene{
                     break;
                 case 'tradeBox':
                     this.menuManager.toggle('tradeBox');
+                    break;
+                case 'donation':
+                    this.menuManager.toggle('donation');
                     break;
                 case 'displayShelf'://shelfに変える
                     //店に並べる画面

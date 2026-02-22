@@ -7,7 +7,7 @@ export default class World extends BaseScene{
         this.player=null;
     }
     create(data){//このdataはscene.start('World')のときに渡される引数
-        const map=this.createMap('map','Serene_Village_48x48','tileset');
+        const map=this.createMap('map');
         
         super.create(data);
 

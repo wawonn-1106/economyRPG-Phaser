@@ -44,7 +44,8 @@ export default class Title extends Phaser.Scene{
                 this.registry.set('salesHistory',data.salesHistory||[]);
                 this.registry.set('gameTime',data.gameTime||null);
                 this.registry.set('maxCustomers',data.maxCustomers||6);
-
+                this.registry.set('bridgeDonation',0);
+                
                 await this.fetchWeather();
 
                 const playerPos=data.playerPosition;
@@ -86,7 +87,7 @@ export default class Title extends Phaser.Scene{
 
         //console.log("JSONロード結果:", defaultInventoryData);
 
-        this.registry.set('money',1000);//1000円いれとく
+        this.registry.set('money',10000);//10000円いれとく
         this.registry.set('unlockedIds',[]);
         this.registry.set('inventoryData',defaultInventoryData?.items||[]);
         this.registry.set('maxInventorySlots',10);
@@ -97,6 +98,7 @@ export default class Title extends Phaser.Scene{
         this.registry.set('salesHistory',[]);
         this.registry.set('gameTime',null);
         this.registry.set('maxCustomers',6);
+        this.registry.set('bridgeDonation',0);
 
 
         await this.fetchWeather();
